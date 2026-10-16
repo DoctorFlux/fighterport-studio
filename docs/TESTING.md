@@ -29,3 +29,12 @@ Windows GUI smoke actually launched at 1280x820, WPF rendering tier 2; rendered 
 Generated results/screenshots/native/project files stay in ignored artifacts. Fixture source is deterministic original code; no game assets in CI. Known negative experiments and corrections are documented in decisions/0002-native-worker.md. Current status overrides old checkpoint counts when more criteria are added.
 
 Follow-up increment: **23 passed / 0 failed**, including five restricted-FK cases and one further native case. Native tests now also compare UV0/normals/weight identity, deterministic repeated MDL0 bytes and a rotated alternate original rig. Native GUI project was loaded into both source and published desktop builds; edited CHR0 export/decode passed. Packaged CLI map-template/retarget/import/export/doctor were exercised. Native fixture model is now 124816 bytes after deterministic resource names removed random job UUIDs. Capability JSON/Markdown equality is checked by test.ps1. Setup tested its idempotent existing-SDK path; a fresh machine/remote CI remains unrun.
+
+
+## Unified resource/ancillary verification
+
+Full suite: `./scripts/test.ps1 -Native -Ultimate -LocalAssets` (44 cases at this checkpoint). Targeted changed workspace cases: `./scripts/test.ps1 -WorkspaceOnly -LocalAssets`; native worker must already be built. This runs original actual native fixture generation and optional supplied Mario texture/SRT checks, without rerunning completed worker-failure cases.
+
+WorkspaceTests verifies ARC bank scope/ambiguity, decoded source textures, native ApplyVIS Boolean states including fractional boundaries/loop/mute/reset, SRT keys and native fractional ApplySRT matrices, independent Maya UV expectation, opaque/unevaluated retention, save/reopen, overrides, hashes and source overwrite rejection. Original RGBA8 quadrants are checked in WPF; palette/mip/alpha/multiple-UV conformance remains pending.
+
+`gui-smoke.ps1 -Published -WorkspaceModel <model.pac> -WorkspaceMotion <motion.pac>` launches the real published apphost, exercises shared commands and native tree expansion, textures, skeletal plus ancillary playback and FPWORK save/reopen. Original fixtures additionally exercise explicit skeletal CHR0 write/decode. See RESOURCE_WORKSPACE.md for paths/clicks. Reports and captures are ignored; commercial captures must stay local. Existing default key-edit/undo and mapping/playback smoke modes remain available, now also with `-Published`.

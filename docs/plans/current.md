@@ -1,5 +1,20 @@
 # Next executable acceptance criterion
 
+**M3.C/D ancillary fidelity and editable native round trips**, with remaining M1.E interactions and M3.A2 mappings preserved below.
+
+Initial unified workspace is tested: native Brawl trees, material-bound TEX0, original CHR0+VIS0+SRT0 and supplied Mario Wait2 CHR0+limited SRT0 on one timeline, FPWORK save/reopen and explicit partial conversion. Quaternion/rest-parent policy subset is tested and pushed. Completed M2.C2 remains regression coverage; do not rebuild it.
+
+1. Read AGENTS.md, full unified spec, status and capabilities. Preserve all 44 suite assertions and both published resource workflows. RESOURCE_WORKSPACE.md gives exact clicks and boundaries.
+2. Extend original material fixtures to indexed palettes, alpha, asymmetric wrap/mips, multiple materials and extra UV sets. Verify pixels/coordinates independently; preserve native identities and ambiguity.
+3. Implement verified SRT rotation/matrix modes and additional sampler composition. Compare native fractional matrices and original visuals. Then typed VIS/SRT binding edits/undo and genuine decoded native export; continue PAT0/CLR0/SHP0/constraints without dropping opaque groups.
+4. Complete M1.E search/recent sources, texture channel/mip/usages, viewport bone picking/role correction, dirty prompts, broader undo, source relinking, conservative companion assembly, group rate/mute/solo and Ultimate companion tree. Current folder indexing is bounded and nonrecursive.
+5. Continue reviewed Mario target-rig maps, ambiguous/helper semantics, both-direction target skin/pose expectations and native export checks. Never approve uncertain mappings or label same-rig conversion as retargeting.
+6. Build/test, publish locally, update matrix/status/master evidence, review staged source/diff. Push only exact DoctorFlux/fighterport-studio PUBLIC after live check, verify remote SHA, keep receipt local. No original/derived commercial content in Git.
+
+The earlier mapping and multi-game queue is retained below. Its initial quaternion criterion is now completed only for the documented subset.
+
+# Retained mapping and multi-game queue
+
 **M1.E / M3.C1 / M3.D1 — Unified Brawl resource workspace, material-bound textures and synchronized VIS0.**
 
 M3.A2 quaternion/rest-parent-translation subset now passes independent original tests; full mapping/twist/contact work below remains. Execute the complete unified editor instruction, retaining the older pending criteria below.

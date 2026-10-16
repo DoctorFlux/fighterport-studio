@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace FighterPort.Desktop;
 
-public sealed class Workbench : Window
+public sealed partial class Workbench : Window
 {
     private EditSession session=new(Demo.Create());
     private readonly Viewport3D viewport=new();
@@ -47,63 +47,43 @@ public sealed class Workbench : Window
 
     public Workbench(string[] args)
     {
-        root=FindRoot();Title="FighterPort Studio • original asset workbench";Width=1280;Height=820;MinWidth=1000;MinHeight=600;Background=new SolidColorBrush(Color.FromRgb(15,22,31));Foreground=Brushes.White;
+        root=FindRoot();Title="FighterPort Studio • resource workspace";Width=1440;Height=900;MinWidth=1000;MinHeight=600;Background=new SolidColorBrush(Color.FromRgb(15,22,31));Foreground=Brushes.White;
         var dock=new DockPanel();Content=dock;
-        var header=new StackPanel{Margin=new(14,10,14,8)};DockPanel.SetDock(header,Dock.Top);dock.Children.Add(header);
-        header.Children.Add(new TextBlock{Text="FIGHTERPORT  /  STUDIO",FontSize=24,FontWeight=FontWeights.SemiBold,Foreground=Brushes.White});
-        header.Children.Add(new TextBlock{Text="Local character workbench   •   Neutral shading   •   Native models and original fixtures",Foreground=Brushes.LightSteelBlue,Margin=new(0,4,0,10)});
-        var tools=new WrapPanel();header.Children.Add(tools);
-        Button(tools,"New",()=>SetProject(new CharacterProject()));
-        Button(tools,"Open Demo",()=>SetProject(Demo.Create()));
-        Button(tools,"Alternate Rig",()=>SetProject(Demo.Create(1)));
-        Button(tools,"Tail Demo",()=>SetProject(Demo.Create(2)));
-        Button(tools,"Load Project",()=>{var d=new OpenFileDialog{Filter="FighterPort project|*.fpproj"};if(d.ShowDialog()==true)SetProject(ProjectStore.Load(d.FileName));});
-        Button(tools,"Save Project",()=>{var d=new SaveFileDialog{Filter="FighterPort project|*.fpproj",FileName="character.fpproj"};if(d.ShowDialog()==true){ProjectStore.Save(P,d.FileName);SetStatus("Saved with native resources and hashes.");}});
-        Button(tools,"Import MDL0",()=>Native(async()=>{var d=new OpenFileDialog{Filter="MDL0 v9 / v11|*.mdl0"};if(d.ShowDialog()==true)SetProject(await Backend.ImportModel(d.FileName,operation!.Token));}));
-        Button(tools,"Attach CHR0",()=>Native(async()=>{if(P.Bones.Count==0)throw new InvalidOperationException("Load a model first.");var d=new OpenFileDialog{Filter="CHR0 v4|*.chr0"};if(d.ShowDialog()==true){P.Clips.Add(await Backend.ImportClip(P,d.FileName,30,operation!.Token));Refresh();SetStatus("Bound by exact bone names; 30 fps display rate (CHR0 does not encode fps). Native originals retained.");}}));
-        Button(tools,"Export CHR0",()=>Native(async()=>{var c=SelectedClip??throw new InvalidOperationException("Select a clip.");var d=new SaveFileDialog{Filter="CHR0 v4|*.chr0",FileName="edited.chr0"};if(d.ShowDialog()==true){await Backend.ExportClip(P,c,d.FileName,operation!.Token);SetStatus("Exported CHR0 v4 after decoded key and quarter-frame error checks. Native-tool/in-game compatibility is not yet checked.");}}));
-        Button(tools,"Cancel job",()=>operation?.Cancel());
-        Button(tools,"Map / Retarget",()=>new MappingWindow(P,clips.SelectedIndex){Owner=this}.Show());
-        Button(tools,"Open Brawl PAC",()=>Native(async()=>
-        {
-            var d=new OpenFileDialog{Filter="Brawl PAC / BRRES|*.pac;*.brres"};if(d.ShowDialog()!=true)return;
-            var entries=await Backend.BrowseBundle(d.FileName,operation!.Token);var selected=ChooseResource(entries);if(selected==null)return;
-            if(selected.Kind=="MDL0")SetProject(await Backend.ImportBundleModel(d.FileName,selected.Id,operation.Token));
-            else {if(P.Bones.Count==0)throw new InvalidDataException("Load a main fighter model first");P.Clips.Add(await Backend.ImportBundleClip(P,d.FileName,selected.Id,operation.Token));Refresh();}
-        }));
-        Button(tools,"Open Ultimate model",()=>Native(async()=>{var d=new OpenFileDialog{Filter="Ultimate model descriptor|*.numdlb"};if(d.ShowDialog()==true)SetProject(await Ultimate.ImportModel(d.FileName,operation!.Token));}));
-        Button(tools,"Attach NUANMB",()=>Native(async()=>{if(P.Bones.Count==0)throw new InvalidDataException("Load a model first");var d=new OpenFileDialog{Filter="Ultimate animation|*.nuanmb"};if(d.ShowDialog()==true){P.Clips.Add(await Ultimate.ImportClip(P,d.FileName,operation!.Token));Refresh();SetStatus(string.Join("; ",P.Clips.Last().Losses));}}));
-        Button(tools,"Export NUANMB",()=>Native(async()=>
-        {
-            var clip=SelectedClip??throw new InvalidDataException("Select a clip");bool loss=clip.Losses.Any(s=>s.Contains("native nodes"));
-            if(loss&&MessageBox.Show(this,"This output contains skeletal transforms only. Native visibility/material animation will be omitted. Continue with that loss?","Skeletal-only export",MessageBoxButton.YesNo)!=MessageBoxResult.Yes)return;
-            var d=new SaveFileDialog{Filter="Ultimate animation|*.nuanmb",FileName="edited-skeletal.nuanmb"};if(d.ShowDialog()==true){await Ultimate.ExportClip(P,clip,d.FileName,loss,operation!.Token);SetStatus("Genuine NUANMB 2.0 exported and decoded; scalar/layer baking and native-tool validation remain separate.");}
-        }));
-        Button(tools,"Bake for CHR0",()=>Bake(false));Button(tools,"Bake for NUANMB",()=>Bake(true));
+        InitializeWorkspace();AddMenus(dock);
+        var tools=new WrapPanel{Margin=new(10)};DockPanel.SetDock(tools,Dock.Top);dock.Children.Add(tools);
+        Button(tools,"New",()=>{workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(new CharacterProject());});
+        Button(tools,"Open…",OpenDialog);Button(tools,"Save workspace…",SaveWorkspaceDialog);
+        Button(tools,"Convert…",ConvertDialog);
         DockPanel.SetDock(status,Dock.Bottom);dock.Children.Add(status);
         var playback=new WrapPanel{Margin=new(10)};DockPanel.SetDock(playback,Dock.Bottom);dock.Children.Add(playback);
-        Button(playback,"Play / Pause",()=>playing=!playing);playback.Children.Add(clips);playback.Children.Add(timeline);playback.Children.Add(skeleton);playback.Children.Add(skin);
-        var left=new DockPanel{Width=245,Margin=new(10)};DockPanel.SetDock(left,Dock.Left);dock.Children.Add(left);
-        var leftTitle=new TextBlock{Text="CHARACTER / SKELETON",Foreground=Brushes.LightSteelBlue,Margin=new(4,0,0,10)};DockPanel.SetDock(leftTitle,Dock.Top);left.Children.Add(leftTitle);left.Children.Add(tree);
-        var right=new StackPanel{Width=235,Margin=new(8)};DockPanel.SetDock(right,Dock.Right);dock.Children.Add(right);
-        right.Children.Add(new TextBlock{Text="BONE & KEY INSPECTOR",Foreground=Brushes.LightSteelBlue,Margin=new(12)});right.Children.Add(inspector);
+        Button(playback,"Play / Pause",()=>playing=!playing);playback.Children.Add(clips);playback.Children.Add(timeline);playback.Children.Add(skeleton);playback.Children.Add(skin);playback.Children.Add(sourceMaterials);playback.Children.Add(visibilityEnabled);playback.Children.Add(uvEnabled);
+        var left=new TabControl{Margin=new(8)};DockPanel.SetDock(left,Dock.Left);dock.Children.Add(left);
+        left.Items.Add(new TabItem{Header="Resources",Content=resourceTree});left.Items.Add(new TabItem{Header="Skeleton",Content=tree});
+        var right=new StackPanel{Margin=new(8)};DockPanel.SetDock(right,Dock.Right);dock.Children.Add(right);
+        right.Children.Add(new TextBlock{Text="PROPERTIES",Foreground=Brushes.LightSteelBlue,Margin=new(12)});right.Children.Add(inspector);right.Children.Add(resourceProperties);
         channels.ItemsSource=new[]{"Scale X","Scale Y","Scale Z","Rotate X °","Rotate Y °","Rotate Z °","Translate X cm","Translate Y cm","Translate Z cm"};channels.SelectedIndex=5;
         right.Children.Add(channels);right.Children.Add(value);Button(right,"Set key at current frame",EditKey);Button(right,"Undo",()=>{session.Undo();Render();});Button(right,"Redo",()=>{session.Redo();Render();});
         Button(right,"Frame character",()=>{yaw=.35;pitch=.12;FitCharacter();Render();});
-        right.Children.Add(new TextBlock{Text="Drag: orbit\nShift + drag: pan\nWheel: zoom\n\nKeys preserve Euler turns and Hermite tangents. Editing adds a locked key.\n\nGame profiles, native materials and playable fighter builds remain planned.",Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)});
-        var border=new Border{Background=new SolidColorBrush(Color.FromRgb(22,30,42)),CornerRadius=new(8),Margin=new(0,10,0,0),Child=viewport};dock.Children.Add(border);
+        right.Children.Add(new TextBlock{Text="Drag: orbit\nShift + drag: pan\nWheel: zoom\n\nKeys preserve Euler turns and Hermite tangents. Editing adds a locked key.\n\nSource appearance is approximate (sampler 0 / UV0). TEV, alpha-test and material and other UV animation remain unevaluated. Right-click a resource for applicable actions.",Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)});
+        var border=new Border{Background=new SolidColorBrush(Color.FromRgb(22,30,42)),CornerRadius=new(8),Margin=new(0,10,0,0),Child=viewport};
+        dock.Children.Remove(left);dock.Children.Remove(right);
+        var area=new Grid();area.ColumnDefinitions.Add(new(){Width=new GridLength(290),MinWidth=180});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(1,GridUnitType.Star),MinWidth=300});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(260),MinWidth=200});
+        var advanced=new StackPanel();foreach(UIElement child in right.Children.Cast<UIElement>().Skip(3).ToArray()){right.Children.Remove(child);advanced.Children.Add(child);}right.Children.Add(new Expander{Header="Advanced bone/key editing",Foreground=Brushes.White,Content=advanced});
+        var properties=new ScrollViewer{Content=right,VerticalScrollBarVisibility=ScrollBarVisibility.Auto};Grid.SetColumn(properties,4);Grid.SetColumn(border,2);area.Children.Add(left);area.Children.Add(border);area.Children.Add(properties);
+        foreach(int column in new[]{1,3}){var splitter=new GridSplitter{Width=5,HorizontalAlignment=HorizontalAlignment.Stretch,Background=new SolidColorBrush(Color.FromRgb(43,59,77))};Grid.SetColumn(splitter,column);area.Children.Add(splitter);}dock.Children.Add(area);
         viewport.Children.Add(new ModelVisual3D{Content=scene});viewport.ClipToBounds=true;
         border.MouseDown+=(_,e)=>{mouse=e.GetPosition(border);border.CaptureMouse();};
         border.MouseUp+=(_,_)=>border.ReleaseMouseCapture();
         border.MouseMove+=(_,e)=>{if(!border.IsMouseCaptured)return;var pos=e.GetPosition(border);var delta=pos-mouse;mouse=pos;if(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)){panX-=delta.X*.3;panY+=delta.Y*.3;}else{yaw-=delta.X*.01;pitch=Math.Clamp(pitch+delta.Y*.01,-1.3,1.3);}Render();};
         border.MouseWheel+=(_,e)=>{distance=Math.Clamp(distance*Math.Exp(-e.Delta*.001),1,10000);Render();};
         timeline.ValueChanged+=(_,_)=>{if(!refreshing)Render();};
-        clips.SelectionChanged+=(_,_)=>{if(refreshing)return;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;Render();};
+        clips.SelectionChanged+=(_,_)=>{if(refreshing)return;if(workspace.Data.ClipIndex!=clips.SelectedIndex){workspace.Data.Visibility=null;workspace.Data.Uv=null;workspace.Data.ActiveClip=null;}workspace.Data.ClipIndex=clips.SelectedIndex;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;Render();};
         skeleton.Checked+=(_,_)=>Render();skeleton.Unchecked+=(_,_)=>Render();skin.Checked+=(_,_)=>Render();skin.Unchecked+=(_,_)=>Render();
         tree.SelectedItemChanged+=(_,e)=>{if(e.NewValue is TreeViewItem t&&t.Tag is int i){selectedBone=i;Render();}};
         timer.Tick+=(_,_)=>{double now=watch.Elapsed.TotalSeconds;if(playing&&SelectedClip is { } c){double next=timeline.Value+(now-last)*c.FramesPerSecond;if(next>timeline.Maximum){if(c.Loop)next%=c.FrameCount;else{next=timeline.Maximum;playing=false;}}timeline.Value=next;}last=now;};timer.Start();
         Closed+=(_,_)=>{timer.Stop();operation?.Cancel();};
         Refresh();
+        if(args.Length==4&&args[0]=="--workspace-smoke")Loaded+=async(_,_)=>await WorkspaceSmoke(args[1],args[2],args[3]);
         if(args.Length>=2&&args[0]=="--smoke")
         {
             if(args.Length==3)SetProject(ProjectStore.Load(args[2]));
@@ -170,16 +150,24 @@ public sealed class Workbench : Window
         scene.Children.Clear();scene.Children.Add(new AmbientLight(Color.FromRgb(90,90,90)));scene.Children.Add(new DirectionalLight(Colors.White,new(-1,-2,-3)));
         var target=new Point3D(panX,panY,0);var eye=new Point3D(panX+distance*Math.Sin(yaw)*Math.Cos(pitch),panY+distance*Math.Sin(pitch),distance*Math.Cos(yaw)*Math.Cos(pitch));
         viewport.Camera=new PerspectiveCamera(eye,target-eye,new(0,1,0),45){NearPlaneDistance=.1,FarPlaneDistance=3000};
-        var world=Animation.World(P,SelectedClip,(float)timeline.Value);
-        if(skin.IsChecked==true)foreach(var mesh in P.Meshes)
+        var state=SceneEvaluator.Sample(P,SelectedClip,workspace.Data.Visibility,(float)timeline.Value);var world=state.Pose;
+        if(skin.IsChecked==true)for(int mi=0;mi<P.Meshes.Count;mi++)
         {
+            var mesh=P.Meshes[mi];if(!state.DrawVisibility[mi].Any(v=>v))continue;
             var geometry=new MeshGeometry3D();foreach(var v in mesh.Vertices){var skinned=Animation.Skin(v,P,world);geometry.Positions.Add(Point(skinned.Position));geometry.Normals.Add(new(skinned.Normal.X,skinned.Normal.Y,skinned.Normal.Z));geometry.TextureCoordinates.Add(new(v.UV[0],v.UV[1]));}
             geometry.TriangleIndices=new Int32Collection(mesh.Indices);
             var color=Color.FromScRgb(1,mesh.Color[0],mesh.Color[1],mesh.Color[2]);
             var drawing=new DrawingGroup();drawing.Children.Add(new GeometryDrawing(new SolidColorBrush(color),null,new RectangleGeometry(new(0,0,16,16))));
             drawing.Children.Add(new GeometryDrawing(new SolidColorBrush(Color.FromArgb(55,255,255,255)),null,new RectangleGeometry(new(0,0,8,8))));drawing.Children.Add(new GeometryDrawing(new SolidColorBrush(Color.FromArgb(55,255,255,255)),null,new RectangleGeometry(new(8,8,8,8))));
             var brush=new DrawingBrush(drawing){TileMode=TileMode.Tile,Viewport=new(0,0,.25,.25),ViewportUnits=BrushMappingMode.RelativeToBoundingBox};
-            var material=new DiffuseMaterial(brush);scene.Children.Add(new GeometryModel3D(geometry,material){BackMaterial=material});
+            var draws=mesh.Draws.Count==0?new[]{new MeshDraw()}:mesh.Draws.ToArray();
+            for(int di=0;di<draws.Length;di++)if(state.DrawVisibility[mi][di])
+            {
+                var drawnGeometry=geometry.Clone();
+                if(sourceMaterials.IsChecked==true)drawnGeometry.TextureCoordinates=new PointCollection(mesh.Vertices.Select(v=>{var uv=UvEvaluator.Sample(P,draws[di].MaterialId,workspace.Data.Uv,(float)timeline.Value,new(v.UV[0],v.UV[1]));return new Point(uv.X,uv.Y);}));
+                Brush appearance=sourceMaterials.IsChecked==true?MaterialBrush(draws[di].MaterialId)??brush:brush;
+                var material=new DiffuseMaterial(appearance);scene.Children.Add(new GeometryModel3D(drawnGeometry,material){BackMaterial=material});
+            }
         }
         if(skeleton.IsChecked==true)for(int i=0;i<world.Length;i++)
         {

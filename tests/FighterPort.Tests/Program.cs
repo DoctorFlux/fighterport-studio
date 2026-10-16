@@ -11,6 +11,7 @@ void Near(float a,float b,float tolerance=.001f){Assert(Math.Abs(a-b)<=tolerance
 void Reject(Action action){try{action();}catch(InvalidDataException){return;}throw new Exception("Invalid input was accepted");}
 async Task Test(string name,Func<Task> run){try{await run();Console.WriteLine("PASS "+name);passed++;}catch(Exception e){Console.WriteLine("FAIL "+name+": "+e);failed++;}}
 Task Sync(Action a){a();return Task.CompletedTask;}
+if(args.Contains("--workspace-only")){await WorkspaceTests.Run(output,Test);if(args.Contains("--local-assets"))await WorkspaceTests.RunLocal(output,Test);Console.WriteLine($"RESULT {passed} passed; {failed} failed; output {output}");return failed==0?0:1;}
 var demo=Demo.Create();
 await Test("M1 original detailed rigs, blended skin and six motions",()=>Sync(()=>{foreach(int variant in new[]{0,1,2}){var p=Demo.Create(variant);Assert(p.Bones.Count>45);Assert(p.Meshes.Count>40);Assert(p.Meshes.SelectMany(m=>m.Vertices).Any(v=>v.Weights.Count(w=>w>0)>1));ProjectStore.Validate(p);}Assert(demo.Clips.Count==9);}));
 await Test("M1 rest skin equals original mesh, exact inverse binds",()=>Sync(()=>{var world=Animation.World(demo,null,0);foreach(var v in demo.Meshes.SelectMany(m=>m.Vertices)){Near(Vector3.Distance(Animation.Skin(v,demo,world).Position,Animation.V(v.Position)),0,.0001f);}}));
@@ -138,12 +139,13 @@ if(args.Contains("--native"))
     });
 }
 else Console.WriteLine("SKIP native integration: pass --native after building the worker.");
+if(args.Contains("--native"))await WorkspaceTests.Run(output,Test);
 await WorkerFailureTests.Run(output,Test,args.Contains("--native"));
 await SemanticTests.Run(output,Test);
 await QuaternionRetargetTests.Run(output,Test);
 if(args.Contains("--ultimate"))await UltimateTests.Run(output,Test,args.Contains("--native"));
 else Console.WriteLine("SKIP optional Ultimate backend: pass --ultimate with pinned local Python dependencies installed");
-if(args.Contains("--local-assets"))await LocalReferenceTests.Run(output,Test);
+if(args.Contains("--local-assets")){await LocalReferenceTests.Run(output,Test);await WorkspaceTests.RunLocal(output,Test);}
 Console.WriteLine($"RESULT {passed} passed; {failed} failed; output {output}");
 File.WriteAllText(Path.Combine(output,"result.txt"),$"{passed} passed; {failed} failed; native={args.Contains("--native")}");
 return failed==0?0:1;

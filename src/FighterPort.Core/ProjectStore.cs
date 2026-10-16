@@ -37,6 +37,8 @@ public static class ProjectStore
         bool Finite(float[] a,int count)=>a.Length==count&&a.All(float.IsFinite);
         Require(p.Version==1,"Unsupported project version; migration required");
         Require(p.Bones.Count<=512&&p.Meshes.Count<=128&&p.Clips.Count<=256,"Project quota exceeded");
+        Require(p.Materials.Count<=128&&p.Materials.Select(m=>m.Id).Distinct().Count()==p.Materials.Count,"Material identity/quota");
+        foreach(var material in p.Materials)Require(material.Textures.Count<=8&&material.Textures.Select(t=>t.Slot).Distinct().Count()==material.Textures.Count&&material.Textures.All(t=>t.Slot>=0&&t.Slot<=7&&Finite(t.RestSrt,5)),"Sampler identity/quota/rest state");
         Require(p.Bones.Select(b=>b.Name).Distinct().Count()==p.Bones.Count,"Duplicate bone names need explicit binding");
         Require(p.Bones.Select(b=>b.Id).Distinct().Count()==p.Bones.Count,"Duplicate bone IDs");
         for(int i=0;i<p.Bones.Count;i++)
@@ -61,6 +63,7 @@ public static class ProjectStore
             Require(mesh.Vertices.Count<=200000&&mesh.Indices.Count<=600000,"Mesh quota exceeded");
             Require(Finite(mesh.Color,3),"Invalid material color");
             Require(mesh.NativeAttributes.Count<=64&&mesh.NativeAttributes.All(a=>a.Value.Length==mesh.Vertices.Count&&a.Value.All(v=>v.Length is >=1 and <=4&&v.All(float.IsFinite))),"Invalid retained vertex attributes");
+            Require(mesh.Draws.Count<=16&&mesh.Draws.All(d=>(d.MaterialId==""||p.Materials.Any(m=>m.Id==d.MaterialId))&&(d.VisibilityBoneId==""||p.Bones.Any(b=>b.Id==d.VisibilityBoneId))),"Invalid draw material/visibility binding");
             Require(mesh.Indices.Count%3==0&&mesh.Indices.All(i=>i>=0&&i<mesh.Vertices.Count),"Invalid triangle index");
             foreach(var v in mesh.Vertices)
             {

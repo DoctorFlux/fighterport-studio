@@ -4,11 +4,11 @@ Standalone local Windows character workbench for Brawl, Melee, Ultimate and Riva
 
 ## Run this workspace
 
-Launch `artifacts/publish/desktop/FighterPort.Desktop.exe`. **Open Demo** uses original skinned rigs and motions. **Load Project** can open the locally imported `artifacts/local-mario/brawl.fpproj` or `ultimate.fpproj`; those commercial-derived files are ignored and never shipped with source.
+Launch `artifacts/publish/desktop/FighterPort.Desktop.exe`. **Open** adds native sources or a saved workspace. Expand a Brawl PAC, double-click a model, then open its motion PAC and activate skeletal/ancillary groups. Material references resolve textures through native BRRES/ARC scope. **Save workspace** keeps verified external originals and canonical state; texture pixels are not embedded. See the [click-by-click Mario and original-fixture workflow](docs/RESOURCE_WORKSPACE.md).
 
-Use **Open Brawl PAC** to choose a main MDL0 resource, then a CHR0 from a motion PAC. Main and shadow models are listed separately. **Open Ultimate model** loads NUMDLB with neighboring skeleton/mesh/material dependencies; **Attach NUANMB** adds a skeletal clip. Scrub/play renders actual weighted geometry with neutral shading. Native textures, material/visibility animation and helper constraints are not yet evaluated.
+The initial preview supports CHR0 skeletal motion, original VIS0 draw visibility and direct nonrotating Maya SRT0 sampler-0 UV scale/translation on one timeline. Supplied Mario Wait2 has four evaluated eye tracks; extra samplers and native shader fidelity remain incomplete. Unknown resources stay in their original sources and appear in the native tree. **Demos** contains original rigs. Legacy FPPROJ and Ultimate native model/animation sources still open through the same command; Ultimate materials/ancillary groups remain pending.
 
-**Map / Retarget** provides source/target selection, manual mapping, semantic role suggestions/correction/locks, explicit approval and dual preview. Strict FK and the separately selected rest-axis/hierarchy subset have different gates; see [retargeting](docs/RETARGETING.md). **Bake for CHR0 / NUANMB** makes a measured new clip; export writes a separate native file and validates decoded results. Original same-rig cross-format fixtures pass. **Mario-to-Mario cross-rig transfer remains incomplete.**
+**Tools > Map / Retarget** retains semantic/manual roles and approval-bound strict FK/rest-axis modes, including a tested quaternion/rest-parent translation subset. **Convert** offers all four destinations; full-character output blocks until implemented. Explicit skeletal-only CHR0/NUANMB output uses measured bake and genuine native write/decode, with disclosed ancillary/model omissions. **Mario-to-Mario cross-rig transfer remains incomplete.**
 
 ## Build and verify
 
@@ -22,7 +22,7 @@ Windows x64, PowerShell 7, Git, .NET SDK **10.0.402**, installed .NET 10 Desktop
 ./scripts/publish.ps1
 ```
 
-For the supplied local references only, add `-LocalAssets` to test.ps1. The assertion runner is an executable; use the test script, not dotnet test. Latest full suite: **38 passed, 0 failed**, including three opt-in local-asset cases. GUI mapping and both real-reference playback smokes passed. See [status](docs/DEVELOPMENT_STATUS.md) for exact evidence and limitations.
+For the supplied local references only, add `-LocalAssets` to test.ps1. The assertion runner is an executable; use the test script, not dotnet test. Latest full suite: **44 passed, 0 failed**, including opt-in local-asset cases. Published resource workflows passed for original and Mario sources; existing mapping/playback coverage is retained. See [status](docs/DEVELOPMENT_STATUS.md) for exact evidence and limitations.
 
 publish.ps1 stages local framework-dependent desktop/CLI/native binaries and backend notices/source under ignored artifacts/publish. It uploads nothing. Keep the publish subfolders together and retain this workspace for the optional Ultimate backend. doctor.ps1 checks installed runtime and worker; fresh-machine setup, native-tool GUIs, Modkit/cooking, DCC and game checks remain unrun.
 

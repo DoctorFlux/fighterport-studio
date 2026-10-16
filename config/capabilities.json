@@ -306,7 +306,7 @@
       "operation": "read",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -315,7 +315,7 @@
       "operation": "write",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -324,7 +324,7 @@
       "operation": "edit",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -333,7 +333,7 @@
       "operation": "evaluate",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -342,7 +342,7 @@
       "operation": "preserve",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -351,7 +351,7 @@
       "operation": "package",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Brawl / Project M / Project+",
@@ -360,7 +360,7 @@
       "operation": "validate",
       "state": "Planned",
       "evidence": "",
-      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+      "limitations": "Remaining versions/operations and full fidelity are planned. Tested TEX0 1, VIS0 3 and SRT0 4 subsets have separate rows below; no general ancillary editor/writer or package claim."
     },
     {
       "game": "Melee",
@@ -1134,7 +1134,7 @@
       "operation": "read",
       "state": "LocalReferenceTested",
       "evidence": "LocalReferenceTests.cs; actual desktop playback",
-      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Resource workspace additionally resolves native sampler references; shader fidelity and native model writer remain incomplete."
     },
     {
       "game": "Brawl reference",
@@ -1143,7 +1143,7 @@
       "operation": "evaluate-skin",
       "state": "LocalReferenceTested",
       "evidence": "LocalReferenceTests.cs; actual desktop playback",
-      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Resource workspace additionally resolves native sampler references; shader fidelity and native model writer remain incomplete."
     },
     {
       "game": "Brawl reference",
@@ -1152,7 +1152,7 @@
       "operation": "preserve",
       "state": "LocalReferenceTested",
       "evidence": "LocalReferenceTests.cs; actual desktop playback",
-      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Resource workspace additionally resolves native sampler references; shader fidelity and native model writer remain incomplete."
     },
     {
       "game": "Brawl reference",
@@ -1270,6 +1270,78 @@
       "state": "SyntheticTested",
       "evidence": "QuaternionRetargetTests.cs; 30 portable cases",
       "limitations": "UnitOnly scale, explicit root CopyDelta/nonroot RestParentDelta, TargetRest helpers. No compensation/twist/proportion/IK/contact; commercial maps unapproved."
+    },
+    {
+      "game": "Brawl",
+      "format": "ARC / BRRES",
+      "version": "observed original and supplied PAC",
+      "operation": "browse-resource-tree",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Lazy direct children, stable document hash + ordinal node identity. Main/shadow and separate motion sources remain distinct. No edited container writer."
+    },
+    {
+      "game": "FighterPort",
+      "format": "FPWORK",
+      "version": "1",
+      "operation": "save-reopen",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Verified external originals, canonical active model/clip and ancillary groups, persisted texture override; no texture pixels in JSON. 256 sources, 32 MiB each/save, 32 MiB decoded texture cache. Moving/relinking sources pending."
+    },
+    {
+      "game": "Brawl",
+      "format": "MDL0 material / ARC texture bank",
+      "version": "9 / 11",
+      "operation": "resolve-preview-bindings",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Own BRRES first, then native ARC TextureData matching/global group; duplicates reject. Original duplicate-name banks and supplied nine textures. Sampler 0 UV0 approximation, not TEV/alpha-test/multisampler fidelity."
+    },
+    {
+      "game": "Brawl",
+      "format": "TEX0",
+      "version": "1",
+      "operation": "decode-preview",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Original RGBA8 quadrants and nine supplied native textures decode. Five sampler-0 textures displayed for Mario. Full format/palette/mip/alpha/wrap conformance pending; no general texture writer."
+    },
+    {
+      "game": "Brawl",
+      "format": "VIS0",
+      "version": "3",
+      "operation": "read-evaluate",
+      "state": "SyntheticTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Original animated accessory; fractional boundaries, seek, loop, mute/default reset compared against native ApplyVIS draw visibility bones. v4 path unverified; no retail VIS0 fixture in main Mario motion bank."
+    },
+    {
+      "game": "Brawl",
+      "format": "SRT0",
+      "version": "4",
+      "operation": "read-evaluate",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Direct MatrixMaya sampler 0 UV0 scale/translation only; native Hermite keys/tangents retained. Original motion and Mario Wait2 four tracks vs ApplySRT within 0.00001 UV; all twelve supplied tracks retained, eight extra-sampler tracks unevaluated. Rotation/other matrix modes pending; v5 path unverified."
+    },
+    {
+      "game": "Original",
+      "format": "ARC / MDL0 / TEX0 / CHR0 / VIS0 / SRT0",
+      "version": "native subset",
+      "operation": "fixture-write-read",
+      "state": "SyntheticTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Generated through pinned BrawlLib: skinned model, texture bank, duplicate-name scope, skeletal motion, accessory visibility, UV slide, empty retained SRT resource. Not a general model/package/ancillary exporter."
+    },
+    {
+      "game": "FighterPort",
+      "format": "WPF workspace",
+      "version": "M1.E initial slice",
+      "operation": "open-preview-convert",
+      "state": "LocalReferenceTested",
+      "evidence": "WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
+      "limitations": "Published apphost native tree/model/CHR0/SRT0/save/reopen on original and Mario; original also VIS0 and explicit skeletal CHR0 write/decode. Full character conversion blocks; CHR0/NUANMB skeletal-only output requires explicit omission acceptance. Existing same-rig conversion tests retained."
     }
   ]
 }

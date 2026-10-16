@@ -15,6 +15,7 @@ namespace FighterPort.Core
         public List<NativeResource> Resources { get; set; } = new List<NativeResource>();
         public List<string> Limitations { get; set; } = new List<string>();
         public List<MappingProfile> MappingProfiles { get; set; } = new List<MappingProfile>();
+        public List<PreviewMaterial> Materials { get; set; } = new List<PreviewMaterial>();
     }
     public class Bone
     {
@@ -38,6 +39,7 @@ namespace FighterPort.Core
         public string MaterialId { get; set; } = "";
         public int NativeSubIndex { get; set; }
         public Dictionary<string,float[][]> NativeAttributes { get; set; } = new Dictionary<string,float[][]>();
+        public List<MeshDraw> Draws { get; set; } = new List<MeshDraw>();
     }
     public class Vertex
     {
@@ -122,6 +124,8 @@ namespace FighterPort.Core
     {
         public string Path { get; set; } = "";
         public string Id { get; set; } = "";
+        public int Mip { get; set; }
+        public string PaletteId { get; set; } = "";
     }
     public class BundlePoseRequest
     {
@@ -130,5 +134,88 @@ namespace FighterPort.Core
         public string ClipPath { get; set; } = "";
         public string ClipId { get; set; } = "";
         public float Frame { get; set; }
+    }
+    public class AssetHandle
+    {
+        public string DocumentId { get; set; } = "";
+        public string NodeId { get; set; } = "0";
+    }
+    public class NativeTreeEntry
+    {
+        public string Id { get; set; } = "0";
+        public string Name { get; set; } = "";
+        public string Kind { get; set; } = "";
+        public int Version { get; set; }
+        public long Size { get; set; }
+        public bool HasChildren { get; set; }
+        public string Status { get; set; } = "Preserved in source; evaluation/export not implemented";
+    }
+    public class MeshDraw
+    {
+        public string MaterialId { get; set; } = "";
+        public string VisibilityBoneId { get; set; } = "";
+        public bool DefaultVisible { get; set; } = true;
+        public string Pass { get; set; } = "Opaque";
+    }
+    public class PreviewMaterial
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public List<TextureBinding> Textures { get; set; } = new List<TextureBinding>();
+        public List<string> Limitations { get; set; } = new List<string>();
+    }
+    public class TextureBinding
+    {
+        public int Slot { get; set; }
+        public string Name { get; set; } = "";
+        public string PaletteName { get; set; } = "";
+        public AssetHandle Texture { get; set; } = new AssetHandle { NodeId="" };
+        public string PaletteId { get; set; } = "";
+        public int UVSet { get; set; }
+        public string WrapU { get; set; } = "Clamp";
+        public string WrapV { get; set; } = "Clamp";
+        public string Filter { get; set; } = "Linear";
+        public string Status { get; set; } = "Unresolved";
+        public float[] RestSrt { get; set; } = new float[]{1,1,0,0,0};
+        public string MatrixMode { get; set; } = "MatrixMaya";
+    }
+    public class UvGroup
+    {
+        public string Name { get; set; } = "";
+        public int NativeVersion { get; set; }
+        public int FrameCount { get; set; }
+        public bool Loop { get; set; }
+        public bool Enabled { get; set; } = true;
+        public string MatrixMode { get; set; } = "";
+        public AssetHandle Source { get; set; } = new AssetHandle();
+        public List<UvTrack> Tracks { get; set; } = new List<UvTrack>();
+    }
+    public class UvTrack
+    {
+        public string MaterialName { get; set; } = "";
+        public string MaterialId { get; set; } = "";
+        public int Slot { get; set; }
+        public bool Indirect { get; set; }
+        public List<Curve> Curves { get; set; } = new List<Curve>();
+        public string Status { get; set; } = "Unresolved";
+    }
+    public class VisibilityGroup
+    {
+        public string Name { get; set; } = "";
+        public int NativeVersion { get; set; }
+        public int FrameCount { get; set; }
+        public bool Loop { get; set; }
+        public float Rate { get; set; } = 1;
+        public float Offset { get; set; }
+        public bool Enabled { get; set; } = true;
+        public AssetHandle Source { get; set; } = new AssetHandle();
+        public string SkeletonFingerprint { get; set; } = "";
+        public List<VisibilityTrack> Tracks { get; set; } = new List<VisibilityTrack>();
+    }
+    public class VisibilityTrack
+    {
+        public string Target { get; set; } = "";
+        public string BoneId { get; set; } = "";
+        public bool[] Values { get; set; } = new bool[0];
     }
 }

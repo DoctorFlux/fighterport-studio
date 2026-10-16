@@ -47,4 +47,5 @@ assets-local/
 *.key
 *.pfx
 *.fpproj
+*.fpwork
 __pycache__/

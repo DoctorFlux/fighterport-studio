@@ -106,7 +106,7 @@ internal static class Program
                         Write(output,samples);
                     }
                     break;
-                default: throw new InvalidDataException("Unknown worker operation");
+                default: ResourceOperations.Run(op,input,output);break;
             }
             Console.WriteLine("{\"protocol\":1,\"ok\":true}");return 0;
         }
@@ -135,7 +135,7 @@ internal static class Program
     }
     private static float[] Vec(Vector3 v)=>new[]{v._x,v._y,v._z};
     private static float[] Mat(Matrix m)=>Enumerable.Range(0,16).Select(i=>m[i]).ToArray();
-    private static unsafe CharacterProject ReadModel(MDL0Node model)
+    internal static unsafe CharacterProject ReadModel(MDL0Node model)
     {
         model.Populate();model.ApplyCHR(null,0);
         var project=new CharacterProject { Name=model.Name };
@@ -176,7 +176,7 @@ internal static class Program
         project.Limitations.Add("MDL0 v"+model.Version+" geometry/skeleton/UV0/normal/1-4 weights subset. Native shaders, other UV/color channels and ancillary resources retained opaque only; neutral preview. No general MDL0 rewrite.");
         return project;
     }
-    private static Clip ReadClip(CHR0Node node)
+    internal static Clip ReadClip(CHR0Node node)
     {
         var clip=new Clip { Name=node.Name,NativeVersion=node.Version,FrameCount=node.FrameCount,Loop=node.Loop,FramesPerSecond=30 };
         foreach(CHR0EntryNode bone in node.Children)

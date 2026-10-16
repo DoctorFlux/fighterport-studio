@@ -4,6 +4,7 @@
     <Compile Include="../Shared/Model.cs" Link="Model.cs" />
     <Reference Include="BrawlLib"><HintPath>../../.deps/BrawlCrate/BrawlLib/bin/x86/Release/net472/BrawlLib.dll</HintPath></Reference>
     <Reference Include="System.Web.Extensions" /><Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
     <Reference Include="OpenTK"><HintPath>../../.deps/BrawlCrate/BrawlLib/OpenTK.dll</HintPath></Reference>
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
