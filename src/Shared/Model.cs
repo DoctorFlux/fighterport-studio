@@ -186,6 +186,8 @@ namespace FighterPort.Core
     public class UvGroup
     {
         public string Name { get; set; } = "";
+        public string NativeOriginalPath { get; set; } = "";
+        public List<string> NativeMaterials { get; set; } = new List<string>();
         public int NativeVersion { get; set; }
         public int FrameCount { get; set; }
         public bool Loop { get; set; }
@@ -196,12 +198,19 @@ namespace FighterPort.Core
     }
     public class UvTrack
     {
+        public string NativeTrackId { get; set; } = "";
         public string MaterialName { get; set; } = "";
         public string MaterialId { get; set; } = "";
         public int Slot { get; set; }
         public bool Indirect { get; set; }
         public List<Curve> Curves { get; set; } = new List<Curve>();
         public string Status { get; set; } = "Unresolved";
+    }
+    public class UvExportRequest
+    {
+        public string Path { get; set; } = "";
+        public string Id { get; set; } = "";
+        public UvGroup Group { get; set; } = new UvGroup();
     }
     public class VisibilityGroup
     {

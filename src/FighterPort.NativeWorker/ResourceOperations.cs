@@ -11,11 +11,12 @@ using BrawlLib.Wii;
 using BrawlLib.Wii.Textures;
 using FighterPort.Core;
 
-internal static class ResourceOperations
+internal static partial class ResourceOperations
 {
     private static readonly JavaScriptSerializer Json=new JavaScriptSerializer{MaxJsonLength=32*1024*1024,RecursionLimit=128};
     internal static void Run(string operation,string input,string output)
     {
+        if(operation=="export-uv"){ExportUv(Json.Deserialize<UvExportRequest>(File.ReadAllText(input)),output);return;}
         if(operation=="resource-uv-matrices")
         {
             var bindings=Json.Deserialize<TextureBinding[]>(File.ReadAllText(input));
@@ -155,7 +156,7 @@ internal static class ResourceOperations
         foreach(var mat in materials)
         {
             var result=new PreviewMaterial{Id=Id(mat),Name=mat.Name};
-            result.Limitations.Add("Source approximation: bound sampler 0 UV0 and decoded color/alpha only. Native TEV, lighting, alpha-test, additional samplers and animated materials remain unevaluated.");
+            result.Limitations.Add("Source approximation: bound sampler 0 UV0 and decoded color/alpha only. Native TEV, lighting, alpha-test, additional samplers, nearest/mip filtering and animated materials remain unevaluated.");
             foreach(var sampler in mat.Children.OfType<MDL0MaterialRefNode>())
             {
                 var matches=resources.OfType<TEX0Node>().Where(t=>t.Name==sampler.Texture).ToArray();string scope="owning BRRES";
@@ -176,7 +177,7 @@ internal static class ResourceOperations
             foreach(var draw in obj._drawCalls)project.Meshes[i].Draws.Add(new MeshDraw{MaterialId=draw.MaterialNode==null?"":Id(draw.MaterialNode),VisibilityBoneId=draw.VisibilityBoneNode==null?"":"mdl0-"+draw.VisibilityBoneNode.BoneIndex,DefaultVisible=draw._render,Pass=draw.DrawPass.ToString()});
         }
         project.Limitations.RemoveAll(s=>s.Contains("neutral preview"));
-        project.Limitations.Add("Source appearance approximation: sampler 0 / UV0, decoded color/alpha; native TEV, alpha-test, mixed-axis wrap, other UV/color channels, material/UV/shape animation and edited model export remain unevaluated. Original source documents retained through verified external links.");
+        project.Limitations.Add("Source appearance approximation: sampler 0 / UV0, decoded color/alpha; native TEV, alpha-test, nearest/mip filtering, other color channels, material/UV/shape animation and edited model export remain unevaluated. Original source documents retained through verified external links.");
     }
     private static VisibilityGroup ReadVisibility(VIS0Node node)
     {
@@ -190,11 +191,11 @@ internal static class ResourceOperations
     {
         if(node.Version!=4&&node.Version!=5)throw new NotSupportedException("SRT0 v4/v5 reader");
         if(node.FrameCount<1||node.FrameCount>100000||node.Children.Count>128)throw new InvalidDataException("UV animation quota");
-        var group=new UvGroup{Name=node.Name,NativeVersion=node.Version,FrameCount=node.FrameCount,Loop=node.Loop,MatrixMode=node.MatrixMode.ToString()};
+        var group=new UvGroup{Name=node.Name,NativeOriginalPath=node.OriginalPath??"",NativeMaterials=node.Children.Select(m=>m.Name).ToList(),NativeVersion=node.Version,FrameCount=node.FrameCount,Loop=node.Loop,MatrixMode=node.MatrixMode.ToString()};
         int keys=0;
         foreach(SRT0EntryNode material in node.Children)foreach(SRT0TextureNode sampler in material.Children)
         {
-            var track=new UvTrack{MaterialName=material.Name,Slot=sampler.TextureIndex,Indirect=sampler.Indirect};
+            var track=new UvTrack{NativeTrackId=material.Index+"/"+sampler.Index,MaterialName=material.Name,Slot=sampler.TextureIndex,Indirect=sampler.Indirect};
             for(int channel=0;channel<5;channel++)
             {
                 var curve=new Curve{Channel=channel};
@@ -217,6 +218,11 @@ internal static class ResourceOperations
             var bres=new BRRESNode{Name="OriginalResources",FileType=ARCFileType.ModelData,FileIndex=0,GroupID=0};arc.AddChild(bres);
             if(operation=="fixture-workspace-palette")
             {
+                using(var asymmetric=new Bitmap(8,4))
+                {
+                    for(int y=0;y<4;y++)for(int x=0;x<8;x++)asymmetric.SetPixel(x,y,Color.FromArgb(x>=6&&y==3?0:255,200-x*15-y*20,10+x*25,20+y*50));
+                    var tex=bres.CreateResource<TEX0Node>("Asymmetric");tex.ReplaceRaw(TextureConverter.RGBA8.EncodeTEX0Texture(asymmetric,1));tex.Name="Asymmetric";
+                }
                 using(var image=new Bitmap(32,32,PixelFormat.Format8bppIndexed))
                 {
                     var colors=image.Palette;colors.Entries[0]=Color.Red;colors.Entries[1]=Color.Lime;colors.Entries[2]=Color.Blue;colors.Entries[3]=Color.FromArgb(0,0,0,0);image.Palette=colors;
@@ -264,6 +270,15 @@ internal static class ResourceOperations
                     model.Populate();var uv=bres.CreateResource<SRT0Node>("OriginalUvSlide");uv.FrameCount=chr.FrameCount;uv.Loop=chr.Loop;
                     var mat=new SRT0EntryNode{Name=model._matList[0].Name};uv.AddChild(mat);var sampler=new SRT0TextureNode(0,false);mat.AddChild(sampler);uv.FrameCount=chr.FrameCount;uv.Loop=chr.Loop;
                     sampler.SetKeyframe(3,0,0);sampler.SetKeyframe(3,20,.5f);sampler.SetKeyframe(3,40,0);
+                    var editable=bres.CreateResource<SRT0Node>("OriginalUvEditable");editable.OriginalPath="original/fixtures/asymmetric.srt0";editable.MatrixMode=TexMatrixMode.Matrix3dsMax;
+                    var editableMat=new SRT0EntryNode{Name=model._matList[0].Name};editable.AddChild(editableMat);
+                    foreach(int slot in new[]{0,1,7,10})
+                    {
+                        var track=new SRT0TextureNode(slot==10?2:slot,slot==10);editableMat.AddChild(track);editable.FrameCount=chr.FrameCount;editable.Loop=chr.Loop;
+                        track.SetKeyframe(0,0,slot==1?-1.25f:1);track.SetKeyframe(3,0,.125f);track.SetKeyframe(3,20,.75f);track.SetKeyframe(3,40,-.25f);
+                        track.GetKeyframe(3,0)._tangent=.07f;track.GetKeyframe(3,20)._tangent=-.04f;track.GetKeyframe(3,40)._tangent=.02f;
+                    }
+                    editable.AddChild(new SRT0EntryNode{Name="RetainedEmptyMaterial"});
                     foreach(var mode in new[]{TexMatrixMode.MatrixXSI,TexMatrixMode.Matrix3dsMax})
                     {
                         var rotating=bres.CreateResource<SRT0Node>("OriginalUv"+mode);rotating.MatrixMode=mode;

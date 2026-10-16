@@ -13,7 +13,8 @@ internal static class AncillaryTests
         {
             string request=Path.Combine(output,"palette-request.json"),path=Path.Combine(output,"indexed.pac");
             File.WriteAllText(request,"{}");File.WriteAllBytes(path,await transport.Run("fixture-workspace-palette",request));
-            var ws=Workspace();var doc=await ws.Open(path);var entries=await WorkspaceTests.Inventory(ws,doc);var tex=entries.Single(e=>e.Kind=="TEX0");var alternate=entries.Single(e=>e.Name=="AlternatePalette");
+            var ws=Workspace();var doc=await ws.Open(path);var entries=await WorkspaceTests.Inventory(ws,doc);var tex=entries.Single(e=>e.Name=="IndexedAlpha"&&e.Kind=="TEX0");var alternate=entries.Single(e=>e.Name=="AlternatePalette");
+            File.WriteAllBytes(Path.Combine(output,"asymmetric.png"),await ws.Texture(new(){DocumentId=doc.Id,NodeId=entries.Single(e=>e.Name=="Asymmetric").Id}));
             Check(tex.PixelFormat=="CI8"&&tex.Width==32&&tex.Height==32&&tex.MipCount==2,"Native texture metadata mismatch");
             foreach(int mip in new[]{0,1})foreach(string palette in new[]{"",alternate.Id})
             {

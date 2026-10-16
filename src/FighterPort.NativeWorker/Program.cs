@@ -170,6 +170,12 @@ internal static class Program
                 var normal=v.GetMatrix().GetRotationMatrix()*normals[i];
                 mesh.Vertices.Add(new Vertex { Position=Vec(v.WeightedPosition),Normal=Vec(normal),UV=new[]{uv[i]._x,1-uv[i]._y},Bones=weights.Select(w=>ordered.IndexOf((MDL0BoneNode)w.Bone)).ToArray(),Weights=weights.Select(w=>w.Weight).ToArray() });
             }
+            for(int set=1;set<8;set++)if(pm._faceData[4+set]!=null)
+            {
+                Vector2* coordinates=(Vector2*)pm._faceData[4+set].Address;var retained=new float[pm._pointCount][];
+                for(int i=0;i<pm._pointCount;i++)retained[i]=new[]{coordinates[i]._x,1-coordinates[i]._y};
+                mesh.NativeAttributes["BrawlUV"+set]=retained;
+            }
             mesh.Indices=triangles._indices.Select(i=>checked((int)i)).ToList(); project.Meshes.Add(mesh);
         }
         project.TargetProfile="Brawl MDL0 v"+model.Version;

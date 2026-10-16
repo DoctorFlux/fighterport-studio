@@ -51,7 +51,7 @@ public sealed partial class Workbench : Window
         var dock=new DockPanel();Content=dock;
         InitializeWorkspace();AddMenus(dock);
         var tools=new WrapPanel{Margin=new(10)};DockPanel.SetDock(tools,Dock.Top);dock.Children.Add(tools);
-        Button(tools,"New",()=>{workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(new CharacterProject());});
+        Button(tools,"New",()=>{if(!KeepUvEdits())return;uvEdit=null;workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(new CharacterProject());});
         Button(tools,"Open…",OpenDialog);Button(tools,"Save workspace…",SaveWorkspaceDialog);
         Button(tools,"Convert…",ConvertDialog);
         DockPanel.SetDock(status,Dock.Bottom);dock.Children.Add(status);
@@ -77,7 +77,7 @@ public sealed partial class Workbench : Window
         border.MouseMove+=(_,e)=>{if(!border.IsMouseCaptured)return;var pos=e.GetPosition(border);var delta=pos-mouse;mouse=pos;if(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)){panX-=delta.X*.3;panY+=delta.Y*.3;}else{yaw-=delta.X*.01;pitch=Math.Clamp(pitch+delta.Y*.01,-1.3,1.3);}Render();};
         border.MouseWheel+=(_,e)=>{distance=Math.Clamp(distance*Math.Exp(-e.Delta*.001),1,10000);Render();};
         timeline.ValueChanged+=(_,_)=>{if(!refreshing)Render();};
-        clips.SelectionChanged+=(_,_)=>{if(refreshing)return;if(workspace.Data.ClipIndex!=clips.SelectedIndex){workspace.Data.Visibility=null;workspace.Data.Uv=null;workspace.Data.ActiveClip=null;}workspace.Data.ClipIndex=clips.SelectedIndex;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;Render();};
+        clips.SelectionChanged+=(_,_)=>{if(refreshing)return;if(workspace.Data.ClipIndex!=clips.SelectedIndex){if(!KeepUvEdits()){refreshing=true;clips.SelectedIndex=workspace.Data.ClipIndex;refreshing=false;return;}workspace.ClearAncillary();uvEdit=null;}workspace.Data.ClipIndex=clips.SelectedIndex;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;Render();};
         skeleton.Checked+=(_,_)=>Render();skeleton.Unchecked+=(_,_)=>Render();skin.Checked+=(_,_)=>Render();skin.Unchecked+=(_,_)=>Render();
         tree.SelectedItemChanged+=(_,e)=>{if(e.NewValue is TreeViewItem t&&t.Tag is int i){selectedBone=i;Render();}};
         timer.Tick+=(_,_)=>{double now=watch.Elapsed.TotalSeconds;if(playing&&SelectedClip is { } c){double next=timeline.Value+(now-last)*c.FramesPerSecond;if(next>timeline.Maximum){if(c.Loop)next%=c.FrameCount;else{next=timeline.Maximum;playing=false;}}timeline.Value=next;}last=now;};timer.Start();
@@ -165,7 +165,7 @@ public sealed partial class Workbench : Window
             {
                 var drawnGeometry=geometry.Clone();
                 if(sourceMaterials.IsChecked==true)drawnGeometry.TextureCoordinates=new PointCollection(mesh.Vertices.Select(v=>{var uv=UvEvaluator.Sample(P,draws[di].MaterialId,workspace.Data.Uv,(float)timeline.Value,new(v.UV[0],v.UV[1]));return new Point(uv.X,uv.Y);}));
-                Brush appearance=sourceMaterials.IsChecked==true?MaterialBrush(draws[di].MaterialId)??brush:brush;
+                Brush appearance=sourceMaterials.IsChecked==true?MaterialBrush(draws[di].MaterialId,drawnGeometry)??brush:brush;
                 var material=new DiffuseMaterial(appearance);scene.Children.Add(new GeometryModel3D(drawnGeometry,material){BackMaterial=material});
             }
         }

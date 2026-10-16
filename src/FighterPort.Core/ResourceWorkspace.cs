@@ -27,11 +27,15 @@ public sealed class WorkspaceData
 }
 
 /// <summary>Bounded, verified external source documents; no texture pixels or temporary paths in saves.</summary>
-public sealed partial class ResourceWorkspace(string workerPath,string jobs,string pythonScript)
+public sealed partial class ResourceWorkspace(string workerPath,string jobs,string pythonScript,IWorkerTransport? transport=null)
 {
-    private readonly WorkerProcess worker=new(workerPath,jobs);
+    private readonly IWorkerTransport worker=transport??new WorkerProcess(workerPath,jobs);
     private readonly UltimateBackend ultimate=new("python",pythonScript,jobs);
     public WorkspaceData Data { get; private set; }=new();
+    private string savedUv="null";
+    public bool IsUvDirty=>JsonSerializer.Serialize(Data.Uv,ProjectStore.Json)!=savedUv;
+    private void MarkUvSaved()=>savedUv=JsonSerializer.Serialize(Data.Uv,ProjectStore.Json);
+    public void ClearAncillary(){Data.Visibility=null;Data.Uv=null;Data.ActiveClip=null;MarkUvSaved();}
     private async Task<byte[]> Request(string operation,SourceDocument doc,string id,CancellationToken ct,int mip=0,string palette="")
     {
         Verify(doc);Directory.CreateDirectory(jobs);string request=System.IO.Path.Combine(jobs,Guid.NewGuid()+".json");
@@ -67,6 +71,7 @@ public sealed partial class ResourceWorkspace(string workerPath,string jobs,stri
         var p=doc.Adapter=="Brawl"?JsonSerializer.Deserialize<CharacterProject>(await Request("resource-model",doc,handle.NodeId,ct),ProjectStore.Json)!:await ultimate.ImportModel(doc.Path,ct);
         foreach(var binding in p.Materials.SelectMany(m=>m.Textures))binding.Texture.DocumentId=doc.Id;
         ProjectStore.Validate(p);Data.Project=p;Data.ActiveModel=ProjectStore.Clone(handle);Data.ClipIndex=-1;Data.ActiveClip=null;Data.Visibility=null;Data.Uv=null;
+        MarkUvSaved();
         Data.Problems=p.Limitations.ToList();Data.Problems.AddRange(p.Materials.SelectMany(m=>m.Textures).Where(t=>t.Texture.NodeId=="").Select(t=>t.Name+": "+t.Status));
     }
     public async Task ActivateClip(AssetHandle handle,CancellationToken ct=default)
@@ -76,6 +81,7 @@ public sealed partial class ResourceWorkspace(string workerPath,string jobs,stri
         clip.FramesPerSecond=60;clip.SkeletonFingerprint=Animation.Fingerprint(Data.Project);
         var candidate=ProjectStore.Clone(Data.Project);candidate.Clips.Add(clip);ProjectStore.Validate(candidate);
         Data.Project=candidate;Data.ClipIndex=candidate.Clips.Count-1;Data.ActiveClip=ProjectStore.Clone(handle);Data.Visibility=null;Data.Uv=null;
+        MarkUvSaved();
         Data.Problems.AddRange(clip.Losses); // Separate sources are never paired by clip display name alone.
         if(doc.Adapter=="Brawl")Data.Problems.Add("Brawl preview timing profile: 60 fps. CHR0 encodes frame indices, not fps; original frame count and keys retained.");
     }
@@ -99,8 +105,8 @@ public sealed partial class ResourceWorkspace(string workerPath,string jobs,stri
             track.Status=UvEvaluator.Support(Data.Project,group,track);
         }
         UvEvaluator.Validate(Data.Project,group);
-        if(!group.Tracks.Any(t=>t.Status.StartsWith("Evaluated:")))throw new InvalidDataException("SRT0 has no evaluable direct Maya ST or XSI/3dsMax SRT sampler 0 UV0 tracks; source retained. Other modes/channels require further implementation.");
         Data.Uv=group;Data.Problems.AddRange(group.Tracks.Where(t=>!t.Status.StartsWith("Evaluated:")).Select(t=>t.MaterialName+" / "+t.Slot+": "+t.Status));
+        MarkUvSaved();
     }
     public Task<byte[]> ExtractSlice(AssetHandle handle,CancellationToken ct=default)=>Request("resource-extract",Document(handle),handle.NodeId,ct);
     public void OverrideTexture(string materialId,int slot,AssetHandle texture,string palette="")
@@ -110,7 +116,7 @@ public sealed partial class ResourceWorkspace(string workerPath,string jobs,stri
     }
     public void Save(string path)
     {
-        CheckOutput(path);foreach(var doc in Data.Documents)Verify(doc);Validate(Data);ProjectStore.AtomicWrite(path,JsonSerializer.SerializeToUtf8Bytes(Data,ProjectStore.Json));
+        CheckOutput(path);foreach(var doc in Data.Documents)Verify(doc);Validate(Data);ProjectStore.AtomicWrite(path,JsonSerializer.SerializeToUtf8Bytes(Data,ProjectStore.Json));MarkUvSaved();
     }
     public void CheckOutput(string path)
     {
@@ -121,7 +127,7 @@ public sealed partial class ResourceWorkspace(string workerPath,string jobs,stri
     {
         if(new FileInfo(path).Length>ProjectStore.MaxBytes)throw new InvalidDataException("Workspace size quota");
         var candidate=JsonSerializer.Deserialize<WorkspaceData>(File.ReadAllBytes(path),ProjectStore.Json)??throw new InvalidDataException("Empty workspace");
-        Validate(candidate);foreach(var doc in candidate.Documents)Verify(doc);Data=candidate;
+        Validate(candidate);foreach(var doc in candidate.Documents)Verify(doc);Data=candidate;MarkUvSaved();
     }
     public static void Validate(WorkspaceData data)
     {

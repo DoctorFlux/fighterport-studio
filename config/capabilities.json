@@ -1369,6 +1369,33 @@
       "state": "SyntheticTested",
       "evidence": "AncillaryTests.cs; WorkspaceTests.cs; published workspace smoke; docs/RESOURCE_WORKSPACE.md",
       "limitations": "Working-copy integer sample and explicit bone/native-name binding edits, 16-step visibility-only undo/redo, FPWORK persistence. Genuine BrawlLib writer, decoded metadata/targets/constants/every sample checked before create-new output. Native rate 1/offset 0/enabled required; standalone subset, no container repack/native-tool/game check."
+    },
+    {
+      "game": "Brawl",
+      "format": "TEX0 / WPF sampler",
+      "version": "1 RGBA8; mip 0",
+      "operation": "render-addressed-color-alpha",
+      "state": "SyntheticTested",
+      "evidence": "SamplingSmoke.cs; sampling-smoke.ps1; docs/TEXTURE_DIAGNOSIS.md",
+      "limitations": "736 actual DiffuseMaterial pixel probes: independent U/V Clamp Repeat Mirror, outside-unit/seam coordinates, negative scale, fractional loop/reverse/mute/reset and two materials. Native asymmetric alpha fixture. Bilinear max 3/255; nearest and native mip/LOD unsupported. Bounded atlas fallback, not TEV fidelity."
+    },
+    {
+      "game": "Brawl",
+      "format": "SRT0",
+      "version": "4",
+      "operation": "edit-bind-undo-write-decode",
+      "state": "SyntheticTested",
+      "evidence": "UvEditingTests.cs; UvEditing.cs; UvExport.cs; published workspace smoke",
+      "limitations": "Native working-copy mutation preserves every direct/additional/indirect track and empty material; exact decoded metadata/keys/tangents plus fractional probes; set/move/delete, explicit binding, 16-step undo, FPWORK and dirty prompts. Unknown flags/v5/unrepresentable constants block. No repacking/native-tool/game check."
+    },
+    {
+      "game": "Brawl",
+      "format": "MDL0",
+      "version": "9 / 11 UV arrays",
+      "operation": "read-retain-extra-uv",
+      "state": "SyntheticTested",
+      "evidence": "WorkspaceTests.cs; original distinct UV0/UV1 fixture",
+      "limitations": "Retains present facepoint UV1-7 in canonical native attributes. UV1 independent value/convention assertions; preview still sampler 0 UV0; retention is not shader evaluation."
     }
   ]
 }

@@ -49,3 +49,13 @@ assets-local/
 *.fpproj
 *.fpwork
 __pycache__/
+
+# Native ancillary resources and textures are local inputs/outputs.
+*.srt0
+*.vis0
+*.pat0
+*.clr0
+*.shp0
+*.scn0
+*.tex0
+*.plt0

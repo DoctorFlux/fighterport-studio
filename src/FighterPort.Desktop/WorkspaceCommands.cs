@@ -20,6 +20,7 @@ public sealed partial class Workbench
     private readonly CheckBox uvEnabled=new(){Content="SRT0",Foreground=Brushes.White,Margin=new(8),IsChecked=true};
     private readonly Dictionary<string,BitmapSource> textureCache=[];
     private long textureBytes;
+    private readonly TextureSampling textureSampling=new();
     private sealed record ResourceSelection(AssetHandle Handle,NativeTreeEntry Entry);
     private ResourceWorkspace CreateWorkspace()
     {
@@ -33,7 +34,8 @@ public sealed partial class Workbench
         sourceMaterials.Checked+=(_,_)=>Render();sourceMaterials.Unchecked+=(_,_)=>Render();
         uvEnabled.Checked+=(_,_)=>{if(workspace.Data.Uv is {} uv)uv.Enabled=true;Render();};uvEnabled.Unchecked+=(_,_)=>{if(workspace.Data.Uv is {} uv)uv.Enabled=false;Render();};
         visibilityEnabled.Checked+=(_,_)=>SetVisibilityEnabled(true);visibilityEnabled.Unchecked+=(_,_)=>SetVisibilityEnabled(false);
-        PreviewKeyDown+=(_,e)=>{if(Keyboard.Modifiers!=ModifierKeys.Control)return;if(e.Key==Key.O){OpenDialog();e.Handled=true;}if(e.Key==Key.S){SaveWorkspaceDialog();e.Handled=true;}if(e.Key==Key.Z){session.Undo();Render();e.Handled=true;}if(e.Key==Key.Y){session.Redo();Render();e.Handled=true;}};
+        PreviewKeyDown+=(_,e)=>{if(Keyboard.Modifiers!=ModifierKeys.Control)return;if(e.Key==Key.O){OpenDialog();e.Handled=true;}if(e.Key==Key.S){SaveWorkspaceDialog();e.Handled=true;}if(e.Key==Key.Z){if(!UvHistory(false)){session.Undo();Render();}e.Handled=true;}if(e.Key==Key.Y){if(!UvHistory(true)){session.Redo();Render();}e.Handled=true;}};
+        Closing+=(_,e)=>{if(!KeepUvEdits())e.Cancel=true;};
         AllowDrop=true;Drop+=(_,e)=>{if(e.Data.GetData(DataFormats.FileDrop) is string[] paths)Native(async()=>{foreach(string path in paths.Take(32))await OpenPath(path);});};
     }
     private void SetVisibilityEnabled(bool enabled){if(workspace.Data.Visibility is {} group)group.Enabled=enabled;Render();}
@@ -48,10 +50,10 @@ public sealed partial class Workbench
         MenuItem Section(string name){var item=new MenuItem{Header=name};menu.Items.Add(item);return item;}
         void Command(MenuItem parent,string name,Action action){var item=new MenuItem{Header=name};item.Click+=(_,_)=>{try{action();}catch(Exception e){SetStatus(e.Message);}};parent.Items.Add(item);}
         var file=Section("_File");Command(file,"_Open…  Ctrl+O",OpenDialog);Command(file,"Open _folder…",()=>Native(async()=>{var dialog=new OpenFolderDialog{Title="Index supported files in one folder (up to 256; no disk scan)"};if(dialog.ShowDialog()==true)await OpenFolder(dialog.FolderName);}));Command(file,"_Save workspace…  Ctrl+S",SaveWorkspaceDialog);
-        var edit=Section("_Edit");Command(edit,"Undo  Ctrl+Z",()=>{session.Undo();Render();});Command(edit,"Redo  Ctrl+Y",()=>{session.Redo();Render();});
+        var edit=Section("_Edit");Command(edit,"Undo  Ctrl+Z",()=>{if(!UvHistory(false)){session.Undo();Render();}});Command(edit,"Redo  Ctrl+Y",()=>{if(!UvHistory(true)){session.Redo();Render();}});
         var view=Section("_View");Command(view,"Frame character",()=>{FitCharacter();Render();});Command(view,"Problems / dependency limits…",()=>MessageBox.Show(this,string.Join("\n",workspace.Data.Problems.Concat(P.Materials.SelectMany(m=>m.Limitations)).Distinct()),"Workspace problems"));
         var tools=Section("_Tools");Command(tools,"Map / Retarget…",()=>new MappingWindow(P,clips.SelectedIndex){Owner=this}.Show());Command(tools,"Cancel native job",()=>operation?.Cancel());
-        var demos=Section("_Demos");foreach(var item in new[]{("Original humanoid",0),("Alternate rig",1),("Tail rig",2)})Command(demos,item.Item1,()=>{workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(Demo.Create(item.Item2));});
+        var demos=Section("_Demos");foreach(var item in new[]{("Original humanoid",0),("Alternate rig",1),("Tail rig",2)})Command(demos,item.Item1,()=>{if(!KeepUvEdits())return;uvEdit=null;workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(Demo.Create(item.Item2));});
         var help=Section("_Help");Command(help,"Verified subset",()=>MessageBox.Show(this,"Brawl MDL0 v9/v11 geometry; CHR0 v4; VIS0 v3 tested (v4 unverified); TEX0 v1 decoding and native material references. Direct Maya ST and XSI/3dsMax SRT0 sampler-0 UV0. CI8/RGB5A3 palette/alpha and two-mip original fixture tested; VIS0 v3 edit/export with decoded validation. Source appearance approximates the native shader. Other channels remain in original source files; edited container/model export is pending. Melee, Rivals 2, Dragon Ball and DCC milestones remain in the master plan.","FighterPort Studio"));
     }
     private async Task OpenFolder(string folder)
@@ -68,10 +70,10 @@ public sealed partial class Workbench
         if(Directory.Exists(path)){await OpenFolder(path);return;}
         if(Path.GetExtension(path).Equals(".fpwork",StringComparison.OrdinalIgnoreCase))
         {
-            workspace.Load(path);resourceTree.Items.Clear();foreach(var source in workspace.Data.Documents)AddDocument(source);
+            if(!KeepUvEdits())return;workspace.Load(path);uvEdit=null;resourceTree.Items.Clear();foreach(var source in workspace.Data.Documents)AddDocument(source);
             int index=workspace.Data.ClipIndex;SetProject(workspace.Data.Project);refreshing=true;clips.SelectedIndex=index;refreshing=false;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);visibilityEnabled.IsChecked=workspace.Data.Visibility?.Enabled??true;uvEnabled.IsChecked=workspace.Data.Uv?.Enabled??true;await LoadTextures();Render();SetStatus("Workspace reopened; every external source hash verified.");return;
         }
-        if(Path.GetExtension(path).Equals(".fpproj",StringComparison.OrdinalIgnoreCase)){workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(ProjectStore.Load(path));return;}
+        if(Path.GetExtension(path).Equals(".fpproj",StringComparison.OrdinalIgnoreCase)){if(!KeepUvEdits())return;uvEdit=null;workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(ProjectStore.Load(path));return;}
         var doc=await workspace.Open(path,operation?.Token??default);
         if(!resourceTree.Items.OfType<TreeViewItem>().Any(i=>i.Tag is ResourceSelection r&&r.Handle.DocumentId==doc.Id))AddDocument(doc);
         SetStatus("Source added read-only. Expand resources; double-click a model, skeletal clip, VIS0 or texture. Unimplemented resources remain visible.");
@@ -90,7 +92,12 @@ public sealed partial class Workbench
         void Action(string label,Func<Task> action){var m=new MenuItem{Header=label};m.Click+=(_,_)=>Native(action);menu.Items.Add(m);}
         if(entry.Kind is "MDL0" or "NUMDLB" or "NUMSHB")Action("Display model / resolve materials",()=>Activate(selection));
         if(entry.Kind is "CHR0" or "NUANMB")Action("Use skeletal animation",()=>Activate(selection));
-        if(entry.Kind=="SRT0")Action("Bind UV animation to materials / timeline",()=>Activate(selection));
+        if(entry.Kind=="SRT0")
+        {
+            Action("Bind UV animation to materials / timeline",()=>Activate(selection));
+            var editUv=new MenuItem{Header="Edit active SRT0 curves / bindings / export…"};menu.Items.Add(editUv);
+            editUv.Click+=(_,_)=>{try{if(operation!=null)throw new InvalidOperationException("Wait for the native job");EditUv();}catch(Exception e){SetStatus(e.Message);}};
+        }
         if(entry.Kind=="VIS0")
         {
             Action("Bind visibility to active model / timeline",()=>Activate(selection));
@@ -110,7 +117,7 @@ public sealed partial class Workbench
     {
         var e=selection.Entry;resourceProperties.Text=$"{e.Kind} v{e.Version} • {e.Size:N0} bytes\n{e.Name}\nHandle: {e.Id}\n{e.Status}\nSource: {Path.GetFileName(workspace.Document(selection.Handle).Path)}";
         if(selection.Handle.DocumentId==workspace.Data.ActiveModel?.DocumentId&&P.Materials.SingleOrDefault(m=>m.Id==e.Id) is {} material)
-            resourceProperties.Text+="\n"+string.Join("\n",material.Textures.Select(t=>$"Sampler {t.Slot} / UV{t.UVSet}: {t.Name}\n{t.Status}"));
+            resourceProperties.Text+="\n"+string.Join("\n",material.Textures.Select(t=>$"Sampler {t.Slot} / UV{t.UVSet}: {t.Name}\nU: {t.WrapU}, V: {t.WrapV}, requested magnification: {t.Filter}\n{t.MatrixMode}; SRT: {string.Join(", ",t.RestSrt)}\n{t.Status}\nPreview: bounded bilinear mip 0; nearest/LOD, TEV and additional samplers unsupported"));
     }
     private async Task ExpandNode(TreeViewItem item)
     {
@@ -125,6 +132,7 @@ public sealed partial class Workbench
     }
     private async Task Activate(ResourceSelection selection)
     {
+        if(selection.Entry.Kind is "MDL0" or "NUMDLB" or "NUMSHB" or "CHR0" or "NUANMB" or "SRT0"){if(!KeepUvEdits())return;uvEdit=null;}
         var token=operation?.Token??default;
         switch(selection.Entry.Kind)
         {
@@ -149,7 +157,7 @@ public sealed partial class Workbench
     }
     private async Task LoadTextures()
     {
-        textureCache.Clear();textureBytes=0;
+        textureCache.Clear();textureSampling.Clear();textureBytes=0;
         foreach(var binding in P.Materials.SelectMany(m=>m.Textures).Where(t=>t.Slot==0&&t.Texture.NodeId!=""))
         {
             string key=TextureKey(binding);if(textureCache.ContainsKey(key))continue;
@@ -163,14 +171,16 @@ public sealed partial class Workbench
             catch(Exception e){workspace.Data.Problems.Add(binding.Name+": "+e.Message);}
         }
     }
-    private Brush? MaterialBrush(string id)
+    private Brush? MaterialBrush(string id,System.Windows.Media.Media3D.MeshGeometry3D geometry)
     {
         var binding=P.Materials.SingleOrDefault(m=>m.Id==id)?.Textures.SingleOrDefault(t=>t.Slot==0);
         if(binding==null||binding.UVSet!=0||!textureCache.TryGetValue(TextureKey(binding),out var image))return null;
-        // WPF supports symmetric repeat/mirror. Mixed wrap modes remain an explicit approximation.
-        var tile=binding.WrapU.Contains("Mirror")&&binding.WrapV.Contains("Mirror")?TileMode.FlipXY:binding.WrapU.Contains("Repeat")&&binding.WrapV.Contains("Repeat")?TileMode.Tile:TileMode.None;
-        var brush=new ImageBrush(image){TileMode=tile,Viewport=new(0,0,1,1),ViewportUnits=BrushMappingMode.Absolute,Stretch=Stretch.Fill};
-        RenderOptions.SetBitmapScalingMode(brush,binding.Filter.Contains("Nearest")?BitmapScalingMode.NearestNeighbor:BitmapScalingMode.Linear);brush.Freeze();return brush;
+        try
+        {
+            var sampled=textureSampling.Prepare(image,geometry.TextureCoordinates.ToArray(),binding.WrapU,binding.WrapV,binding.Filter);
+            geometry.TextureCoordinates=new(sampled.Coordinates);return sampled.Brush;
+        }
+        catch(InvalidOperationException e){string problem=binding.Name+": "+e.Message;if(!workspace.Data.Problems.Contains(problem))workspace.Data.Problems.Add(problem);return null;}
     }
     private async Task PreviewTexture(ResourceSelection selection)
     {
@@ -255,7 +265,9 @@ public sealed partial class Workbench
         {
             await OpenPath(modelPath);await OpenPath(motionPath);var models=await Inventory(workspace.Data.Documents[0]);var motions=await Inventory(workspace.Data.Documents[1]);
             await Activate(models.First(e=>e.Entry.Kind=="MDL0"));if(textureCache.Count==0)throw new InvalidDataException("No resolved source textures");
+            Capture(Path.Combine(output,"rest.png"));
             await Activate(motions.FirstOrDefault(e=>e.Entry.Kind=="CHR0"&&e.Entry.Name=="Wait2")??motions.First(e=>e.Entry.Kind=="CHR0"));
+            timeline.Value=10.25;Render();Capture(Path.Combine(output,"skeletal-only.png"));
             var vis=motions.FirstOrDefault(e=>e.Entry.Kind=="VIS0"&&e.Entry.Name=="OriginalAccessory");if(vis!=null)await Activate(vis);
             var uv=motions.FirstOrDefault(e=>e.Entry.Kind=="SRT0"&&e.Entry.Name==SelectedClip!.Name)??motions.First(e=>e.Entry.Kind=="SRT0"&&e.Entry.Name=="OriginalUvSlide");await Activate(uv);
             var group=workspace.Data.Visibility;var state0=SceneEvaluator.Sample(P,SelectedClip,group,0);timeline.Value=10;
@@ -266,12 +278,13 @@ public sealed partial class Workbench
                 image.CopyPixels(new Int32Rect(4,24,1,1),pixel,4,0);if(pixel[0]!=255||pixel[2]!=0)throw new InvalidDataException("Native original lower-left blue texel mismatch");
                 await ConvertSkeletal(false,Path.Combine(output,"skeletal-only-"+Guid.NewGuid().ToString("N")+".chr0"));
                 EditVisibility(smoke:true);await workspace.ExportVisibility(Path.Combine(output,"edited-visibility-"+Guid.NewGuid().ToString("N")+".vis0"));
+                await Activate(motions.Single(e=>e.Entry.Name=="OriginalUvEditable"));EditUv(smoke:true);await workspace.ExportUv(Path.Combine(output,"edited-uv-"+Guid.NewGuid().ToString("N")+".srt0"));workspace.Save(Path.Combine(output,"uv-edited.fpwork"));
                 await Activate(motions.Single(e=>e.Entry.Name=="OriginalUvMatrix3dsMax"));timeline.Value=20.25;Render();
                 Capture(Path.Combine(output,"rotating-uv.png"));
                 string indexed=Path.Combine(Path.GetDirectoryName(modelPath)!,"indexed.pac");
                 if(File.Exists(indexed))
                 {
-                    await OpenPath(indexed);var resources=await Inventory(workspace.Data.Documents.Last());await PreviewTexture(resources.Single(r=>r.Entry.Kind=="TEX0"));
+                    await OpenPath(indexed);var resources=await Inventory(workspace.Data.Documents.Last());await PreviewTexture(resources.Single(r=>r.Entry.Kind=="TEX0"&&r.Entry.Name=="IndexedAlpha"));
                     var viewer=OwnedWindows.Cast<Window>().Last();var dock=(DockPanel)viewer.Content;var controls=dock.Children.OfType<StackPanel>().Single();
                     controls.Children.OfType<ComboBox>().First().SelectedIndex=1;
                     var paletteChoice=controls.Children.OfType<ComboBox>().Last();paletteChoice.SelectedItem=paletteChoice.Items.Cast<string>().Single(s=>s.StartsWith("AlternatePalette"));
@@ -286,7 +299,7 @@ public sealed partial class Workbench
             }
             workspace.Data.Project=P;workspace.Data.ClipIndex=clips.SelectedIndex;string saved=Path.Combine(output,"reopened.fpwork");workspace.Save(saved);await OpenPath(saved);timeline.Value=10;
             await Reveal(workspace.Data.ActiveModel!);await Reveal(workspace.Data.Uv!.Source);await Task.Delay(400);Capture(Path.Combine(output,"workspace.png"));
-            File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),$"PASS actual WPF resource workflow; {P.Bones.Count} bones, {P.Meshes.Count} meshes, {textureCache.Count} textures; CHR0 {SelectedClip!.Name}; VIS0 {group?.Name??"absent"}, {group?.Tracks.Count(t=>t.BoneId!="")??0} bound tracks; SRT0 {workspace.Data.Uv!.Name} / {workspace.Data.Uv.Tracks.Count(t=>t.Status.StartsWith("Evaluated:"))} evaluated tracks; save/reopen/hash verification. Original fixtures additionally exercise rotating SRT0, VIS editor buttons/undo/redo/native export and mip/palette/alpha viewer checks when indexed.pac is present. Source appearance is approximate, other channels preserved unevaluated. Native-tool/in-game checks unrun.");Application.Current.Shutdown(0);
+            File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),$"PASS actual WPF resource workflow; {P.Bones.Count} bones, {P.Meshes.Count} meshes, {textureCache.Count} textures; CHR0 {SelectedClip!.Name}; VIS0 {group?.Name??"absent"}, {group?.Tracks.Count(t=>t.BoneId!="")??0} bound tracks; SRT0 {workspace.Data.Uv!.Name} / {workspace.Data.Uv.Tracks.Count(t=>t.Status.StartsWith("Evaluated:"))} evaluated tracks; save/reopen/hash verification. Original fixtures additionally exercise rotating SRT0, VIS and all-track SRT editors/undo/redo/native export and mip/palette/alpha viewer checks when indexed.pac is present. Source appearance is approximate, other channels preserved unevaluated. Native-tool/in-game checks unrun.");Application.Current.Shutdown(0);
         }
         catch(Exception e){File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),e.ToString());Application.Current.Shutdown(1);}
     }

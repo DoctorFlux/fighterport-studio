@@ -33,6 +33,13 @@ public static class ColladaFixture
                     E("input",A("semantic","NORMAL"),A("source","#"+id+"-norm"),A("offset",1)),
                     E("input",A("semantic","TEXCOORD"),A("source","#"+id+"-uv"),A("offset",2),A("set",0)),
                     E("p",string.Join(" ",m.Indices.SelectMany(i=>new[]{i,i,i})))))));
+            if(m.NativeAttributes.TryGetValue("BrawlUV1",out var uv1))
+            {
+                var mesh=geometry.Elements().Last().Element(Ns+"mesh")!;var triangles=mesh.Element(Ns+"triangles")!;
+                mesh.AddFirst(Source(id+"-uv1",uv1.SelectMany(v=>v),2,["S","T"]));
+                triangles.AddFirst(E("input",A("semantic","TEXCOORD"),A("source","#"+id+"-uv1"),A("offset",3),A("set",1)));
+                triangles.Element(Ns+"p")!.Value=string.Join(" ",m.Indices.SelectMany(i=>new[]{i,i,i,i}));
+            }
             // Omit zero influences: BrawlLib reduces influences after choosing rigid vs blended
             // storage, so sending an explicit zero can select the wrong storage convention.
             var influences=m.Vertices.Select(v=>v.Bones.Zip(v.Weights).Where(w=>w.Second>0).ToArray()).ToArray();

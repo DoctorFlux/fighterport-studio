@@ -9,6 +9,7 @@ internal static class WorkspaceTests
         {
             string root=Environment.CurrentDirectory,worker=Path.Combine(root,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),jobs=Path.Combine(root,".local/jobs");
             var backend=new NativeBackend(worker,jobs);var transport=new WorkerProcess(worker,jobs);var demo=Demo.Create();
+            foreach(var uvMesh in demo.Meshes)uvMesh.NativeAttributes["BrawlUV1"]=uvMesh.Vertices.Select(v=>new[]{1-.5f*v.UV[0],.25f+2*v.UV[1]}).ToArray();
             string mdl=Path.Combine(output,"workspace.mdl0"),chr=Path.Combine(output,"workspace.chr0"),model=Path.Combine(output,"workspace-model.pac"),motion=Path.Combine(output,"workspace-motion.pac");
             await backend.GenerateModelFixture(demo,mdl);await backend.ExportClip(demo,demo.Clips[2],chr);
             string request=Path.Combine(output,"fixture-request.json");File.WriteAllText(request,JsonSerializer.Serialize(new BundlePoseRequest{ModelPath=mdl,ClipPath=chr},ProjectStore.Json));
@@ -20,6 +21,11 @@ internal static class WorkspaceTests
             AssetHandle Handle(SourceDocument d,NativeTreeEntry e)=>new(){DocumentId=d.Id,NodeId=e.Id};
             await ws.ActivateModel(Handle(a,models.Single(e=>e.Kind=="MDL0")));
             Check(ws.Data.Project.Materials.Count>0,"No native materials");
+            foreach(var uvMesh in ws.Data.Project.Meshes)
+            {
+                Check(uvMesh.NativeAttributes.TryGetValue("BrawlUV1",out var uv1),"Native UV1 missing");
+                for(int i=0;i<uvMesh.Vertices.Count;i++)Check(Math.Abs(uv1![i][0]-(1-.5f*uvMesh.Vertices[i].UV[0]))<.00001f&&Math.Abs(uv1[i][1]-(.25f+2*uvMesh.Vertices[i].UV[1]))<.00001f,"Distinct UV1 values/convention lost");
+            }
             foreach(var binding in ws.Data.Project.Materials.SelectMany(m=>m.Textures))Check(binding.Texture.NodeId!=""&&binding.Texture.DocumentId==a.Id,"Unresolved original binding");
             Check(models.Count(e=>e.Kind=="TEX0"&&e.Name=="OriginalQuadrants")==2,"Scoped duplicate fixture missing");
             var texture=ws.Data.Project.Materials[0].Textures[0].Texture;Check(texture.NodeId.StartsWith("0/1/"),"Wrong ARC texture group selected");byte[] png=await ws.Texture(texture);Check(png.Take(8).SequenceEqual(new byte[]{137,80,78,71,13,10,26,10}),"Native PNG decode");File.WriteAllBytes(Path.Combine(output,"quadrants.png"),png);
@@ -64,6 +70,7 @@ internal static class WorkspaceTests
             return Task.CompletedTask;
         });
         await AncillaryTests.Run(output,test);
+        await UvEditingTests.Run(output,test);
     }
     internal static async Task RunLocal(string output,Func<string,Func<Task>,Task> test)
     {
