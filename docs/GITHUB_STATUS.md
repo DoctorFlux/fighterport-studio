@@ -7,3 +7,4 @@
 - Branch main; source commits/pushes authorized after staged review and live exact identity/visibility verification. scripts/push.ps1 verifies those values and the remote main SHA after pushing. Resolve current checkpoint via git rev-parse HEAD and git rev-parse origin/main; the final response records the actual result.
 - No repository replacement, collaborators, forced push, public binary release or uploaded game/derived assets. Private local configuration, caches and build artifacts remain ignored.
 - CI manual-only and not dispatched. Local roadmap is authoritative; existing issues are a partial historical mirror.
+Verified implementation delivery: f7b4229a1d00ac04336ff71378a81ec3e6f38186 pushed on 2026-10-16 after exact live public visibility check; remote main SHA matched. Documentation-only receipt follows. No assets or binaries uploaded.
