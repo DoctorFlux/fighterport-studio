@@ -16,6 +16,27 @@ internal static class ResourceOperations
     private static readonly JavaScriptSerializer Json=new JavaScriptSerializer{MaxJsonLength=32*1024*1024,RecursionLimit=128};
     internal static void Run(string operation,string input,string output)
     {
+        if(operation=="resource-uv-matrices")
+        {
+            var bindings=Json.Deserialize<TextureBinding[]>(File.ReadAllText(input));
+            if(bindings.Length>256)throw new InvalidDataException("Matrix probe quota");
+            Write(output,bindings.Select(b=>
+            {
+                var v=b.RestSrt;var state=new BrawlLib.Modeling.TextureFrameState(new BrawlLib.Internal.Vector2(v[0],v[1]),v[2],new BrawlLib.Internal.Vector2(v[3],v[4]),(TexMatrixMode)Enum.Parse(typeof(TexMatrixMode),b.MatrixMode),false);
+                var uv=state._transform*new BrawlLib.Internal.Vector3(.25f,.25f,0);return new[]{uv._x,1-uv._y};
+            }).ToArray());return;
+        }
+        if(operation=="export-visibility")
+        {
+            var g=Json.Deserialize<VisibilityGroup>(File.ReadAllText(input));
+            if(g.NativeVersion!=3||g.FrameCount<1||g.FrameCount>100000||g.Tracks.Count>512||g.Tracks.Sum(t=>(long)t.Values.Length)>1000000||g.Tracks.Any(t=>t.Values.Length!=1&&t.Values.Length!=g.FrameCount))throw new InvalidDataException("VIS0 v3 writer quota/subset");
+            using(var node=new VIS0Node{Name=g.Name,OriginalPath=g.NativeOriginalPath,Version=3,FrameCount=g.FrameCount,Loop=g.Loop})
+            {
+                foreach(var track in g.Tracks){var entry=node.CreateEntry();entry.Name=track.Target;if(track.Values.Length==1)entry.MakeConstant(track.Values[0]);else for(int f=0;f<g.FrameCount;f++)entry.SetEntry(f,track.Values[f]);}
+                node.Export(output);
+            }
+            return;
+        }
         if(operation.StartsWith("fixture-workspace-")){Fixture(operation,Json.Deserialize<BundlePoseRequest>(File.ReadAllText(input)),output);return;}
         if(operation=="resource-vis-pose"||operation=="resource-uv-pose")
         {
@@ -74,14 +95,18 @@ internal static class ResourceOperations
                     if(chr.Version!=4)throw new NotSupportedException("CHR0 v4 subset");Write(output,Program.ReadClip(chr));break;
                 case "resource-vis": Write(output,ReadVisibility(node as VIS0Node??throw new InvalidDataException("Select VIS0")));break;
                 case "resource-uv": Write(output,ReadUv(node as SRT0Node??throw new InvalidDataException("Select SRT0")));break;
-                case "resource-texture":
+                case "resource-texture":case "resource-texture-probe":
                     var texture=node as TEX0Node??throw new InvalidDataException("Select TEX0");
                     if(texture.Width<1||texture.Height<1||texture.Width>4096||texture.Height>4096||(long)texture.Width*texture.Height>4*1024*1024||request.Mip<0||request.Mip>=texture.LevelOfDetail)throw new InvalidDataException("Texture dimension/mip quota");
                     var candidates=texture.BRESNode?.Children.SelectMany(g=>g.Children).OfType<PLT0Node>().Where(p=>p.Name==texture.Name).ToArray()??new PLT0Node[0];
                     if(texture.HasPalette&&string.IsNullOrEmpty(request.PaletteId)&&candidates.Length!=1)throw new InvalidDataException("Missing/ambiguous palette; explicit palette handle required");
-                    var palette=string.IsNullOrEmpty(request.PaletteId)?candidates.SingleOrDefault():Resolve(root,request.PaletteId) as PLT0Node;
+                    var palette=string.IsNullOrEmpty(request.PaletteId)?(texture.HasPalette?candidates.SingleOrDefault():null):Resolve(root,request.PaletteId) as PLT0Node;
                     if(texture.HasPalette&&palette==null)throw new InvalidDataException("Required palette missing");
-                    using(var bitmap=texture.GetImage(request.Mip,palette)??throw new InvalidDataException("Texture decode failed"))bitmap.Save(output,ImageFormat.Png);
+                    using(var bitmap=texture.GetImage(request.Mip,palette)??throw new InvalidDataException("Texture decode failed"))
+                    {
+                        if(operation=="resource-texture")bitmap.Save(output,ImageFormat.Png);
+                        else Write(output,new{Width=bitmap.Width,Height=bitmap.Height,Pixels=new[]{bitmap.GetPixel(bitmap.Width/4,bitmap.Height/4).ToArgb(),bitmap.GetPixel(3*bitmap.Width/4,bitmap.Height/4).ToArgb(),bitmap.GetPixel(bitmap.Width/4,3*bitmap.Height/4).ToArgb(),bitmap.GetPixel(3*bitmap.Width/4,3*bitmap.Height/4).ToArgb()}});
+                    }
                     break;
                 case "resource-extract":
                     // Raw source slice, not a renamed/rebuilt native export. Standalone resource relocation is separate.
@@ -106,7 +131,8 @@ internal static class ResourceOperations
     {
         string kind=node is MDL0Node?"MDL0":node.GetType().Name.Replace("Node","");
         bool preview=node is MDL0Node||node is CHR0Node||node is VIS0Node||node is TEX0Node||node is SRT0Node;
-        return new NativeTreeEntry{Id=Id(node),Name=node.Name,Kind=kind,Version=(node as BRESEntryNode)?.Version??0,Size=node.UncompressedSize,HasChildren=node.HasChildren,Status=preview?"Preview subset available; source retained read-only":"Source retained; evaluation and edited export not implemented"};
+        var texture=node as TEX0Node;
+        return new NativeTreeEntry{Id=Id(node),Name=node.Name,Kind=kind,Version=(node as BRESEntryNode)?.Version??0,Size=node.UncompressedSize,HasChildren=node.HasChildren,Width=texture?.Width??0,Height=texture?.Height??0,MipCount=texture?.LevelOfDetail??0,PixelFormat=texture?.Format.ToString()??"",Status=preview?"Preview subset available; source retained read-only":"Source retained; evaluation and edited export not implemented"};
     }
     private static void Appearance(MDL0Node model,CharacterProject project)
     {
@@ -156,7 +182,7 @@ internal static class ResourceOperations
     {
         if(node.Version!=3&&node.Version!=4)throw new NotSupportedException("VIS0 v3/v4 subset");
         if(node.FrameCount<1||node.FrameCount>100000||node.Children.Count>512||(long)node.FrameCount*node.Children.Count>1000000)throw new InvalidDataException("VIS0 quota");
-        var group=new VisibilityGroup{Name=node.Name,NativeVersion=node.Version,FrameCount=node.FrameCount,Loop=node.Loop};
+        var group=new VisibilityGroup{Name=node.Name,NativeOriginalPath=node.OriginalPath??"",NativeVersion=node.Version,FrameCount=node.FrameCount,Loop=node.Loop};
         foreach(VIS0EntryNode entry in node.Children)group.Tracks.Add(new VisibilityTrack{Target=entry.Name,Values=entry.EntryCount==0?new[]{entry.Enabled}:Enumerable.Range(0,node.FrameCount).Select(entry.GetEntry).ToArray()});
         return group;
     }
@@ -189,7 +215,25 @@ internal static class ResourceOperations
         using(var arc=new ARCNode{Name="OriginalConformance"})
         {
             var bres=new BRRESNode{Name="OriginalResources",FileType=ARCFileType.ModelData,FileIndex=0,GroupID=0};arc.AddChild(bres);
-            if(operation=="fixture-workspace-model"||operation=="fixture-workspace-ambiguous")
+            if(operation=="fixture-workspace-palette")
+            {
+                using(var image=new Bitmap(32,32,PixelFormat.Format8bppIndexed))
+                {
+                    var colors=image.Palette;colors.Entries[0]=Color.Red;colors.Entries[1]=Color.Lime;colors.Entries[2]=Color.Blue;colors.Entries[3]=Color.FromArgb(0,0,0,0);image.Palette=colors;
+                    var bits=image.LockBits(new Rectangle(0,0,32,32),ImageLockMode.WriteOnly,PixelFormat.Format8bppIndexed);
+                    try{for(int y=0;y<32;y++){var row=new byte[bits.Stride];for(int x=0;x<32;x++)row[x]=(byte)((x<16?0:1)+(y<16?0:2));System.Runtime.InteropServices.Marshal.Copy(row,0,IntPtr.Add(bits.Scan0,y*bits.Stride),row.Length);}}finally{image.UnlockBits(bits);}
+                    BrawlLib.Internal.IO.FileMap palette;
+                    // ReplaceRaw transfers FileMap ownership to the node; disposal before ARC rebuild invalidates its source.
+                    var encoded=TextureConverter.CI8.EncodeTEX0TextureIndexed(image,2,WiiPaletteFormat.RGB5A3,out palette);
+                    {
+                        var tex=bres.CreateResource<TEX0Node>("IndexedAlpha");tex.ReplaceRaw(encoded);tex.Name="IndexedAlpha";
+                        var pal=bres.CreateResource<PLT0Node>("IndexedAlpha");pal.ReplaceRaw(palette);pal.Name="IndexedAlpha";
+                    }
+                    colors.Entries[0]=Color.Yellow;image.Palette=colors;
+                    {var pal=bres.CreateResource<PLT0Node>("AlternatePalette");pal.ReplaceRaw(TextureConverter.EncodePLT0Palette(image.Palette,WiiPaletteFormat.RGB5A3));pal.Name="AlternatePalette";}
+                }
+            }
+            else if(operation=="fixture-workspace-model"||operation=="fixture-workspace-ambiguous")
             {
                 var model=NodeFactory.FromFile(null,request.ModelPath) as MDL0Node??throw new InvalidDataException("Original MDL0 required");
                 bres.GetOrCreateFolder<MDL0Node>().AddChild(model);model.Populate();
@@ -212,7 +256,7 @@ internal static class ResourceOperations
             else if(operation=="fixture-workspace-motion")
             {
                 var chr=NodeFactory.FromFile(null,request.ClipPath) as CHR0Node??throw new InvalidDataException("Original CHR0 required");bres.GetOrCreateFolder<CHR0Node>().AddChild(chr);
-                var vis=bres.CreateResource<VIS0Node>("OriginalAccessory");vis.Version=3;vis.FrameCount=chr.FrameCount;vis.Loop=chr.Loop;
+                var vis=bres.CreateResource<VIS0Node>("OriginalAccessory");vis.Version=3;vis.OriginalPath="OriginalFixtures/Accessory.anim";vis.FrameCount=chr.FrameCount;vis.Loop=chr.Loop;
                 var entry=vis.CreateEntry();entry.Name="LeftHand";for(int i=0;i<vis.FrameCount;i++)entry.SetEntry(i,i<10||i>=20);
                 var opaque=bres.CreateResource<SRT0Node>("PreservedUvGap");opaque.FrameCount=chr.FrameCount; // Real native empty channel fixture; no UV animation support claim.
                 using(var model=NodeFactory.FromFile(null,request.ModelPath) as MDL0Node)
@@ -220,6 +264,14 @@ internal static class ResourceOperations
                     model.Populate();var uv=bres.CreateResource<SRT0Node>("OriginalUvSlide");uv.FrameCount=chr.FrameCount;uv.Loop=chr.Loop;
                     var mat=new SRT0EntryNode{Name=model._matList[0].Name};uv.AddChild(mat);var sampler=new SRT0TextureNode(0,false);mat.AddChild(sampler);uv.FrameCount=chr.FrameCount;uv.Loop=chr.Loop;
                     sampler.SetKeyframe(3,0,0);sampler.SetKeyframe(3,20,.5f);sampler.SetKeyframe(3,40,0);
+                    foreach(var mode in new[]{TexMatrixMode.MatrixXSI,TexMatrixMode.Matrix3dsMax})
+                    {
+                        var rotating=bres.CreateResource<SRT0Node>("OriginalUv"+mode);rotating.MatrixMode=mode;
+                        var material=new SRT0EntryNode{Name=model._matList[0].Name};rotating.AddChild(material);var channel=new SRT0TextureNode(0,false);material.AddChild(channel);rotating.FrameCount=chr.FrameCount;rotating.Loop=chr.Loop;
+                        channel.SetKeyframe(0,0,1.5f);channel.SetKeyframe(1,0,.75f);
+                        channel.SetKeyframe(2,0,0);channel.SetKeyframe(2,20,90);channel.SetKeyframe(2,40,-90);
+                        channel.SetKeyframe(3,0,.125f);channel.SetKeyframe(4,0,-.25f);
+                    }
                 }
             }
             else throw new InvalidDataException("Unknown original fixture mode");

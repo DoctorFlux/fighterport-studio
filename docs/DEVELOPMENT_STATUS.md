@@ -1,12 +1,12 @@
 # Development status — 2026-10-16
 
-Current tested checkpoint: **M3.A2 quaternion/rest-parent transfer subset**, followed by **M1.E / M1.C2 / M3.C1 / M3.D1 initial unified resource workspace**. Existing WPF/native workers/tests are preserved. Full requirements, IDs and multi-game scope remain in MASTER_PLAN.md, ROADMAP.md and the unified continuation specification.
+Current tested checkpoint: **M3.C1 / M3.D1 palette/mip and rotating UV fidelity, visibility editing and native export**, following the retained M3.A2 and unified resource workspace subsets. Existing WPF/native workers/tests are preserved. Full requirements, IDs and multi-game scope remain in MASTER_PLAN.md, ROADMAP.md and the unified continuation specification.
 
 ## Repository
 
 Only https://github.com/DoctorFlux/fighterport-studio, configured origin/main. **PUBLIC**, explicitly authorized by the user; historical private-only instructions are superseded. No visibility mutation. scripts/push.ps1 checks live identity/visibility and actual remote SHA, then writes an ignored .local/checkpoints receipt. Reviewed source only; no game/derived content, local configuration, dependencies or binaries committed. CI remains unrun/manual-only.
 
-M3.A2 checkpoint **fb386fdb19ab1250c637c48b14a04dea77a16518** was pushed and remote-verified this run. The subsequent workspace checkpoint is identified by Git HEAD and its local receipt after review/push. A local commit alone is not proof of upload.
+M3.A2 checkpoint **fb386fdb19ab1250c637c48b14a04dea77a16518** was pushed and remote-verified this run. Unified workspace checkpoint **73a0c5492eb6bb0bfb7ba62ecada868e43f9fc6c** was also remote-verified. The current ancillary checkpoint is identified by Git HEAD and its local receipt after review/push. A local commit alone is not proof of upload.
 
 ## Local application
 
@@ -32,13 +32,13 @@ Retained earlier results: Brawl main MDL0 v9, 63 bones/14 meshes/10,252 facepoin
 
 ## Next executable task and limits
 
-Next **M3.C/D ancillary fidelity/editing**: original indexed palette, alpha, wrap/mip and additional-UV fixtures; verified rotating SRT matrices and sampler composition; explicit ancillary binding edits/undo; genuine VIS0/SRT0 writers with decoded validation. Then PAT0/CLR0/SHP0/constraints and full native model/package round trips. Complete M1.E search/recent/dirty-state, viewport semantic picking, conservative companion assembly and source relinking. Keep unsupported modes visible/preserved.
+Next **M3.C/D ancillary fidelity/editing**: SRT0 v4 curve/binding edits/undo and genuine decoded native export, preserving every sampler track; further CI4/palette ambiguity, asymmetric wrap, multiple-material/additional-UV fixtures and sampler composition. VIS0 v3 editing/export and CI8/RGB5A3 alpha/two-mip fixtures are now tested. XSI/3dsMax rotation is tested; Maya rotation-only backend discrepancy remains unresolved. Then PAT0/CLR0/SHP0/constraints and full native model/package round trips. Complete M1.E search/recent/dirty-state, viewport semantic picking, conservative companion assembly and source relinking. Keep unsupported modes visible/preserved.
 
 Continue M3.A2 ambiguity/helper refinements, human-reviewed exact-fingerprint Mario maps, both target-rig transfer directions, measured bake/native decode. No guessed commercial map is approved. Proportions, twist, scale compensation, IK/contact and continuous-error proof remain incomplete.
 
 Keep Rivals Modkit/interchange M4.A, Melee M5.A, optimization M3.B, Dragon Ball sources M5.C, equal optional Blender/Maya/3ds Max M4.B, discovery/legacy M0.C/M5.D/E and every master requirement. All four full-character writers/packages remain required.
 
-Appearance is approximate: sampler 0/UV0 decoded color/alpha, nonrotating Maya SRT scale/translation, VIS0. No full TEV, alpha-test, extra samplers, other color/texture/shape/constraint evaluation or native edited model/container. PLT0/mip support is not proved by TEX0 tests. Ultimate companion/material/ancillary work remains pending. FPWORK needs unchanged originals at existing paths; relinking/portable bundles are pending. Undo covers scalar keys, not all workspace commands; dirty prompts and richer group mute/solo/rate controls remain incomplete.
+Appearance is approximate: sampler 0/UV0 decoded color/alpha, Maya ST and XSI/3dsMax SRT, VIS0. No full TEV, alpha-test, extra samplers, other color/texture/shape/constraint evaluation or native edited model/container. CI8/RGB5A3 palettes/alpha and mip 0/1 have independent original pixel checks; other palette/format/wrap coverage remains incomplete. Ultimate companion/material/ancillary work remains pending. FPWORK needs unchanged originals at existing paths; relinking/portable bundles are pending. Undo covers scalar keys and a separate 16-step VIS editor, not all workspace commands; dirty prompts and richer group mute/solo/rate controls remain incomplete.
 
 Bounds: 256 documents, 32 MiB per source/save/worker response, 32 MiB decoded cache, 4-megapixel texture decode, 45-second supervised native jobs. Legacy FPPROJ/Ultimate retention still has 8 MiB dependency bounds. This is not an OS parser sandbox. Folder indexing is immediate-folder/256-entry bounded; no all-disk scan.
 
@@ -50,3 +50,17 @@ Framework-dependent publish needs installed .NET 10 Desktop and .NET Framework 4
 Final publish completed with zero build warnings/errors. Changed workspace tests passed **3/3**, `artifacts/tests/20261016-190656`, including ambiguous eligible texture banks and reused standalone native preflight. Script-driven **published apphost** smokes passed at `artifacts/gui-workspace-workspace-model` (native tree, textured model, CHR0/VIS0/SRT0, source checks, save/reopen and skeletal-only native CHR0 bake/write/decode) and `artifacts/gui-workspace-FitMario00` (actual Mario textures, Wait2 skeletal/UV groups, save/reopen). Existing published key-edit/undo/redo, mapping and Ultimate playback smokes passed at `artifacts/gui-smoke`, `artifacts/gui-mapping-smoke`, `artifacts/gui-playback-ultimate`. No new capability is inferred from native-tool/in-game checks, which remain unrun.
 
 Final review follow-up: duplicate bound UV targets now reject before rendering; original workspace tests **2/2 passed** at `artifacts/tests/20261016-191030`, and the published original workflow passed again. Reviewed 25 staged source/test/script/document files; staged path, whitespace, UTF-8 and credential-pattern checks passed. Commercial assets and all build/test artifacts remain excluded.
+
+
+## Palette / UV / ancillary checkpoint — 2026-10-16
+
+- Build succeeds with zero warnings/errors. Full regression **47 passed / 0 failed**, `artifacts/tests/20261016-192451`; all **688 supplied source hashes unchanged**. Existing tests retained, including native failure regression; no reimplementation of that milestone.
+- CI8 TEX0 + RGB5A3 PLT0 are generated through the pinned real encoder. Independent red/green/blue/transparent quadrant checks cover 32×32 mip 0 and 16×16 mip 1, plus a yellow alternate palette. The texture viewer exposes native metadata, mip/palette choice, decoded dimensions, sampler/UV/wrap usages and persisted palette overrides. Viewport stays on mip 0.
+- XSI/3dsMax UV SRT: 32 native matrix combinations, independent 90-degree expectations, and genuine rotating SRT0 v4 fractional ApplySRT comparisons (tolerance 0.00001 UV). Maya rotation remains unsupported because its pinned rotation-only branch differs from its general formula. Additional samplers/UVs remain unevaluated.
+- VIS0 v3 working-copy sample and explicit target-binding edits, separate bounded undo/redo, FPWORK persistence, genuine native standalone export and decoded metadata/target/constant/sample validation. Original-path metadata is preserved from the verified source, including older workspace saves. Constant expansion/undo and duplicate binding rejection are tested. Source overwrite, existing destination and unencoded timing overrides reject. v4 user data, opaque metadata beyond this subset, native container repacking and native-tool/game checks are not claimed.
+- First published original workflow passed with actual visibility editor buttons, undo/redo, native export, rotating UV capture and texture-window mip/palette/alpha checks. Only original screenshots were viewed; commercial captures remain local. Final targeted/source-metadata and publish checks follow in the checkpoint record below.
+
+Next executable task: implement typed SRT0 v4 key/tangent and binding edits/undo, a genuine native writer and decoded fractional validation without dropping the currently unevaluated direct/indirect sampler tracks. Keep all four peer character destinations and the entire multi-game roadmap.
+
+
+Final ancillary checkpoint verification: **6/6 focused cases passed**, `artifacts/tests/20261016-192803`, including original-path metadata, constant expansion/undo, duplicate-binding rejection and opt-in Mario. Final publish completed with **zero warnings/errors**. Published original and Mario workspace smokes passed at `artifacts/gui-workspace-workspace-model` and `artifacts/gui-workspace-FitMario00`; original uses the newly generated fixtures in the targeted test directory. Packaged CLI doctor reports runtime 10.0.11, Windows true, native worker true. Source review/push uses the exact PUBLIC repository workflow; actual commit identity is recorded in Git and the ignored verified receipt. No commercial assets, native outputs, local settings or build artifacts are staged.

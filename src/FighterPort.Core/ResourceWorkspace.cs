@@ -27,7 +27,7 @@ public sealed class WorkspaceData
 }
 
 /// <summary>Bounded, verified external source documents; no texture pixels or temporary paths in saves.</summary>
-public sealed class ResourceWorkspace(string workerPath,string jobs,string pythonScript)
+public sealed partial class ResourceWorkspace(string workerPath,string jobs,string pythonScript)
 {
     private readonly WorkerProcess worker=new(workerPath,jobs);
     private readonly UltimateBackend ultimate=new("python",pythonScript,jobs);
@@ -99,7 +99,7 @@ public sealed class ResourceWorkspace(string workerPath,string jobs,string pytho
             track.Status=UvEvaluator.Support(Data.Project,group,track);
         }
         UvEvaluator.Validate(Data.Project,group);
-        if(!group.Tracks.Any(t=>t.Status.StartsWith("Evaluated:")))throw new InvalidDataException("SRT0 has no evaluable direct Maya sampler 0 scale/translation tracks; source retained. Other modes/channels require further implementation.");
+        if(!group.Tracks.Any(t=>t.Status.StartsWith("Evaluated:")))throw new InvalidDataException("SRT0 has no evaluable direct Maya ST or XSI/3dsMax SRT sampler 0 UV0 tracks; source retained. Other modes/channels require further implementation.");
         Data.Uv=group;Data.Problems.AddRange(group.Tracks.Where(t=>!t.Status.StartsWith("Evaluated:")).Select(t=>t.MaterialName+" / "+t.Slot+": "+t.Status));
     }
     public Task<byte[]> ExtractSlice(AssetHandle handle,CancellationToken ct=default)=>Request("resource-extract",Document(handle),handle.NodeId,ct);

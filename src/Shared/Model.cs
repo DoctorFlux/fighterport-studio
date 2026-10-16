@@ -148,6 +148,10 @@ namespace FighterPort.Core
         public int Version { get; set; }
         public long Size { get; set; }
         public bool HasChildren { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int MipCount { get; set; }
+        public string PixelFormat { get; set; } = "";
         public string Status { get; set; } = "Preserved in source; evaluation/export not implemented";
     }
     public class MeshDraw
@@ -202,6 +206,7 @@ namespace FighterPort.Core
     public class VisibilityGroup
     {
         public string Name { get; set; } = "";
+        public string NativeOriginalPath { get; set; } = "";
         public int NativeVersion { get; set; }
         public int FrameCount { get; set; }
         public bool Loop { get; set; }

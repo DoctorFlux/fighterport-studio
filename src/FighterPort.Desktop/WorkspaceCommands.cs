@@ -39,7 +39,7 @@ public sealed partial class Workbench
     private void SetVisibilityEnabled(bool enabled){if(workspace.Data.Visibility is {} group)group.Enabled=enabled;Render();}
     private void OpenDialog()=>Native(async()=>
     {
-        var d=new OpenFileDialog{Title="Open source or saved workspace",Filter="Supported sources / workspaces|*.pac;*.brres;*.mdl0;*.chr0;*.vis0;*.tex0;*.numdlb;*.numshb;*.nusktb;*.nuanmb;*.numatb;*.fpwork;*.fpproj|All files|*.*",Multiselect=true};
+        var d=new OpenFileDialog{Title="Open source or saved workspace",Filter="Supported sources / workspaces|*.pac;*.brres;*.mdl0;*.chr0;*.vis0;*.srt0;*.tex0;*.plt0;*.numdlb;*.numshb;*.nusktb;*.nuanmb;*.numatb;*.fpwork;*.fpproj|All files|*.*",Multiselect=true};
         if(d.ShowDialog()==true)foreach(string path in d.FileNames)await OpenPath(path);
     });
     private void AddMenus(DockPanel dock)
@@ -52,7 +52,7 @@ public sealed partial class Workbench
         var view=Section("_View");Command(view,"Frame character",()=>{FitCharacter();Render();});Command(view,"Problems / dependency limits…",()=>MessageBox.Show(this,string.Join("\n",workspace.Data.Problems.Concat(P.Materials.SelectMany(m=>m.Limitations)).Distinct()),"Workspace problems"));
         var tools=Section("_Tools");Command(tools,"Map / Retarget…",()=>new MappingWindow(P,clips.SelectedIndex){Owner=this}.Show());Command(tools,"Cancel native job",()=>operation?.Cancel());
         var demos=Section("_Demos");foreach(var item in new[]{("Original humanoid",0),("Alternate rig",1),("Tail rig",2)})Command(demos,item.Item1,()=>{workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(Demo.Create(item.Item2));});
-        var help=Section("_Help");Command(help,"Verified subset",()=>MessageBox.Show(this,"Brawl MDL0 v9/v11 geometry; CHR0 v4; VIS0 v3 tested (v4 unverified); TEX0 v1 decoding and native material references. Direct Maya SRT0 sampler-0 UV0 scale/translation. Source appearance approximates the native shader. Other channels remain in original source files; edited container/model export is pending. Melee, Rivals 2, Dragon Ball and DCC milestones remain in the master plan.","FighterPort Studio"));
+        var help=Section("_Help");Command(help,"Verified subset",()=>MessageBox.Show(this,"Brawl MDL0 v9/v11 geometry; CHR0 v4; VIS0 v3 tested (v4 unverified); TEX0 v1 decoding and native material references. Direct Maya ST and XSI/3dsMax SRT0 sampler-0 UV0. CI8/RGB5A3 palette/alpha and two-mip original fixture tested; VIS0 v3 edit/export with decoded validation. Source appearance approximates the native shader. Other channels remain in original source files; edited container/model export is pending. Melee, Rivals 2, Dragon Ball and DCC milestones remain in the master plan.","FighterPort Studio"));
     }
     private async Task OpenFolder(string folder)
     {
@@ -91,7 +91,12 @@ public sealed partial class Workbench
         if(entry.Kind is "MDL0" or "NUMDLB" or "NUMSHB")Action("Display model / resolve materials",()=>Activate(selection));
         if(entry.Kind is "CHR0" or "NUANMB")Action("Use skeletal animation",()=>Activate(selection));
         if(entry.Kind=="SRT0")Action("Bind UV animation to materials / timeline",()=>Activate(selection));
-        if(entry.Kind=="VIS0")Action("Bind visibility to active model / timeline",()=>Activate(selection));
+        if(entry.Kind=="VIS0")
+        {
+            Action("Bind visibility to active model / timeline",()=>Activate(selection));
+            var edit=new MenuItem{Header="Edit active visibility / export VIS0…"};menu.Items.Add(edit);
+            edit.Click+=(_,_)=>{try{if(operation!=null)throw new InvalidOperationException("Wait for the active native job");EditVisibility();}catch(Exception e){SetStatus(e.Message);}};
+        }
         if(entry.Kind=="TEX0")
         {
             Action("Preview texture",()=>PreviewTexture(selection));
@@ -135,7 +140,7 @@ public sealed partial class Workbench
             default:ShowProperties(selection);SetStatus("Resource preserved in its verified source. Evaluation and edited export for this node type are not implemented.");return;
         }
         ShowProperties(selection);Render();
-        SetStatus($"{P.Name} • {P.Bones.Count} bones • {textureCache.Count} decoded textures • skeletal: {SelectedClip?.Name??"rest"} • visibility: {workspace.Data.Visibility?.Name??"none"}. Source appearance: sampler 0 / UV0 approximation; TEV, alpha-test, material/shape and other UV modes pending. "+string.Join("; ",workspace.Data.Problems.Distinct().Take(3)));
+        SetStatus($"{P.Name} • {P.Bones.Count} bones • {textureCache.Count} decoded textures • skeletal: {SelectedClip?.Name??"rest"} • visibility: {workspace.Data.Visibility?.Name??"none"}. Source appearance: sampler 0 / UV0 approximation; TEV, alpha-test, material/shape, Maya rotation and additional samplers pending. "+string.Join("; ",workspace.Data.Problems.Distinct().Take(3)));
     }
     private static string TextureKey(TextureBinding binding)=>binding.Texture.DocumentId+":"+binding.Texture.NodeId+":"+binding.PaletteId;
     private static BitmapSource Decode(byte[] bytes)
@@ -169,8 +174,27 @@ public sealed partial class Workbench
     }
     private async Task PreviewTexture(ResourceSelection selection)
     {
-        var image=Decode(await workspace.Texture(selection.Handle,ct:operation?.Token??default));
-        var window=new Window{Owner=this,Title=selection.Entry.Name+" — decoded mip 0",Width=600,Height=600,Content=new Image{Source=image,Stretch=Stretch.Uniform}};window.Show();
+        var doc=workspace.Document(selection.Handle);var palettes=(await Inventory(doc)).Where(e=>e.Entry.Kind=="PLT0").ToArray();
+        var mip=new ComboBox{ItemsSource=Enumerable.Range(0,Math.Max(1,selection.Entry.MipCount)).Select(i=>"Mip "+i),SelectedIndex=0,Margin=new(4)};
+        var palette=new ComboBox{ItemsSource=new[]{"Automatic palette in texture BRRES"}.Concat(palettes.Select(p=>p.Entry.Name+" ["+p.Handle.NodeId+"]")),SelectedIndex=0,Margin=new(4)};
+        var image=new Image{Stretch=Stretch.Uniform};var details=new TextBlock{TextWrapping=TextWrapping.Wrap,Margin=new(6)};
+        var panel=new DockPanel();var controls=new StackPanel();DockPanel.SetDock(controls,Dock.Top);panel.Children.Add(controls);panel.Children.Add(image);
+        controls.Children.Add(new TextBlock{Text=$"{selection.Entry.PixelFormat} / {selection.Entry.Width} × {selection.Entry.Height} / {selection.Entry.MipCount} native mips. Alpha retained; native material alpha-test is not simulated.",Margin=new(6),TextWrapping=TextWrapping.Wrap});
+        controls.Children.Add(mip);controls.Children.Add(palette);controls.Children.Add(details);
+        var decode=new Button{Content="Decode selected mip / palette",Margin=new(4)};controls.Children.Add(decode);
+        var bind=new Button{Content="Use selected palette for active material bindings to this texture",Margin=new(4)};controls.Children.Add(bind);
+        var window=new Window{Owner=this,Title=selection.Entry.Name+" — native texture",Width=650,Height=650,Content=panel};
+        async Task Load(bool apply)
+        {
+            int level=mip.SelectedIndex;string pal=palette.SelectedIndex==0?"":palettes[palette.SelectedIndex-1].Handle.NodeId;
+            var decoded=Decode(await workspace.Texture(selection.Handle,level,pal,operation?.Token??default));image.Source=decoded;
+            var uses=P.Materials.SelectMany(m=>m.Textures.Where(t=>t.Texture.DocumentId==selection.Handle.DocumentId&&t.Texture.NodeId==selection.Handle.NodeId).Select(t=>(m,t))).ToArray();
+            details.Text=$"Decoded {decoded.PixelWidth} × {decoded.PixelHeight}. Uses: "+string.Join(", ",uses.Select(u=>$"{u.m.Name} / sampler {u.t.Slot} / UV{u.t.UVSet} / {u.t.WrapU},{u.t.WrapV}"));
+            if(apply){workspace.Data.Project=P;foreach(var u in uses)workspace.OverrideTexture(u.m.Id,u.t.Slot,selection.Handle,pal);await LoadTextures();Render();SetStatus("Palette override applied to listed uses; save workspace to retain it. Viewport uses mip 0.");}
+        }
+        decode.Click+=(_,_)=>Native(()=>Load(false));bind.Click+=(_,_)=>Native(()=>Load(true));
+        window.Show();
+        try{await Load(false);}catch(Exception e){details.Text=e.Message+" — select an explicit palette and decode.";}
         ShowProperties(selection);
     }
     private async Task OverrideTexture(ResourceSelection selection)
@@ -241,10 +265,28 @@ public sealed partial class Workbench
                 var image=new FormatConvertedBitmap(textureCache.Values.First(),PixelFormats.Bgra32,null,0);byte[] pixel=new byte[4];image.CopyPixels(new Int32Rect(4,4,1,1),pixel,4,0);if(pixel[2]!=255||pixel[1]!=0||pixel[0]!=0)throw new InvalidDataException("Native original upper-left red texel mismatch");
                 image.CopyPixels(new Int32Rect(4,24,1,1),pixel,4,0);if(pixel[0]!=255||pixel[2]!=0)throw new InvalidDataException("Native original lower-left blue texel mismatch");
                 await ConvertSkeletal(false,Path.Combine(output,"skeletal-only-"+Guid.NewGuid().ToString("N")+".chr0"));
+                EditVisibility(smoke:true);await workspace.ExportVisibility(Path.Combine(output,"edited-visibility-"+Guid.NewGuid().ToString("N")+".vis0"));
+                await Activate(motions.Single(e=>e.Entry.Name=="OriginalUvMatrix3dsMax"));timeline.Value=20.25;Render();
+                Capture(Path.Combine(output,"rotating-uv.png"));
+                string indexed=Path.Combine(Path.GetDirectoryName(modelPath)!,"indexed.pac");
+                if(File.Exists(indexed))
+                {
+                    await OpenPath(indexed);var resources=await Inventory(workspace.Data.Documents.Last());await PreviewTexture(resources.Single(r=>r.Entry.Kind=="TEX0"));
+                    var viewer=OwnedWindows.Cast<Window>().Last();var dock=(DockPanel)viewer.Content;var controls=dock.Children.OfType<StackPanel>().Single();
+                    controls.Children.OfType<ComboBox>().First().SelectedIndex=1;
+                    var paletteChoice=controls.Children.OfType<ComboBox>().Last();paletteChoice.SelectedItem=paletteChoice.Items.Cast<string>().Single(s=>s.StartsWith("AlternatePalette"));
+                    controls.Children.OfType<Button>().First().RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+                    while(operation!=null)await Task.Delay(50);
+                    var preview=(BitmapSource)dock.Children.OfType<Image>().Single().Source;
+                    if(preview.PixelWidth!=16||preview.PixelHeight!=16)throw new InvalidDataException("GUI mip decode did not change dimensions");
+                    var pixels=new FormatConvertedBitmap(preview,PixelFormats.Bgra32,null,0);byte[] pixelValue=new byte[4];pixels.CopyPixels(new Int32Rect(4,4,1,1),pixelValue,4,0);
+                    if(pixelValue[2]!=255||pixelValue[1]!=255||pixelValue[0]!=0)throw new InvalidDataException("GUI alternate palette mismatch");
+                    pixels.CopyPixels(new Int32Rect(12,12,1,1),pixelValue,4,0);if(pixelValue[3]!=0)throw new InvalidDataException("GUI palette alpha mismatch");viewer.Close();
+                }
             }
             workspace.Data.Project=P;workspace.Data.ClipIndex=clips.SelectedIndex;string saved=Path.Combine(output,"reopened.fpwork");workspace.Save(saved);await OpenPath(saved);timeline.Value=10;
             await Reveal(workspace.Data.ActiveModel!);await Reveal(workspace.Data.Uv!.Source);await Task.Delay(400);Capture(Path.Combine(output,"workspace.png"));
-            File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),$"PASS actual WPF resource workflow; {P.Bones.Count} bones, {P.Meshes.Count} meshes, {textureCache.Count} textures; CHR0 {SelectedClip!.Name}; VIS0 {group?.Name??"absent"}, {group?.Tracks.Count(t=>t.BoneId!="")??0} bound tracks; SRT0 {workspace.Data.Uv!.Name} / {workspace.Data.Uv.Tracks.Count(t=>t.Status.StartsWith("Evaluated:"))} evaluated tracks; save/reopen/hash verification. Source appearance is approximate, other channels preserved unevaluated. Native-tool/in-game checks unrun.");Application.Current.Shutdown(0);
+            File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),$"PASS actual WPF resource workflow; {P.Bones.Count} bones, {P.Meshes.Count} meshes, {textureCache.Count} textures; CHR0 {SelectedClip!.Name}; VIS0 {group?.Name??"absent"}, {group?.Tracks.Count(t=>t.BoneId!="")??0} bound tracks; SRT0 {workspace.Data.Uv!.Name} / {workspace.Data.Uv.Tracks.Count(t=>t.Status.StartsWith("Evaluated:"))} evaluated tracks; save/reopen/hash verification. Original fixtures additionally exercise rotating SRT0, VIS editor buttons/undo/redo/native export and mip/palette/alpha viewer checks when indexed.pac is present. Source appearance is approximate, other channels preserved unevaluated. Native-tool/in-game checks unrun.");Application.Current.Shutdown(0);
         }
         catch(Exception e){File.WriteAllText(Path.Combine(output,"workspace-smoke.txt"),e.ToString());Application.Current.Shutdown(1);}
     }

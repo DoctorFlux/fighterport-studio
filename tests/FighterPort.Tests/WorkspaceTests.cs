@@ -37,6 +37,9 @@ internal static class WorkspaceTests
             Check(motions.Any(e=>e.Kind=="SRT0"&&e.Name=="PreservedUvGap"),"Unevaluated native channel lost");
             await ws.ActivateUv(Handle(b,motions.Single(e=>e.Kind=="SRT0"&&e.Name=="OriginalUvSlide")));
             await CheckUv(ws,transport,request,model,motion);
+            foreach(string mode in new[]{"MatrixXSI","Matrix3dsMax"})
+            {await ws.ActivateUv(Handle(b,motions.Single(e=>e.Name=="OriginalUv"+mode)));await CheckUv(ws,transport,request,model,motion);}
+            await ws.ActivateUv(Handle(b,motions.Single(e=>e.Name=="OriginalUvSlide")));
             var binding0=p.Materials[0].Textures[0];ws.OverrideTexture(p.Materials[0].Id,binding0.Slot,texture);
             string saved=Path.Combine(output,"workspace.fpwork");ws.Save(saved);var reopened=new ResourceWorkspace(worker,jobs,Path.Combine(root,"scripts/ssbh-worker.py"));reopened.Load(saved);
             Check((await reopened.Texture(texture)).SequenceEqual(png),"Texture after reopen");Check(reopened.Data.Visibility!.Tracks[0].Values.SequenceEqual(vis.Tracks[0].Values),"VIS lost");Check(reopened.Data.Project.Materials[0].Textures[0].Status.Contains("override"),"Override lost");
@@ -60,6 +63,7 @@ internal static class WorkspaceTests
             var duplicate=ProjectStore.Clone(group.Tracks[0]);duplicate.MaterialName="DifferentDisplayName";group.Tracks.Add(duplicate);bool rejected=false;try{UvEvaluator.Validate(p,group);}catch(InvalidDataException){rejected=true;}Check(rejected,"Duplicate bound material target accepted");
             return Task.CompletedTask;
         });
+        await AncillaryTests.Run(output,test);
     }
     internal static async Task RunLocal(string output,Func<string,Func<Task>,Task> test)
     {
