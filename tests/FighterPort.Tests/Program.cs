@@ -25,6 +25,36 @@ await Test("M1 missing bone binding and unknown schema rejected",()=>Sync(()=>{v
 await Test("M1 retained resource hash verifies and detects corruption",()=>Sync(()=>{string path=Path.Combine(output,"original.bin");File.WriteAllBytes(path,[1,2,3,4]);var p=ProjectStore.Clone(demo);ProjectStore.Retain(p,path);ProjectStore.Validate(p);p.Resources[0].Base64="AQ==";Reject(()=>ProjectStore.Validate(p));Assert(File.ReadAllBytes(path).SequenceEqual(new byte[]{1,2,3,4}));}));
 await Test("M1 duplicate key/disallowed interpolation rejected",()=>Sync(()=>{var p=ProjectStore.Clone(demo);p.Clips[0].Curves[0].Keys[1].Frame=0;Reject(()=>ProjectStore.Validate(p));p=ProjectStore.Clone(demo);p.Clips[0].Curves[0].Interpolation="guessed";Reject(()=>ProjectStore.Validate(p));}));
 
+CharacterProject RenamedTarget()
+{
+    var target=ProjectStore.Clone(demo);target.Clips.Clear();target.Name="Renamed longer limbs";
+    for(int i=0;i<target.Bones.Count;i++){target.Bones[i].Id=$"target-{i}";target.Bones[i].Name=$"other_{i}";target.Bones[i].Translation[0]*=1.3f;}
+    Animation.SetInverseBinds(target);return target;
+}
+MappingProfile ManualProfile(CharacterProject target)=>new(){Approved=true,SourceFingerprint=Animation.Fingerprint(demo),TargetFingerprint=Animation.Fingerprint(target),BoneIds=demo.Bones.Select((b,i)=>(b,i)).ToDictionary(x=>x.b.Id,x=>target.Bones[x.i].Id)};
+await Test("M1.D renamed FK profile transfers motion and preserves target mesh/binds",()=>Sync(()=>
+{
+    var target=RenamedTarget();var profile=ManualProfile(target);string before=System.Text.Json.JsonSerializer.Serialize(target);string sourceBefore=System.Text.Json.JsonSerializer.Serialize(demo);
+    var result=FkRetarget.Transfer(demo,2,target,profile);Assert(result.Branch=="target/fk");Assert(result.Clips.Count==1);
+    Assert(System.Text.Json.JsonSerializer.Serialize(target)==before&&System.Text.Json.JsonSerializer.Serialize(demo)==sourceBefore,"Input mutated");
+    Assert(System.Text.Json.JsonSerializer.Serialize(result.Meshes)==System.Text.Json.JsonSerializer.Serialize(target.Meshes));Assert(System.Text.Json.JsonSerializer.Serialize(result.Bones)==System.Text.Json.JsonSerializer.Serialize(target.Bones));
+    foreach(var c in result.Clips[0].Curves){var i=target.Bones.FindIndex(b=>b.Name==c.Bone);var original=demo.Clips[2].Curves.Single(x=>x.Bone==demo.Bones[i].Name&&x.Channel==c.Channel);Near(Animation.Evaluate(c,23.25f),Animation.Evaluate(original,23.25f));}
+    string path=Path.Combine(output,"fk.fpproj");ProjectStore.Save(result,path);Assert(ProjectStore.Load(path).MappingProfiles[0].Approved);
+}));
+await Test("M1.D approval, stale fingerprint and incomplete map reject",()=>Sync(()=>
+{
+    var target=RenamedTarget();var profile=ManualProfile(target);profile.Approved=false;Reject(()=>FkRetarget.Transfer(demo,2,target,profile));profile.Approved=true;profile.SourceFingerprint="stale";Reject(()=>FkRetarget.Transfer(demo,2,target,profile));profile=ManualProfile(target);profile.BoneIds.Clear();Reject(()=>FkRetarget.Transfer(demo,2,target,profile));
+}));
+await Test("M1.D incompatible axes and hierarchy reject without guessing",()=>Sync(()=>
+{
+    var target=RenamedTarget();target.Bones[0].Rotation=[0,25,0];Animation.SetInverseBinds(target);Reject(()=>FkRetarget.Transfer(demo,2,target,ManualProfile(target)));target=RenamedTarget();target.Bones[4].Parent=1;Animation.SetInverseBinds(target);Reject(()=>FkRetarget.Transfer(demo,2,target,ManualProfile(target)));
+}));
+await Test("M1.D full turns retained and root motion requires policy",()=>Sync(()=>
+{
+    var target=RenamedTarget();var profile=ManualProfile(target);var spin=FkRetarget.Transfer(demo,5,target,profile);Near(Animation.Evaluate(spin.Clips[0].Curves[0],45),540);Reject(()=>FkRetarget.Transfer(demo,4,target,profile));profile.RootTranslation="CopyDelta";var jump=FkRetarget.Transfer(demo,4,target,profile);Near(Animation.Evaluate(jump.Clips[0].Curves[0],30),45);Reject(()=>FkRetarget.Transfer(demo,7,target,profile));
+}));
+await Test("M1.D automatic template is only an unapproved exact-name suggestion",()=>Sync(()=>{var target=RenamedTarget();var template=FkRetarget.Template(demo,target);Assert(!template.Approved&&template.BoneIds.Count==0);Reject(()=>FkRetarget.Transfer(demo,2,target,template));}));
+
 if(args.Contains("--native"))
 {
     var backend=new NativeBackend(Path.Combine(Environment.CurrentDirectory,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),Path.Combine(Environment.CurrentDirectory,".local/jobs"));
@@ -38,6 +68,12 @@ if(args.Contains("--native"))
         foreach(var bone in p.Bones){var reference=demo.Bones.Single(b=>b.Name==bone.Name);for(int i=0;i<16;i++)Near(bone.InverseBind[i],reference.InverseBind[i],.002f);}
         var nativePositions=p.Meshes.SelectMany(m=>m.Vertices).Select(v=>Animation.V(v.Position)).ToArray();
         foreach(var v in demo.Meshes.SelectMany(m=>m.Vertices))Assert(nativePositions.Any(n=>Vector3.Distance(n,Animation.V(v.Position))<.01f),"Imported mesh differs from original fixture");
+        for(int mi=0;mi<demo.Meshes.Count;mi++)foreach(var v in demo.Meshes[mi].Vertices)
+        {
+            var candidate=p.Meshes[mi].Vertices.FirstOrDefault(n=>Vector3.Distance(Animation.V(n.Position),Animation.V(v.Position))<.01f&&Math.Abs(n.UV[0]-v.UV[0])<.001f&&Math.Abs(n.UV[1]-v.UV[1])<.001f);
+            Assert(candidate!=null,"Native UV or vertex mismatch");Near(Vector3.Distance(Animation.V(candidate!.Normal),Animation.V(v.Normal)),0,.001f);
+            for(int wi=0;wi<v.Bones.Length;wi++)if(v.Weights[wi]>0){int nativeBone=p.Bones.FindIndex(b=>b.Name==demo.Bones[v.Bones[wi]].Name);int influence=Array.IndexOf(candidate.Bones,nativeBone);Assert(influence>=0,"Missing native influence");Near(candidate.Weights[influence],v.Weights[wi],.0001f);}
+        }
         Assert(p.Meshes.SelectMany(m=>m.Vertices).Any(v=>v.Weights.Count(w=>w>0)>1));
         p.Clips.Add(await backend.ImportClip(p,chr));var baseline=Animation.World(p,p.Clips[0],30);
         var session=new EditSession(p);string boneName=demo.Clips[2].Curves[0].Bone;session.EditKey(0,boneName,4,15,-42);
@@ -59,6 +95,11 @@ if(args.Contains("--native"))
             foreach(var c in demo.Clips[index].Curves)for(int i=0;i<samples[c.Bone+":"+c.Channel].Length;i++)Near(samples[c.Bone+":"+c.Channel][i],Animation.Evaluate(c,i*.25f),.15f);
             if(index==5)Near(Animation.Evaluate(decoded.Curves.Single(c=>c.Channel==4),45),540,.05f);
         }
+    });
+    await Test("M2 deterministic native model bytes and rotated alternate bind conversion",async()=>
+    {
+        string a=Path.Combine(output,"repeat-a.mdl0"),b=Path.Combine(output,"repeat-b.mdl0");await backend.GenerateModelFixture(demo,a);await backend.GenerateModelFixture(demo,b);Assert(File.ReadAllBytes(a).SequenceEqual(File.ReadAllBytes(b)),"Native fixture generation is nondeterministic");
+        var alternate=Demo.Create(1);string path=Path.Combine(output,"orion.mdl0");await backend.GenerateModelFixture(alternate,path);var decoded=await backend.ImportModel(path);var points=decoded.Meshes.SelectMany(m=>m.Vertices).Select(v=>Animation.V(v.Position)).ToArray();foreach(var v in alternate.Meshes.SelectMany(m=>m.Vertices))Assert(points.Any(n=>Vector3.Distance(n,Animation.V(v.Position))<.02f),"Rotated native fixture differs");
     });
     await Test("M2 native rejects corrupt input and unsupported step export",async()=>
     {

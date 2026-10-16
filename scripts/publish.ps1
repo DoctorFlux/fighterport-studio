@@ -7,6 +7,16 @@ New-Item -ItemType Directory -Force "$destination/native", "$destination/notices
 Copy-Item src/FighterPort.NativeWorker/bin/Release/net472/* "$destination/native" -Recurse -Force
 Copy-Item .deps/BrawlCrate/LICENSE "$destination/notices/BrawlLib-LGPL-3.0.txt" -Force
 Copy-Item docs/DEPENDENCIES.md "$destination/notices/DEPENDENCIES.md" -Force
+$lock = Get-Content src/FighterPort.NativeWorker/packages.lock.json -Raw | ConvertFrom-Json -AsHashtable
+foreach ($target in $lock.dependencies.Values) {
+    foreach ($entry in $target.GetEnumerator()) {
+        if (!$entry.Value.resolved) { continue }
+        $package = Join-Path $env:NUGET_PACKAGES "$($entry.Key.ToLowerInvariant())/$($entry.Value.resolved)"
+        $noticeDir = Join-Path "$destination/notices" "$($entry.Key)-$($entry.Value.resolved)"
+        New-Item -ItemType Directory -Force $noticeDir | Out-Null
+        Get-ChildItem -LiteralPath $package -File | Where-Object Name -Match 'LICENSE|NOTICE' | Copy-Item -Destination $noticeDir -Force
+    }
+}
 # Redistribution preparation includes corresponding upstream source and exact local changes.
 git -C .deps/BrawlCrate archive --format=zip --output="$destination/notices/BrawlLib-source.zip" HEAD
 if ($LASTEXITCODE -ne 0) { throw 'Source archive failed' }

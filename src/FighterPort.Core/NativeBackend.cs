@@ -53,8 +53,9 @@ public sealed class NativeBackend(string workerPath,string jobsDirectory)
     public async Task GenerateModelFixture(CharacterProject original,string path)
     {
         if(File.Exists(path))throw new IOException("Fixture output exists");
-        string temp=Path.Combine(Path.GetFullPath(jobsDirectory),Guid.NewGuid()+".dae");Directory.CreateDirectory(Path.GetDirectoryName(temp)!);
-        try { ColladaFixture.Write(original,temp);ProjectStore.AtomicWrite(path,await Run("fixture-model",temp)); }finally { File.Delete(temp); }
+        string directory=Path.Combine(Path.GetFullPath(jobsDirectory),Guid.NewGuid().ToString("N"));Directory.CreateDirectory(directory);
+        string temp=Path.Combine(directory,"original-fixture.dae");
+        try { ColladaFixture.Write(original,temp);ProjectStore.AtomicWrite(path,await Run("fixture-model",temp)); }finally { Directory.Delete(directory,true); }
     }
     public async Task<Dictionary<string,float[]>> Samples(string path) => JsonSerializer.Deserialize<Dictionary<string,float[]>>(await Run("sample-clip",path))!;
 }

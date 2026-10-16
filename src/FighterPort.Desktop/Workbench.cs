@@ -36,7 +36,14 @@ public sealed class Workbench : Window
     private CancellationTokenSource? operation;
     private CharacterProject P=>session.Project;
     private Clip? SelectedClip=>clips.SelectedIndex>=0&&clips.SelectedIndex<P.Clips.Count?P.Clips[clips.SelectedIndex]:null;
-    private NativeBackend Backend=>new(Path.Combine(root,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),Path.Combine(root,".local/jobs"));
+    private NativeBackend Backend
+    {
+        get
+        {
+            string packaged=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../native/FighterPort.NativeWorker.exe"));
+            return new(File.Exists(packaged)?packaged:Path.Combine(root,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),Path.Combine(root,".local/jobs"));
+        }
+    }
 
     public Workbench(string[] args)
     {
@@ -80,7 +87,11 @@ public sealed class Workbench : Window
         timer.Tick+=(_,_)=>{double now=watch.Elapsed.TotalSeconds;if(playing&&SelectedClip is { } c){double next=timeline.Value+(now-last)*c.FramesPerSecond;if(next>timeline.Maximum){if(c.Loop)next%=c.FrameCount;else{next=timeline.Maximum;playing=false;}}timeline.Value=next;}last=now;};timer.Start();
         Closed+=(_,_)=>{timer.Stop();operation?.Cancel();};
         Refresh();
-        if(args.Length==2&&args[0]=="--smoke") Loaded+=async(_,_)=>await Smoke(args[1]);
+        if(args.Length>=2&&args[0]=="--smoke")
+        {
+            if(args.Length==3)SetProject(ProjectStore.Load(args[2]));
+            Loaded+=async(_,_)=>await Smoke(args[1]);
+        }
         if(args.Length==2&&args[0]=="--project")SetProject(ProjectStore.Load(args[1]));
     }
     private static string FindRoot()
@@ -145,10 +156,18 @@ public sealed class Workbench : Window
         try
         {
             Directory.CreateDirectory(output);await Task.Delay(700);Capture(Path.Combine(output,"demo.png"));
-            timeline.Value=30;clips.SelectedIndex=2;timeline.Value=30;channels.SelectedIndex=4;selectedBone=10;value.Text="-45";EditKey();session.Undo();session.Redo();
-            string project=Path.Combine(output,"gui.fpproj");ProjectStore.Save(P,project);SetProject(ProjectStore.Load(project));clips.SelectedIndex=2;timeline.Value=30;
+            int clipIndex=Math.Min(2,P.Clips.Count-1);
+            timeline.Value=30;clips.SelectedIndex=clipIndex;timeline.Value=30;channels.SelectedIndex=4;selectedBone=10;value.Text="-45";EditKey();session.Undo();session.Redo();
+            string project=Path.Combine(output,"gui.fpproj");ProjectStore.Save(P,project);SetProject(ProjectStore.Load(project));clips.SelectedIndex=clipIndex;timeline.Value=30;
             await Task.Delay(300);Capture(Path.Combine(output,"edited.png"));
-            File.WriteAllText(Path.Combine(output,"gui-smoke.txt"),$"PASS: Loaded window {ActualWidth}x{ActualHeight}; demo viewport; scrub; key edit; undo/redo; save/reopen; screenshot. Rendering tier: {RenderCapability.Tier>>16}. Native tool/in-game checks unrun.");
+            string native="";
+            if(P.Resources.Count>0)
+            {
+                string exported=Path.Combine(output,"gui-edited-"+Guid.NewGuid().ToString("N")+".chr0");await Backend.ExportClip(P,SelectedClip!,exported);var decoded=await Backend.ImportClip(P,exported);
+                if(Math.Abs(Animation.Evaluate(decoded.Curves.Single(c=>c.Bone==P.Bones[10].Name&&c.Channel==4),30)+45)>.05f)throw new InvalidDataException("GUI native edit did not round trip");
+                native=" Native source project loaded; GUI edit exported and decoded successfully.";
+            }
+            File.WriteAllText(Path.Combine(output,"gui-smoke.txt"),$"PASS: Loaded window {ActualWidth}x{ActualHeight}; skinned viewport; scrub; key edit; undo/redo; save/reopen; screenshot. Rendering tier: {RenderCapability.Tier>>16}.{native} Native tool/in-game checks unrun.");
             Application.Current.Shutdown(0);
         }
         catch(Exception e){File.WriteAllText(Path.Combine(output,"gui-smoke.txt"),e.ToString());Application.Current.Shutdown(1);}

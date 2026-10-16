@@ -946,6 +946,33 @@
       "state": "Planned",
       "evidence": "",
       "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "MappingProfile",
+      "version": "1",
+      "operation": "exact-name-template",
+      "state": "SyntheticTested",
+      "evidence": "M1.D tests; packaged CLI exercised",
+      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "MappingProfile",
+      "version": "1",
+      "operation": "approved-profile-save",
+      "state": "SyntheticTested",
+      "evidence": "M1.D tests; packaged CLI exercised",
+      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "MappingProfile",
+      "version": "1",
+      "operation": "restricted-fk-transfer",
+      "state": "SyntheticTested",
+      "evidence": "M1.D tests; packaged CLI exercised",
+      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
     }
   ]
 }

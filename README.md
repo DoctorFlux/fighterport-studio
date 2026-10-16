@@ -27,3 +27,11 @@ Use a **new** fixture directory. In the desktop use Import MDL0 then Attach CHR0
 Only generated original fixture code is tracked. Dependency clones/caches, builds, private config, user projects and native/game binaries are ignored. License obligations and corresponding backend source are documented in [dependencies](docs/DEPENDENCIES.md). Manual-only CI is prepared and unrun. Before pushing use `scripts/review.ps1`, inspect `git diff --cached`, commit, then `scripts/push.ps1` which verifies privacy and remote commit identity.
 
 See [complete scope](docs/MASTER_PLAN.md), [roadmap](docs/ROADMAP.md), [status](docs/DEVELOPMENT_STATUS.md), [current task](docs/plans/current.md), [format operations](docs/FORMAT_SUPPORT.md), [testing](docs/TESTING.md) and [GitHub status](docs/GITHUB_STATUS.md). Melee, Ultimate, Rivals II, Dragon Ball source adapters, native ancillary tracks, general DCC/interchange, automatic mapping/rebinding/optimization remain planned. No native-tool, retail-asset or in-game validation is claimed.
+
+## Current local build and restricted FK
+
+Launch `artifacts/publish/desktop/FighterPort.Desktop.exe` (verified Windows launch). Load `artifacts/demo-native/native.fpproj` for the genuine native-import demo; Open Demo starts the original canonical character. CLI executable: `artifacts/publish/cli/FighterPort.Cli.exe`; backend: `artifacts/publish/native/FighterPort.NativeWorker.exe`. Keep the publish subfolders together.
+
+The CLI also exposes `map-template <source> <target> <profile.json>` and `retarget <source> <clip-index> <target> <approved-profile.json> <new-project>`. Review the unapproved exact-name suggestions and set the profile's explicit approval only after mapping is correct. Matching rest axes/hierarchy and unit rest scales are required; root motion needs CopyDelta policy. See [retargeting](docs/RETARGETING.md). Desktop mapping controls are the next task.
+
+Current evidence: 23 automated tests passed, native and original GUI smoke passed, packaged CLI exercised. Published apphost ran on installed .NET 10.0.11; project-local SDK commands use 10.0.13. No remote CI or native-tool/in-game checks ran.

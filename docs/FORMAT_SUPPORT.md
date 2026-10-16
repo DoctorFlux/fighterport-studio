@@ -109,3 +109,6 @@ Generated from config/capabilities.json. SyntheticTested is not retail/native-to
 | Xenoverse 2 | Native source assets TBD | evaluate | Planned |  Source only. No native export requirement. |
 | Xenoverse 2 | Native source assets TBD | preserve | Planned |  Source only. No native export requirement. |
 | Xenoverse 2 | Native source assets TBD | validate | Planned |  Source only. No native export requirement. |
+| Original / canonical rigs | MappingProfile 1 | exact-name-template | SyntheticTested | M1.D tests; packaged CLI exercised CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding. |
+| Original / canonical rigs | MappingProfile 1 | approved-profile-save | SyntheticTested | M1.D tests; packaged CLI exercised CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding. |
+| Original / canonical rigs | MappingProfile 1 | restricted-fk-transfer | SyntheticTested | M1.D tests; packaged CLI exercised CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding. |

@@ -14,6 +14,7 @@ namespace FighterPort.Core
         public List<Clip> Clips { get; set; } = new List<Clip>();
         public List<NativeResource> Resources { get; set; } = new List<NativeResource>();
         public List<string> Limitations { get; set; } = new List<string>();
+        public List<MappingProfile> MappingProfiles { get; set; } = new List<MappingProfile>();
     }
     public class Bone
     {
@@ -72,5 +73,14 @@ namespace FighterPort.Core
         public string Name { get; set; } = "";
         public string Sha256 { get; set; } = "";
         public string Base64 { get; set; } = "";
+    }
+    public class MappingProfile
+    {
+        public int Version { get; set; } = 1;
+        public string SourceFingerprint { get; set; } = "";
+        public string TargetFingerprint { get; set; } = "";
+        public bool Approved { get; set; }
+        public string RootTranslation { get; set; } = "Reject";
+        public Dictionary<string,string> BoneIds { get; set; } = new Dictionary<string,string>();
     }
 }
