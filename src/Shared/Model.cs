@@ -26,6 +26,7 @@ namespace FighterPort.Core
         public float[] Rotation { get; set; } = new float[3];
         public float[] Scale { get; set; } = new float[] { 1, 1, 1 };
         public float[] InverseBind { get; set; } = new float[16];
+        public float[] RestMatrix { get; set; } = new float[0];
     }
     public class Mesh
     {
@@ -34,6 +35,9 @@ namespace FighterPort.Core
         public float[] Color { get; set; } = new float[] { .2f, .65f, .8f };
         public List<Vertex> Vertices { get; set; } = new List<Vertex>();
         public List<int> Indices { get; set; } = new List<int>();
+        public string MaterialId { get; set; } = "";
+        public int NativeSubIndex { get; set; }
+        public Dictionary<string,float[][]> NativeAttributes { get; set; } = new Dictionary<string,float[][]>();
     }
     public class Vertex
     {
@@ -52,6 +56,9 @@ namespace FighterPort.Core
         public float FramesPerSecond { get; set; } = 30;
         public bool Loop { get; set; }
         public List<Curve> Curves { get; set; } = new List<Curve>();
+        public PoseTransfer Transfer { get; set; } = null!;
+        public List<TransformTrack> TransformTracks { get; set; } = new List<TransformTrack>();
+        public List<string> Losses { get; set; } = new List<string>();
     }
     public class Curve
     {
@@ -82,5 +89,43 @@ namespace FighterPort.Core
         public bool Approved { get; set; }
         public string RootTranslation { get; set; } = "Reject";
         public Dictionary<string,string> BoneIds { get; set; } = new Dictionary<string,string>();
+    }
+    public class PoseTransfer
+    {
+        public List<Bone> SourceBones { get; set; } = new List<Bone>();
+        public Clip SourceClip { get; set; } = null!;
+        public MappingProfile Mapping { get; set; } = null!;
+        public string Method { get; set; } = "WorldRestDelta-v1";
+    }
+    public class TransformTrack
+    {
+        public string Bone { get; set; } = "";
+        public List<TransformSample> Samples { get; set; } = new List<TransformSample>();
+    }
+    public class TransformSample
+    {
+        public float[] Scale { get; set; } = new float[] {1,1,1};
+        public float[] Rotation { get; set; } = new float[] {0,0,0,1};
+        public float[] Translation { get; set; } = new float[3];
+    }
+    public class BundleResource
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Kind { get; set; } = "";
+        public int Version { get; set; }
+    }
+    public class BundleRequest
+    {
+        public string Path { get; set; } = "";
+        public string Id { get; set; } = "";
+    }
+    public class BundlePoseRequest
+    {
+        public string ModelPath { get; set; } = "";
+        public string ModelId { get; set; } = "";
+        public string ClipPath { get; set; } = "";
+        public string ClipId { get; set; } = "";
+        public float Frame { get; set; }
     }
 }

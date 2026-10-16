@@ -15,3 +15,10 @@ Checked 2026-10-16. Dependencies are local ignored tools, not vendored binaries.
 | NumPy | 2.2.6, CPython 3.10 Windows x64 wheel | Optional inspector matrix dependency; BSD-3-Clause plus bundled-component notices in package license. Not included in desktop distribution. |
 
 Core/UI/CLI have no third-party NuGet dependencies. Worker and BrawlLib restore lockfiles are retained. `scripts/prepare-native.ps1` applies two documented modifications to the pinned source. `scripts/publish.ps1` stages local executables, backend license, NuGet license/third-party notices, upstream source archive and local patch under ignored artifacts; this is not permission or a claim of readiness for external binary redistribution. Do not bundle commercial game files. Original fixture code/assets may be redistributed under this project's fixture notice (tests/FIXTURES.md).
+
+
+Continuation: ssbh_data_py 0.9.1 / NumPy 2.2.6 now also power the optional native model/animation worker and original fixture generator. Packaged modl_data/mesh_data/skel_data/anim_data/matl_data .pyi APIs were inspected and actually executed. This local publish remains workspace-dependent for Ultimate: Python and .deps/ssbh-python are not included in a relocatable binary package; no runtime cloud/DCC dependency.
+
+prepare-native.ps1 now has **three** modifications: legacy resource reference, x86 bfloat bit-preserving write, and CHR0 indexed I12 encoding to preserve explicit tangents instead of regenerated dense-stream tangents. Source/patch/license are staged locally by publish.ps1. I12 is the existing genuine backend native format, not a custom exporter. File size can increase; decode validation remains mandatory.
+
+Source-only research checkout ssbh_wgpu revision f5f9e14a83e48e0e9282c77add192b8fcfd4c24b verified normalized quaternion interpolation and rigid-parent skinning semantics. It is not linked, copied into runtime or distributed.

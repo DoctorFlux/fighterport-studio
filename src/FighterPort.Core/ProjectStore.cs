@@ -45,11 +45,22 @@ public static class ProjectStore
             Require(Finite(b.Translation,3)&&Finite(b.Rotation,3)&&Finite(b.Scale,3)&&Finite(b.InverseBind,16),"Invalid bone transform");
             Require(b.Scale.All(x=>Math.Abs(x)>1e-6f),"Singular scale");
             Require(System.Numerics.Matrix4x4.Invert(Animation.M(b.InverseBind),out _),"Singular inverse bind");
+            Require(b.RestMatrix.Length==0||Finite(b.RestMatrix,16),"Invalid native rest matrix");
+        }
+        if(p.Bones.Any(b=>b.RestMatrix.Length>0))
+        {
+            var rest=Animation.World(p,null,0);
+            for(int i=0;i<rest.Length;i++)
+            {
+                Require(Animation.A(Animation.M(p.Bones[i].InverseBind)*rest[i]).Zip(Animation.A(System.Numerics.Matrix4x4.Identity)).All(x=>Math.Abs(x.First-x.Second)<.002f),"Native rest matrix does not match fingerprinted inverse bind");
+                if(p.Bones[i].RestMatrix.Length>0)Require(System.Numerics.Vector3.Distance(Animation.RestLocal(p.Bones[i]).Translation,Animation.V(p.Bones[i].Translation))<.0001f,"Native rest translation mismatch");
+            }
         }
         foreach(var mesh in p.Meshes)
         {
             Require(mesh.Vertices.Count<=200000&&mesh.Indices.Count<=600000,"Mesh quota exceeded");
             Require(Finite(mesh.Color,3),"Invalid material color");
+            Require(mesh.NativeAttributes.Count<=64&&mesh.NativeAttributes.All(a=>a.Value.Length==mesh.Vertices.Count&&a.Value.All(v=>v.Length is >=1 and <=4&&v.All(float.IsFinite))),"Invalid retained vertex attributes");
             Require(mesh.Indices.Count%3==0&&mesh.Indices.All(i=>i>=0&&i<mesh.Vertices.Count),"Invalid triangle index");
             foreach(var v in mesh.Vertices)
             {
@@ -60,10 +71,27 @@ public static class ProjectStore
         }
         foreach(var clip in p.Clips)
         {
+            if(clip.Transfer is { } layer)
+            {
+                Require(layer.Method=="WorldRestDelta-v1"&&layer.SourceClip!=null&&layer.SourceClip.Transfer==null&&layer.Mapping!=null&&clip.Curves.Count==0&&clip.TransformTracks.Count==0,"Invalid/nested retarget layer");
+                var source=new CharacterProject{Bones=layer.SourceBones,Clips=[layer.SourceClip!]};Validate(source);
+                Require(layer.Mapping!.Approved&&layer.Mapping.SourceFingerprint==Animation.Fingerprint(source)&&layer.Mapping.TargetFingerprint==Animation.Fingerprint(p),"Stale/unapproved retarget layer");
+                Require(layer.Mapping.BoneIds.Values.Distinct().Count()==layer.Mapping.BoneIds.Count&&layer.Mapping.BoneIds.All(x=>source.Bones.Any(b=>b.Id==x.Key)&&p.Bones.Any(b=>b.Id==x.Value)),"Invalid retarget mapping");
+                Require(source.Bones.Concat(p.Bones).All(b=>b.Scale.All(s=>Math.Abs(s-1)<.0001f))&&!layer.SourceClip!.Curves.Any(c=>c.Channel<3),"Unsupported retarget scale");
+                RestPoseRetarget.ValidateMapping(source,layer.SourceClip!,p,layer.Mapping!);
+                Require(clip.FrameCount==layer.SourceClip!.FrameCount&&clip.Loop==layer.SourceClip.Loop&&clip.FramesPerSecond==layer.SourceClip.FramesPerSecond,"Retarget timing mismatch");
+            }
             Require(clip.FrameCount>0&&clip.FrameCount<=100000&&float.IsFinite(clip.FramesPerSecond)&&clip.FramesPerSecond>0,"Invalid clip timing");
             Require(clip.Curves.Count<=4608,"Curve quota exceeded");
             Require(clip.Curves.Select(c=>(c.Bone,c.Channel)).Distinct().Count()==clip.Curves.Count,"Duplicate channels");
             Require(clip.SkeletonFingerprint==Animation.Fingerprint(p),"Clip belongs to a different skeleton");
+            Require(clip.TransformTracks.Count<=512&&clip.TransformTracks.Select(t=>t.Bone).Distinct().Count()==clip.TransformTracks.Count,"Duplicate/excess transform tracks");
+            foreach(var track in clip.TransformTracks)
+            {
+                Require(p.Bones.Any(b=>b.Name==track.Bone)&&!clip.Curves.Any(c=>c.Bone==track.Bone),"Unbound/mixed transform track");
+                Require(track.Samples.Count==1||track.Samples.Count==clip.FrameCount,"Transform sample count mismatch");
+                foreach(var sample in track.Samples)Require(Finite(sample.Scale,3)&&Finite(sample.Rotation,4)&&Finite(sample.Translation,3)&&sample.Scale.All(s=>s>1e-6f)&&Math.Abs(sample.Rotation.Sum(q=>q*q)-1)<.002f,"Invalid transform sample");
+            }
             foreach(var c in clip.Curves)
             {
                 Require(p.Bones.Any(b=>b.Name==c.Bone)&&c.Channel>=0&&c.Channel<9,"Unresolved clip binding");

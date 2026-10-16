@@ -23,4 +23,14 @@ $old = 'return new bfloat {_data = val.Reverse()};'
 $new = 'bfloat result = default(bfloat); *(uint*)&result = (*(uint*)&val).Reverse(); return result; // FighterPort: preserve endian bits on x86'
 if ($endian.Contains($old)) { [IO.File]::WriteAllText((Join-Path $repoRoot $endianFile), $endian.Replace($old,$new)) }
 Copy-Item config/brawllib.packages.lock.json "$source/BrawlLib/packages.lock.json" -Force
+# Dense L1/L4 CHR0 streams regenerate tangents on decode and can change fractional
+# poses. Keep the genuine backend's indexed full-float encoding for explicit keys.
+$converterFile = Join-Path $source 'BrawlLib/Wii/Animations/AnimationConverter.cs'
+$converter = Get-Content $converterFile -Raw
+$marker = '                //calculate size'
+$patch = "                // FighterPort: preserve explicit values and tangents with native I12.`r`n                if (format != AnimDataFormat.None) format = AnimDataFormat.I12;`r`n`r`n$marker"
+if (!$converter.Contains('// FighterPort: preserve explicit values and tangents')) {
+    if ([regex]::Matches($converter,[regex]::Escape($marker)).Count -ne 1) { throw 'Unexpected CHR0 encoder patch location' }
+    [IO.File]::WriteAllText((Join-Path $repoRoot $converterFile), $converter.Replace($marker,$patch))
+}
 Invoke-Dotnet build $project -c Release '-p:Platform=x86' '-p:RestorePackagesWithLockFile=true' '-p:RestoreLockedMode=true' --nologo '-v:q'

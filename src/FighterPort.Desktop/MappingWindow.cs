@@ -23,23 +23,29 @@ internal sealed class MappingWindow : Window
     private readonly TextBlock names=new(){Margin=new(8),Foreground=Brushes.White};
     private readonly CharacterPreview left=new(),right=new();
     private bool refreshing;
+    private AnatomyProfile sourceRoles,targetRoles;
+    private readonly CheckBox restDelta=new(){Content="Rest-axis / hierarchy transfer",Foreground=Brushes.White,Margin=new(8)};
     private sealed record Choice(string Id,string Name);
 
     public MappingWindow(CharacterProject current,int clipIndex=0)
     {
         source=ProjectStore.Clone(current);target=Demo.Create();session=new(source,target);
+        sourceRoles=Anatomy.Suggest(source);targetRoles=Anatomy.Suggest(target);
         Title="FighterPort • Manual mapping / restricted FK";Width=1250;Height=850;MinWidth=950;MinHeight=650;Background=new SolidColorBrush(Color.FromRgb(15,22,31));
         var dock=new DockPanel();Content=dock;
         var top=new StackPanel{Margin=new(10)};DockPanel.SetDock(top,Dock.Top);dock.Children.Add(top);
         top.Children.Add(new TextBlock{Text="MANUAL BONE MAPPING",FontSize=23,Foreground=Brushes.White});
-        top.Children.Add(new TextBlock{Text="Restricted FK: identical local rest axes, unit rest scale, matching mapped ancestors. Rotation deltas only; root translation needs CopyDelta. No IK or anatomical inference. Orion's rotated root is rejected.",TextWrapping=TextWrapping.Wrap,Foreground=Brushes.LightSteelBlue,Margin=new(0,8,0,8)});
+        top.Children.Add(new TextBlock{Text="Review semantic suggestions or assign bones manually. Strict FK requires matching rest axes and hierarchy. Enable rest-axis transfer for different axes and intermediate parents. Both modes require unit scale and explicit root translation policy; no IK or contact correction.",TextWrapping=TextWrapping.Wrap,Foreground=Brushes.LightSteelBlue,Margin=new(0,8,0,8)});
         var tools=new WrapPanel();top.Children.Add(tools);
         Add(tools,"Load source",()=>Load(true));Add(tools,"Load target",()=>Load(false));
         Add(tools,"Reset exact names",()=>{session.Reset();Refresh();});Add(tools,"Unassign all",()=>{session.Clear();Refresh();});
         Add(tools,"Load profile",()=>{var d=new OpenFileDialog{Filter="Mapping profile|*.json"};if(d.ShowDialog()==true){session.LoadProfile(d.FileName);Refresh();}});
         Add(tools,"Save profile",()=>{var d=new SaveFileDialog{Filter="Mapping profile|*.json",FileName="mapping.json"};if(d.ShowDialog()==true)session.SaveProfile(d.FileName);});
         Add(tools,"Preview transfer",Preview);
-        Add(tools,"Save new target project",()=>{var d=new SaveFileDialog{Filter="FighterPort project|*.fpproj",FileName="target-fk.fpproj"};if(d.ShowDialog()==true){session.SaveResult(clips.SelectedIndex,d.FileName);message.Text="Saved new target/fk project. Source and target snapshots preserved.";}});
+        Add(tools,"Source roles",()=>new AnatomyWindow(source,sourceRoles,p=>{sourceRoles=p;session.Approve(false);SyncApproval();}){Owner=this}.ShowDialog());
+        Add(tools,"Target roles",()=>new AnatomyWindow(target,targetRoles,p=>{targetRoles=p;session.Approve(false);SyncApproval();}){Owner=this}.ShowDialog());
+        Add(tools,"Suggest by roles",()=>{session.LoadProfile(Anatomy.Map(source,sourceRoles,target,targetRoles));Refresh();});
+        Add(tools,"Save new target project",()=>{var d=new SaveFileDialog{Filter="FighterPort project|*.fpproj",FileName="target-transfer.fpproj"};if(d.ShowDialog()==true){session.SaveResult(clips.SelectedIndex,d.FileName,restDelta.IsChecked==true);message.Text="Saved new target project. Source and target snapshots preserved.";}});
         var options=new WrapPanel();top.Children.Add(options);options.Children.Add(clips);options.Children.Add(new TextBlock{Text="  Root translation: ",Foreground=Brushes.White,VerticalAlignment=VerticalAlignment.Center});options.Children.Add(policy);options.Children.Add(approval);options.Children.Add(time);top.Children.Add(names);
         DockPanel.SetDock(message,Dock.Bottom);dock.Children.Add(message);
         var previews=new Grid{Height=310};previews.ColumnDefinitions.Add(new());previews.ColumnDefinitions.Add(new());previews.Children.Add(left);Grid.SetColumn(right,1);previews.Children.Add(right);DockPanel.SetDock(previews,Dock.Bottom);dock.Children.Add(previews);
@@ -48,6 +54,7 @@ internal sealed class MappingWindow : Window
         policy.SelectionChanged+=(_,_)=>{if(refreshing)return;session.SetRootPolicy((string)policy.SelectedItem);SyncApproval();};
         approval.Checked+=(_,_)=>{if(!refreshing){session.Approve(true);Invalidate();}};approval.Unchecked+=(_,_)=>{if(!refreshing){session.Approve(false);Invalidate();}};
         time.ValueChanged+=(_,_)=>{if(!refreshing)Draw();};
+        options.Children.Add(restDelta);restDelta.Click+=(_,_)=>{session.Approve(false);SyncApproval();};
         Refresh();clips.SelectedIndex=Math.Clamp(clipIndex,0,Math.Max(0,source.Clips.Count-1));
     }
     private Clip? SelectedClip=>clips.SelectedIndex>=0&&clips.SelectedIndex<source.Clips.Count?source.Clips[clips.SelectedIndex]:null;
@@ -58,7 +65,7 @@ internal sealed class MappingWindow : Window
     private void Load(bool isSource)
     {
         var d=new OpenFileDialog{Filter="FighterPort project|*.fpproj"};if(d.ShowDialog()!=true)return;
-        var p=ProjectStore.Load(d.FileName);if(isSource)source=p;else target=p;session=new(source,target);Refresh();
+        var p=ProjectStore.Load(d.FileName);if(isSource){source=p;sourceRoles=Anatomy.Suggest(p);}else{target=p;targetRoles=Anatomy.Suggest(p);}session=new(source,target);Refresh();
     }
     private void Invalidate(){result=null;message.Text="Preview invalidated. Review mapping and approve before transfer.";Draw();}
     private void SyncApproval(){refreshing=true;approval.IsChecked=session.Profile.Approved;refreshing=false;Invalidate();}
@@ -80,7 +87,7 @@ internal sealed class MappingWindow : Window
     }
     private void Preview()
     {
-        result=session.Preview(clips.SelectedIndex);message.Text=$"Transferred {SelectedClip!.Name} into target/fk. Target skin and binds preserved. Scrub to compare; save creates a new project.";Draw();
+        result=session.Preview(clips.SelectedIndex,restDelta.IsChecked==true);message.Text=$"Transferred {SelectedClip!.Name} into {result.Branch}. Target skin and binds preserved. Rest-delta layers require a measured bake before native export.";Draw();
     }
     private void Draw(){left.Show(source,SelectedClip,(float)time.Value);right.Show(result??target,result?.Clips.Last(),(float)time.Value);}
 
@@ -101,8 +108,12 @@ internal sealed class MappingWindow : Window
             string projectPath=Path.Combine(output,"mapped-"+Guid.NewGuid().ToString("N")+".fpproj");session.SaveResult(clips.SelectedIndex,projectPath);Check(ProjectStore.Load(projectPath).MappingProfiles.Last().Approved);
             Check(beforeSource==JsonSerializer.Serialize(source)&&beforeTarget==JsonSerializer.Serialize(target));
             var orion=Demo.Create(1);var incompatible=new MappingSession(source,orion);incompatible.Clear();for(int i=0;i<source.Bones.Count;i++)incompatible.Assign(source.Bones[i].Id,orion.Bones[i].Id);incompatible.Approve(true);Reject(()=>incompatible.Preview(2));
+            target=orion;session=incompatible;sourceRoles=Anatomy.Suggest(source);targetRoles=Anatomy.Suggest(target);Refresh();
+            restDelta.IsChecked=true;restDelta.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));Check(!session.Profile.Approved);
+            approval.IsChecked=true;Preview();time.Value=12.25;Check(result?.Branch=="target/rest-delta");
+            string restPath=Path.Combine(output,"rest-delta-"+Guid.NewGuid().ToString("N")+".fpproj");session.SaveResult(2,restPath,true);Check(ProjectStore.Load(restPath).Clips.Last().Transfer!=null);
             await Task.Delay(500);var bitmap=new RenderTargetBitmap((int)ActualWidth,(int)ActualHeight,96,96,PixelFormats.Pbgra32);bitmap.Render(this);var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using(var stream=File.Create(Path.Combine(output,"mapping.png")))encoder.Save(stream);
-            File.WriteAllText(Path.Combine(output,"mapping-smoke.txt"),"PASS: UI assign/unassign revokes approval; unapproved/missing/stale/rotated-root rejected; approved profile save/reopen; source/target unchanged; target/fk saved and skinned preview scrubbed.");Application.Current.Shutdown(0);
+            File.WriteAllText(Path.Combine(output,"mapping-smoke.txt"),"PASS: UI assign/unassign revokes approval; unapproved/missing/stale/strict rotated-root rejected; approved profile save/reopen; source/target unchanged; strict and rest-delta targets saved/reopened and skinned previews scrubbed; mode change revokes approval.");Application.Current.Shutdown(0);
         }
         catch(Exception e){File.WriteAllText(Path.Combine(output,"mapping-smoke.txt"),e.ToString());Application.Current.Shutdown(1);}
     }

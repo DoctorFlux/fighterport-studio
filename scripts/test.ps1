@@ -1,4 +1,8 @@
-param([switch]$Native)
+param([switch]$Native,[switch]$Ultimate,[switch]$LocalAssets)
 . $PSScriptRoot/environment.ps1
 & $PSScriptRoot/capabilities.ps1 -Check
-if ($Native) { Invoke-Dotnet run --project tests/FighterPort.Tests -c Release -- --native } else { Invoke-Dotnet run --project tests/FighterPort.Tests -c Release }
+$testArgs = @()
+if ($Native) { $testArgs += '--native' }
+if ($Ultimate) { $testArgs += '--ultimate' }
+if ($LocalAssets) { $testArgs += '--local-assets' }
+Invoke-Dotnet run --project tests/FighterPort.Tests -c Release -- @testArgs

@@ -6,7 +6,7 @@ try
     string root=Environment.CurrentDirectory;
     string packaged=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../native/FighterPort.NativeWorker.exe"));
     var backend=new NativeBackend(File.Exists(packaged)?packaged:Path.Combine(root,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),Path.Combine(root,".local/jobs"));
-    if(args.Length==0) { Console.WriteLine("FighterPort: demo <project> | inspect <project> | native-fixture <new-dir> | import <model.mdl0> <clip.chr0> <project> | export <project> <clip-index> <new.chr0> | map-template <source> <target> <profile.json> | retarget <source> <clip-index> <target> <approved-profile.json> <new-project> | doctor");return 0; }
+    if(args.Length==0) { Console.WriteLine("FighterPort: demo <project> | inspect <project> | native-fixture <new-dir> | import <model.mdl0> <clip.chr0> <project> | export <project> <clip-index> <new.chr0> | map-template <source> <target> <profile.json> | retarget <source> <clip-index> <target> <approved-profile.json> <new-project> | browse-bundle <pac> | import-bundle <model-pac> <model-id> <motion-pac> <clip-id> <project> | import-ultimate <model.numdlb> <clip.nuanmb> <project> | doctor");return 0; }
     switch(args[0])
     {
         case "demo": ProjectStore.Save(Demo.Create(),args[1]);Console.WriteLine("Original character saved.");break;
@@ -24,6 +24,13 @@ try
             var project=ProjectStore.Load(args[1]);await backend.ExportClip(project,project.Clips[int.Parse(args[2])],args[3]);Console.WriteLine("CHR0 written. Native-tool check remains separate.");break;
         case "doctor":
             Console.WriteLine($"Runtime: {Environment.Version}; Windows: {OperatingSystem.IsWindows()}; Native worker: {File.Exists(backend.WorkerPath)}; No AI/cloud runtime. DCC discovery is pending; DCCs are optional.");break;
+        case "browse-bundle":
+            Console.WriteLine(JsonSerializer.Serialize(await backend.BrowseBundle(args[1]),ProjectStore.Json));break;
+        case "import-bundle":
+            var bundleModel=await backend.ImportBundleModel(args[1],args[2]);bundleModel.Clips.Add(await backend.ImportBundleClip(bundleModel,args[3],args[4]));ProjectStore.Save(bundleModel,args[5]);Console.WriteLine("Brawl bundle model/clip saved with original PAC resources.");break;
+        case "import-ultimate":
+            var ultimate=new UltimateBackend("python",Path.Combine(root,"scripts/ssbh-worker.py"),Path.Combine(root,".local/jobs"));
+            var up=await ultimate.ImportModel(args[1]);up.Clips.Add(await ultimate.ImportClip(up,args[2]));ProjectStore.Save(up,args[3]);Console.WriteLine("Ultimate model and skeletal clip saved; material/visibility/constraint limitations recorded.");break;
         case "map-template":
             ProjectStore.AtomicWrite(args[3],JsonSerializer.SerializeToUtf8Bytes(FkRetarget.Template(ProjectStore.Load(args[1]),ProjectStore.Load(args[2])),ProjectStore.Json));
             Console.WriteLine("Unapproved template written. Review BoneIds (exact-name suggestions only), root policy and fingerprints before setting Approved=true.");break;

@@ -2,6 +2,8 @@ using FighterPort.Core;
 using System.Numerics;
 using System.Security.Cryptography;
 
+if(args.FirstOrDefault()=="--fault-worker")return await WorkerFailureTests.Child(args);
+
 int passed=0,failed=0;
 string output=Path.Combine(Environment.CurrentDirectory,"artifacts/tests",DateTime.UtcNow.ToString("yyyyMMdd-HHmmss"));Directory.CreateDirectory(output);
 void Assert(bool condition,string message="Assertion failed"){if(!condition)throw new Exception(message);}
@@ -136,6 +138,11 @@ if(args.Contains("--native"))
     });
 }
 else Console.WriteLine("SKIP native integration: pass --native after building the worker.");
+await WorkerFailureTests.Run(output,Test,args.Contains("--native"));
+await SemanticTests.Run(output,Test);
+if(args.Contains("--ultimate"))await UltimateTests.Run(output,Test,args.Contains("--native"));
+else Console.WriteLine("SKIP optional Ultimate backend: pass --ultimate with pinned local Python dependencies installed");
+if(args.Contains("--local-assets"))await LocalReferenceTests.Run(output,Test);
 Console.WriteLine($"RESULT {passed} passed; {failed} failed; output {output}");
 File.WriteAllText(Path.Combine(output,"result.txt"),$"{passed} passed; {failed} failed; native={args.Contains("--native")}");
 return failed==0?0:1;

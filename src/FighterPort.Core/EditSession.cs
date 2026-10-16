@@ -9,6 +9,9 @@ public sealed class EditSession
     {
         var candidate=ProjectStore.Clone(Project);
         var clip=candidate.Clips[clipIndex];
+        bool nativeRest=candidate.Bones.Any(b=>b.Name==bone&&b.RestMatrix.Length>0);
+        bool completeScalarPose=Enumerable.Range(0,9).All(channelIndex=>clip.Curves.Any(c=>c.Bone==bone&&c.Channel==channelIndex));
+        if(clip.Transfer!=null||clip.TransformTracks.Count>0||(nativeRest&&!completeScalarPose))throw new InvalidDataException("Scalar editing requires an explicit measured Euler bake for quaternion/native-matrix or retarget-layer clips");
         var curve=clip.Curves.FirstOrDefault(c=>c.Bone==bone&&c.Channel==channel);
         if(curve==null) { curve=new(){Bone=bone,Channel=channel}; clip.Curves.Add(curve); }
         var key=curve.Keys.FirstOrDefault(k=>k.Frame==frame);

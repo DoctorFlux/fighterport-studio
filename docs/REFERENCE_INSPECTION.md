@@ -2,7 +2,7 @@
 
 The user supplied Brawl and Ultimate Mario folders on 2026-10-16. Both entire directories are ignored and forbidden by the staged-source guard. All 678 input files were SHA-256 hashed before inspection; the manifest and derived reports remain under ignored `.local/references`. Never commit bone dumps, native bytes, local paths/configuration or game textures. Existing source requirements remain in the master plan; the newer user instruction authorizes local reference reads.
 
-Verified inspection scope: BrawlLib's actual resource tree decoded `FitMario00.pac`, finding a 63-bone main MDL0 v11 and an 18-bone shadow model. ssbh_data_py 0.9.1 read the supplied Ultimate body c00 SKEL 1.0 with 98 bones. Reports list names, native indices, parents and matrices. Native conventions are preserved, not guessed into canonical coordinates. No gameplay, mesh/animation conversion, native rewrite, character provenance/authenticity or in-game compatibility is implied. Costume variants and animation folders have not been semantically compared.
+Verified inspection scope: BrawlLib's actual resource tree decoded `FitMario00.pac`, finding a 63-bone main MDL0 v9 and an 18-bone shadow model. ssbh_data_py 0.9.1 read the supplied Ultimate body c00 SKEL 1.0 with 98 bones. Reports list names, native indices, parents and matrices. Native conventions are preserved, not guessed into canonical coordinates. No gameplay, mesh/animation conversion, native rewrite, character provenance/authenticity or in-game compatibility is implied. Costume variants and animation folders have not been semantically compared.
 
 Commands, from the repository root (choose new output names):
 

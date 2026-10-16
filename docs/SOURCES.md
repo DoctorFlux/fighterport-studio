@@ -13,3 +13,10 @@ Checked 2026-10-16 unless noted. No inference API is used at runtime.
 - https://rivals2.com/workshop/knowledge-base/character-creation/rig-your-character/ and https://rivals2.com/workshop/knowledge-base/character-creation/texture-your-character/: current official beta constraints summarized in REFERENCE_INSPECTION.md. Modkit editor/cooking remains unrun.
 
 All later game/tool starting links remain in the complete master specification. They are planned research, not evidence of working support. Melee/Rivals/Dragon Ball, full Ultimate model/animation conversion, FBX and DCC bridges remain unimplemented.
+
+
+Continuation evidence:
+- https://github.com/ScanMountGoat/ssbh_data_py version 0.9.1 installed .pyi interfaces for MODL/MESH/SKEL/ANIM/MATL and actual native read/save calls: scripts/ssbh-worker.py and generate-ultimate-fixture.py; original and supplied local tests.
+- https://github.com/ScanMountGoat/ssbh_wgpu at f5f9e14a83e48e0e9282c77add192b8fcfd4c24b, ssbh_wgpu/src/animation.rs and shader/skinning.wgsl: normalized quaternion lerp/linear S/T and rigid/weighted geometry conventions. Local source inspected; no SSBH Editor GUI/game validation.
+- Pinned BrawlLib AnimationConverter.cs: L1/L4 regenerate tangents; existing I12 preserves explicit key values/tangents. Local selection patch in prepare-native.ps1 verified by original fractional native regression.
+- Supplied Brawl PAC is MDL0 **v9**, not the earlier report label v11. Both Brawl and Ultimate now have canonical geometry/rig/skeletal subset imports. Complete game conversion and later adapters remain unimplemented.

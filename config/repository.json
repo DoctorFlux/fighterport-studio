@@ -2,6 +2,6 @@
   "nameWithOwner": "DoctorFlux/fighterport-studio",
   "url": "https://github.com/DoctorFlux/fighterport-studio",
   "remote": "https://github.com/DoctorFlux/fighterport-studio.git",
-  "private": true,
+  "private": false,
   "branch": "main"
 }

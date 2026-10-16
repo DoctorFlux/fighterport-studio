@@ -32,15 +32,25 @@ public static class Animation
         return c.Keys[^1].Value;
     }
     public static float Wrap(Clip clip, float frame) => clip.Loop ? ((frame % clip.FrameCount)+clip.FrameCount)%clip.FrameCount : Math.Clamp(frame,0,clip.FrameCount-1);
+    public static Matrix4x4 RestLocal(Bone b)=>b.RestMatrix.Length==16?M(b.RestMatrix):Local(b.Scale,b.Rotation,b.Translation);
+    public static Matrix4x4 SampleTransform(TransformTrack track,float frame)
+    {
+        float f=Math.Clamp(frame,0,track.Samples.Count-1);int i=(int)f;float t=f-i;
+        var a=track.Samples[i];var b=track.Samples[Math.Min(i+1,track.Samples.Count-1)];
+        Quaternion Q(float[] q)=>new(q[0],q[1],q[2],q[3]);
+        return Matrix4x4.CreateScale(Vector3.Lerp(V(a.Scale),V(b.Scale),t))*Matrix4x4.CreateFromQuaternion(Quaternion.Lerp(Q(a.Rotation),Q(b.Rotation),t))*Matrix4x4.CreateTranslation(Vector3.Lerp(V(a.Translation),V(b.Translation),t));
+    }
     public static Matrix4x4[] World(CharacterProject project, Clip? clip, float frame)
     {
+        if(clip?.Transfer!=null)return RestPoseRetarget.World(project,clip,frame);
         if (clip != null) frame = Wrap(clip,frame);
         var result = new Matrix4x4[project.Bones.Count];
         for (int i=0;i<result.Length;i++)
         {
             var b=project.Bones[i]; float[] values=[..b.Scale,..b.Rotation,..b.Translation];
             if (clip != null) foreach (var c in clip.Curves.Where(c=>c.Bone==b.Name)) values[c.Channel]=Evaluate(c,frame);
-            var local=Local(values[..3],values[3..6],values[6..9]);
+            var track=clip?.TransformTracks.SingleOrDefault(t=>t.Bone==b.Name);
+            var local=track!=null?SampleTransform(track,frame):clip?.Curves.Any(c=>c.Bone==b.Name)==true?Local(values[..3],values[3..6],values[6..9]):RestLocal(b);
             result[i]=b.Parent<0?local:local*result[b.Parent];
         }
         return result;

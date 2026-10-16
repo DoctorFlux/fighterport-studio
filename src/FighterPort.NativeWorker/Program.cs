@@ -26,6 +26,34 @@ internal static class Program
             if(File.Exists(output)) throw new IOException("Worker output must be new");
             switch(op)
             {
+                case "sample-bundle-pose":
+                    var pose=Json.Deserialize<BundlePoseRequest>(File.ReadAllText(input));
+                    if(new FileInfo(pose.ModelPath).Length>32*1024*1024||new FileInfo(pose.ClipPath).Length>32*1024*1024)throw new InvalidDataException("Bundle quota");
+                    using(var modelRoot=NodeFactory.FromFile(null,pose.ModelPath))
+                    using(var clipRoot=NodeFactory.FromFile(null,pose.ClipPath))
+                    {
+                        var model=(MDL0Node)Walk(modelRoot).Single(x=>x.Key==pose.ModelId).Value;
+                        var clip=(CHR0Node)Walk(clipRoot).Single(x=>x.Key==pose.ClipId).Value;
+                        model.Populate();model.ApplyCHR(clip,pose.Frame+1); // BrawlLib display index is 1-based.
+                        Write(output,model.BoneCache.Cast<MDL0BoneNode>().ToDictionary(b=>b.Name,b=>Mat(b.Matrix)));
+                    }
+                    break;
+                case "browse-bundle":
+                    using(var node=NodeFactory.FromFile(null,input))
+                    { Write(output,Walk(node).Where(x=>x.Value is MDL0Node||x.Value is CHR0Node).Select(x=>new BundleResource{Id=x.Key,Name=x.Value.Name,Kind=x.Value is MDL0Node?"MDL0":"CHR0",Version=x.Value is MDL0Node m?m.Version:((CHR0Node)x.Value).Version}).ToArray()); }
+                    break;
+                case "model-from-bundle":
+                case "clip-from-bundle":
+                    var request=Json.Deserialize<BundleRequest>(File.ReadAllText(input));
+                    if(new FileInfo(request.Path).Length>32*1024*1024)throw new InvalidDataException("Bundle quota");
+                    using(var node=NodeFactory.FromFile(null,request.Path))
+                    {
+                        var chosen=Walk(node).Single(x=>x.Key==request.Id).Value;
+                        if(op=="model-from-bundle")
+                        {var m=chosen as MDL0Node??throw new InvalidDataException("Select an MDL0 resource");if(m.Version!=9&&m.Version!=11)throw new NotSupportedException("MDL0 v9/v11 subset");Write(output,ReadModel(m));}
+                        else {var c=chosen as CHR0Node??throw new InvalidDataException("Select a CHR0 resource");if(c.Version!=4)throw new NotSupportedException("CHR0 v4 subset");Write(output,ReadClip(c));}
+                    }
+                    break;
                 case "inspect-bundle":
                     using(var node=NodeFactory.FromFile(null,input))
                     {
@@ -56,7 +84,7 @@ internal static class Program
                     { if(model==null)throw new InvalidDataException(Collada.Error); model.Name="AsterFixture"; model.Export(output); }
                     break;
                 case "import-model":
-                    Header(input,"MDL0",11);
+                    Header(input,"MDL0",-1);
                     using(var node=NodeFactory.FromFile(null,input))
                     { var model=node as MDL0Node??throw new InvalidDataException("Expected MDL0"); Write(output,ReadModel(model)); }
                     break;
@@ -85,12 +113,25 @@ internal static class Program
         catch(Exception e) { Console.Error.WriteLine(e.GetType().Name+": "+e.Message);return 1; }
     }
     private static void Write(string path,object value)=>File.WriteAllText(path,Json.Serialize(value));
+    private static IEnumerable<KeyValuePair<string,ResourceNode>> Walk(ResourceNode root)
+    {
+        if(root==null)throw new InvalidDataException("Unknown bundle");
+        var stack=new Stack<KeyValuePair<string,ResourceNode>>();stack.Push(new KeyValuePair<string,ResourceNode>("0",root));int visited=0;
+        while(stack.Count>0)
+        {
+            var pair=stack.Pop();if(++visited>25000||pair.Key.Count(c=>c=='/')>32)throw new InvalidDataException("Bundle traversal quota");
+            yield return pair;
+            if(pair.Value is MDL0Node||pair.Value is CHR0Node)continue;
+            var children=pair.Value.Children;for(int i=children.Count-1;i>=0;i--)stack.Push(new KeyValuePair<string,ResourceNode>(pair.Key+"/"+i,children[i]));
+        }
+    }
     private static void Header(string path,string magic,int version)
     {
+        NativePreflight.Check(path,magic,version);
         byte[] b=File.ReadAllBytes(path);
         if(b.Length<64||b.Length>8*1024*1024||Encoding.ASCII.GetString(b,0,4)!=magic)throw new InvalidDataException("Invalid native header/quota");
         int size=(b[4]<<24)|(b[5]<<16)|(b[6]<<8)|b[7],v=(b[8]<<24)|(b[9]<<16)|(b[10]<<8)|b[11];
-        if(size<64||size>b.Length||v!=version)throw new InvalidDataException("Unsupported native size/version");
+        if(size<64||size>b.Length||(version!=-1&&v!=version))throw new InvalidDataException("Unsupported native size/version");
     }
     private static float[] Vec(Vector3 v)=>new[]{v._x,v._y,v._z};
     private static float[] Mat(Matrix m)=>Enumerable.Range(0,16).Select(i=>m[i]).ToArray();
@@ -131,7 +172,8 @@ internal static class Program
             }
             mesh.Indices=triangles._indices.Select(i=>checked((int)i)).ToList(); project.Meshes.Add(mesh);
         }
-        project.Limitations.Add("MDL0 v11 geometry/skeleton/UV0/normal/1-4 weights subset. Native shaders, other UV/color channels and ancillary resources retained opaque only; neutral preview. No general MDL0 rewrite.");
+        project.TargetProfile="Brawl MDL0 v"+model.Version;
+        project.Limitations.Add("MDL0 v"+model.Version+" geometry/skeleton/UV0/normal/1-4 weights subset. Native shaders, other UV/color channels and ancillary resources retained opaque only; neutral preview. No general MDL0 rewrite.");
         return project;
     }
     private static Clip ReadClip(CHR0Node node)

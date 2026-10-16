@@ -995,7 +995,7 @@
     {
       "game": "Brawl reference",
       "format": "PAC containing MDL0",
-      "version": "MDL0 11",
+      "version": "MDL0 9",
       "operation": "inspect-skeleton",
       "state": "LocalReferenceTested",
       "evidence": "scripts/inspect-skeleton.py; local reports excluded from Git",
@@ -1017,7 +1017,250 @@
       "operation": "fixture-write-read",
       "state": "SyntheticTested",
       "evidence": "scripts/inspect-skeleton.py self-test",
-      "limitations": "Two original bones; library-generated native format. No skinned Ultimate model/animation fixture yet."
+      "limitations": "Original two-bone native fixture; full original skinned fixture separately tested below. No game compatibility claim."
+    },
+    {
+      "game": "Original",
+      "format": "Native worker protocol",
+      "version": "1",
+      "operation": "bounded-failure-handling",
+      "state": "SyntheticTested",
+      "evidence": "WorkerFailureTests.cs; 12 deterministic malformed cases",
+      "limitations": "45s deadline/log/output/working-set monitoring. Not a hard OS security sandbox or exhaustive fuzzing."
+    },
+    {
+      "game": "Original",
+      "format": "Native worker protocol",
+      "version": "1",
+      "operation": "malformed-header-dictionary-rejection",
+      "state": "SyntheticTested",
+      "evidence": "WorkerFailureTests.cs; 12 deterministic malformed cases",
+      "limitations": "45s deadline/log/output/working-set monitoring. Not a hard OS security sandbox or exhaustive fuzzing."
+    },
+    {
+      "game": "Original",
+      "format": "Native worker protocol",
+      "version": "1",
+      "operation": "atomic-export-failure-handling",
+      "state": "SyntheticTested",
+      "evidence": "WorkerFailureTests.cs; 12 deterministic malformed cases",
+      "limitations": "45s deadline/log/output/working-set monitoring. Not a hard OS security sandbox or exhaustive fuzzing."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "AnatomyProfile",
+      "version": "1",
+      "operation": "suggest-roles",
+      "state": "SyntheticTested",
+      "evidence": "SemanticTests.cs; AnatomyWindow",
+      "limitations": "Aliases and conservative topology/rest positions, side/chain/segments, ambiguous digits and helpers. Suggestions require review; viewport picking pending."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "AnatomyProfile",
+      "version": "1",
+      "operation": "manual-correction-save-reopen",
+      "state": "SyntheticTested",
+      "evidence": "SemanticTests.cs; AnatomyWindow",
+      "limitations": "Aliases and conservative topology/rest positions, side/chain/segments, ambiguous digits and helpers. Suggestions require review; viewport picking pending."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "PoseTransfer",
+      "version": "WorldRestDelta-v1",
+      "operation": "rest-axis-hierarchy-transfer",
+      "state": "SyntheticTested",
+      "evidence": "SemanticTests.cs; actual mapping GUI smoke",
+      "limitations": "Unit-scale scalar source curves; root-only CopyDelta; target offsets/binds retained. No quaternion retargeting/proportion/twist/IK/contact."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "PoseTransfer",
+      "version": "WorldRestDelta-v1",
+      "operation": "fractional-evaluate",
+      "state": "SyntheticTested",
+      "evidence": "SemanticTests.cs; actual mapping GUI smoke",
+      "limitations": "Unit-scale scalar source curves; root-only CopyDelta; target offsets/binds retained. No quaternion retargeting/proportion/twist/IK/contact."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "PoseTransfer",
+      "version": "WorldRestDelta-v1",
+      "operation": "save-reopen",
+      "state": "SyntheticTested",
+      "evidence": "SemanticTests.cs; actual mapping GUI smoke",
+      "limitations": "Unit-scale scalar source curves; root-only CopyDelta; target offsets/binds retained. No quaternion retargeting/proportion/twist/IK/contact."
+    },
+    {
+      "game": "Original",
+      "format": "Measured native bake",
+      "version": "integer samples",
+      "operation": "CHR0-to-NUANMB",
+      "state": "SyntheticTested",
+      "evidence": "UltimateTests.cs genuine export/decode",
+      "limitations": "Same-rig original fixtures only, not Mario cross-rig transfer. Explicit .5deg/.05cm quarter-grid bake bounds; retained source; no continuous-error guarantee."
+    },
+    {
+      "game": "Original",
+      "format": "Measured native bake",
+      "version": "integer samples",
+      "operation": "NUANMB-to-CHR0",
+      "state": "SyntheticTested",
+      "evidence": "UltimateTests.cs genuine export/decode",
+      "limitations": "Same-rig original fixtures only, not Mario cross-rig transfer. Explicit .5deg/.05cm quarter-grid bake bounds; retained source; no continuous-error guarantee."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "PAC resource tree",
+      "version": "supplied PAC / MDL0 9 / CHR0 4",
+      "operation": "browse",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; ignored local evidence",
+      "limitations": "Main/shadow/animation selection; no general container rewrite/packaging, compression/version coverage or ancillary playback."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "PAC resource tree",
+      "version": "supplied PAC / MDL0 9 / CHR0 4",
+      "operation": "import-selected-resource",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; ignored local evidence",
+      "limitations": "Main/shadow/animation selection; no general container rewrite/packaging, compression/version coverage or ancillary playback."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "MDL0",
+      "version": "9",
+      "operation": "read",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; actual desktop playback",
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "MDL0",
+      "version": "9",
+      "operation": "evaluate-skin",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; actual desktop playback",
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "MDL0",
+      "version": "9",
+      "operation": "preserve",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; actual desktop playback",
+      "limitations": "Supplied 63-bone main / 10252 facepoint vertices; neutral geometry, UV0, normals, 1-4 weights. Materials opaque; no native model writer."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "read",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; BrawlLib ApplyCHR fractional world comparison",
+      "limitations": "Supplied Wait1 subset; scalar export checks .001 scale/.05deg/.01cm on quarter-frame grid. No native-tool/game validation."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "evaluate-world-pose",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; BrawlLib ApplyCHR fractional world comparison",
+      "limitations": "Supplied Wait1 subset; scalar export checks .001 scale/.05deg/.01cm on quarter-frame grid. No native-tool/game validation."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "write-decode",
+      "state": "LocalReferenceTested",
+      "evidence": "LocalReferenceTests.cs; BrawlLib ApplyCHR fractional world comparison",
+      "limitations": "Supplied Wait1 subset; scalar export checks .001 scale/.05deg/.01cm on quarter-frame grid. No native-tool/game validation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "MODL / MESH / SKEL",
+      "version": "1.7 / 1.10 / 1.0",
+      "operation": "read",
+      "state": "LocalReferenceTested",
+      "evidence": "UltimateTests.cs originals; LocalReferenceTests.cs c00; desktop playback",
+      "limitations": "98-bone/24098-vertex supplied c00. Exact rest matrices, rigid/blended geometry and retained attributes/material IDs. Native textures/constraints opaque or external, no model writer."
+    },
+    {
+      "game": "Ultimate",
+      "format": "MODL / MESH / SKEL",
+      "version": "1.7 / 1.10 / 1.0",
+      "operation": "evaluate-skin",
+      "state": "LocalReferenceTested",
+      "evidence": "UltimateTests.cs originals; LocalReferenceTests.cs c00; desktop playback",
+      "limitations": "98-bone/24098-vertex supplied c00. Exact rest matrices, rigid/blended geometry and retained attributes/material IDs. Native textures/constraints opaque or external, no model writer."
+    },
+    {
+      "game": "Ultimate",
+      "format": "MODL / MESH / SKEL",
+      "version": "1.7 / 1.10 / 1.0",
+      "operation": "preserve",
+      "state": "LocalReferenceTested",
+      "evidence": "UltimateTests.cs originals; LocalReferenceTests.cs c00; desktop playback",
+      "limitations": "98-bone/24098-vertex supplied c00. Exact rest matrices, rigid/blended geometry and retained attributes/material IDs. Native textures/constraints opaque or external, no model writer."
+    },
+    {
+      "game": "Ultimate",
+      "format": "ANIM / NUANMB",
+      "version": "2.0",
+      "operation": "read",
+      "state": "LocalReferenceTested",
+      "evidence": "Original rigid/blended analytic expectations and supplied a00wait1",
+      "limitations": "Normalized quaternion lerp and linear S/T. 78 supplied transform tracks; material/visibility nodes retained but not evaluated; override/scale-compensation flags reject."
+    },
+    {
+      "game": "Ultimate",
+      "format": "ANIM / NUANMB",
+      "version": "2.0",
+      "operation": "evaluate-transform",
+      "state": "LocalReferenceTested",
+      "evidence": "Original rigid/blended analytic expectations and supplied a00wait1",
+      "limitations": "Normalized quaternion lerp and linear S/T. 78 supplied transform tracks; material/visibility nodes retained but not evaluated; override/scale-compensation flags reject."
+    },
+    {
+      "game": "Ultimate",
+      "format": "ANIM / NUANMB",
+      "version": "2.0",
+      "operation": "preserve",
+      "state": "LocalReferenceTested",
+      "evidence": "Original rigid/blended analytic expectations and supplied a00wait1",
+      "limitations": "Normalized quaternion lerp and linear S/T. 78 supplied transform tracks; material/visibility nodes retained but not evaluated; override/scale-compensation flags reject."
+    },
+    {
+      "game": "Ultimate",
+      "format": "ANIM / NUANMB",
+      "version": "2.0",
+      "operation": "write",
+      "state": "SyntheticTested",
+      "evidence": "UltimateTests.cs genuine ssbh_data_py writer and decode",
+      "limitations": "Nonloop transform-only samples, <=1M quarter-frame bone samples, decoded matrix error .001 per element. Ancillary omission requires approval. No SSBH Editor/game check."
+    },
+    {
+      "game": "Ultimate",
+      "format": "ANIM / NUANMB",
+      "version": "2.0",
+      "operation": "validate-before-publication",
+      "state": "SyntheticTested",
+      "evidence": "UltimateTests.cs genuine ssbh_data_py writer and decode",
+      "limitations": "Nonloop transform-only samples, <=1M quarter-frame bone samples, decoded matrix error .001 per element. Ancillary omission requires approval. No SSBH Editor/game check."
+    },
+    {
+      "game": "Original",
+      "format": "MODL / MESH / SKEL / MATL / ANIM",
+      "version": "1.7 / 1.10 / 1.0 / 1.6 / 2.0",
+      "operation": "fixture-write-read",
+      "state": "SyntheticTested",
+      "evidence": "generate-ultimate-fixture.py and UltimateTests.cs",
+      "limitations": "Original two-bone rigid/blended skin through genuine native writer; neutral test material is not a game shader. Not a general model-export API."
     }
   ]
 }

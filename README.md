@@ -1,37 +1,41 @@
 # FighterPort Studio
 
-Windows-first local character workbench. Original skinned demos and a tested BrawlLib MDL0 v11 / CHR0 v4 subset. Early implementation, not a complete game porter or playable-fighter builder. No commercial assets, AI service or running DCC is needed.
+Standalone local Windows character workbench for Brawl, Melee, Ultimate and Rivals 2, with Dragon Ball source adapters and optional Blender/Maya/3ds Max bridges on the full roadmap. Current implementation is a tested subset, not a complete game porter or playable-fighter builder. No cloud/AI or running DCC is required.
 
-## Setup and run
+## Run this workspace
 
-Windows x64, PowerShell 7, Git, .NET SDK **10.0.402**, .NET Framework 4.7.2+ for the native worker. The current workspace has a project-local SDK in `.tools/dotnet`; other checkouts may install the exact official SDK or use `scripts/setup.ps1`. No global install is performed by project scripts.
+Launch `artifacts/publish/desktop/FighterPort.Desktop.exe`. **Open Demo** uses original skinned rigs and motions. **Load Project** can open the locally imported `artifacts/local-mario/brawl.fpproj` or `ultimate.fpproj`; those commercial-derived files are ignored and never shipped with source.
+
+Use **Open Brawl PAC** to choose a main MDL0 resource, then a CHR0 from a motion PAC. Main and shadow models are listed separately. **Open Ultimate model** loads NUMDLB with neighboring skeleton/mesh/material dependencies; **Attach NUANMB** adds a skeletal clip. Scrub/play renders actual weighted geometry with neutral shading. Native textures, material/visibility animation and helper constraints are not yet evaluated.
+
+**Map / Retarget** provides source/target selection, manual mapping, semantic role suggestions/correction/locks, explicit approval and dual preview. Strict FK and the separately selected rest-axis/hierarchy subset have different gates; see [retargeting](docs/RETARGETING.md). **Bake for CHR0 / NUANMB** makes a measured new clip; export writes a separate native file and validates decoded results. Original same-rig cross-format fixtures pass. **Mario-to-Mario cross-rig transfer remains incomplete.**
+
+## Build and verify
+
+Windows x64, PowerShell 7, Git, .NET SDK **10.0.402**, installed .NET 10 Desktop Runtime and .NET Framework 4.7.2+ for the Brawl worker. This workspace has a local SDK in .tools/dotnet. Ultimate operations additionally use Python 3.10 and local pinned ssbh_data_py 0.9.1 / NumPy 2.2.6 in .deps/ssbh-python; the optional backend is not bundled into a relocatable desktop package. No global installation is performed by build scripts.
 
 ```powershell
 ./scripts/build.ps1 -Native
-./scripts/test.ps1 -Native
+./scripts/test.ps1 -Native -Ultimate
 ./scripts/run.ps1
+./scripts/gui-smoke.ps1 -Mapping
+./scripts/publish.ps1
 ```
 
-The app opens Aster. Click **Open Demo**, **Alternate Rig** or **Tail Demo**; choose a clip, Play/Pause or scrub. Drag to orbit, Shift-drag to pan, wheel to zoom. Select a bone in the left tree, choose a scalar channel/value and Set key; Undo/Redo and Save Project are active. New creates an empty custom character. Load Project reopens it with native resources. Skin/Skeleton toggles aid inspection. Generic rigs are not game reference profiles.
+For the supplied local references only, add `-LocalAssets` to test.ps1. The assertion runner is an executable; use the test script, not dotnet test. Latest full suite: **38 passed, 0 failed**, including three opt-in local-asset cases. GUI mapping and both real-reference playback smokes passed. See [status](docs/DEVELOPMENT_STATUS.md) for exact evidence and limitations.
 
+publish.ps1 stages local framework-dependent desktop/CLI/native binaries and backend notices/source under ignored artifacts/publish. It uploads nothing. Keep the publish subfolders together and retain this workspace for the optional Ultimate backend. doctor.ps1 checks installed runtime and worker; fresh-machine setup, native-tool GUIs, Modkit/cooking, DCC and game checks remain unrun.
+
+Generate original genuine Brawl native fixtures with:
 ```powershell
 . ./scripts/environment.ps1
-Invoke-Dotnet run --project src/FighterPort.Cli -c Release -- native-fixture artifacts/demo-native
-Invoke-Dotnet run --project src/FighterPort.Cli -c Release -- import artifacts/demo-native/aster.mdl0 artifacts/demo-native/punch.chr0 artifacts/imported.fpproj
+Invoke-Dotnet run --project src/FighterPort.Cli -c Release -- native-fixture artifacts/new-native-fixture
 ```
 
-Use a **new** fixture directory. In the desktop use Import MDL0 then Attach CHR0, or Load Project on `artifacts/demo-native/native.fpproj`. Exact bone names resolve clips; no auto-map needed for same-skeleton data. CHR0 display rate defaults to 30 fps because native files have no fps field. Export CHR0 writes a **new**, separate file; source data stays read-only. Unsupported step/fractional-key/dual-key subsets are rejected.
+The fixture output must be new. Original SSBH native fixtures are generated/tested through scripts/generate-ultimate-fixture.py. These are real library-generated formats; fixture materials are neutral test data, not game-ready shaders.
 
-`./scripts/doctor.ps1` checks runtime/worker and bounded optional tool records. `./scripts/gui-smoke.ps1` actually launches/captures/exits the GUI. `./scripts/publish.ps1` stages framework-dependent desktop/CLI and native worker under ignored `artifacts/publish`; publishing here means local build output, no online release. `.NET 10 Desktop Runtime` must be installed to launch the apphost directly. Tests use an executable assertion harness, so `scripts/test.ps1` is the authoritative test command.
+## Source and complete scope
 
-Only generated original fixture code is tracked. Dependency clones/caches, builds, private config, user projects and native/game binaries are ignored. License obligations and corresponding backend source are documented in [dependencies](docs/DEPENDENCIES.md). Manual-only CI is prepared and unrun. Before pushing use `scripts/review.ps1`, inspect `git diff --cached`, commit, then `scripts/push.ps1` which verifies privacy and remote commit identity.
+This repository is **public by explicit user instruction**. Before each source push, scripts/push.ps1 verifies exact origin and live expected visibility from config/repository.json, then checks the remote commit SHA. Run scripts/review.ps1 and inspect the staged diff before committing. No game assets, derived projects/captures/reports, credentials, local configuration, builds or dependency clones belong in Git. CI remains manual-only and unrun.
 
-See [complete scope](docs/MASTER_PLAN.md), [roadmap](docs/ROADMAP.md), [status](docs/DEVELOPMENT_STATUS.md), [current task](docs/plans/current.md), [format operations](docs/FORMAT_SUPPORT.md), [testing](docs/TESTING.md) and [GitHub status](docs/GITHUB_STATUS.md). Melee, full Ultimate, Rivals II, Dragon Ball source adapters, native ancillary tracks, general DCC/interchange, automatic mapping/rebinding/optimization remain planned. Local Mario skeleton references were inspected read-only; this does not establish full asset, native-tool or in-game compatibility. See [reference inspection](docs/REFERENCE_INSPECTION.md).
-
-## Current local build and restricted FK
-
-Launch `artifacts/publish/desktop/FighterPort.Desktop.exe` (verified Windows launch). Load `artifacts/demo-native/native.fpproj` for the genuine native-import demo; Open Demo starts the original canonical character. CLI executable: `artifacts/publish/cli/FighterPort.Cli.exe`; backend: `artifacts/publish/native/FighterPort.NativeWorker.exe`. Keep the publish subfolders together.
-
-Click **Map / Retarget** for source/target project loading, manual assignment, profile save/load, explicit approval, dual skinned preview and new target project output. The CLI also exposes `map-template <source> <target> <profile.json>` and `retarget <source> <clip-index> <target> <approved-profile.json> <new-project>`. Review exact-name suggestions before approving. Matching rest axes/hierarchy and unit rest scales are required; root motion needs CopyDelta policy. See [retargeting](docs/RETARGETING.md). Run `./scripts/gui-smoke.ps1 -Mapping` to exercise this window.
-
-Current evidence: 27 automated tests passed, native and mapping GUI smoke passed, published desktop mapping and CLI doctor exercised. Optional original SKEL 1.0 fixture write/read test passed. CHR0 export now decodes and checks key/quarter-frame error before atomic publication. Published apphost ran on installed .NET 10.0.11; project-local SDK commands use 10.0.13. No remote CI or native-tool/in-game checks ran.
+[Master requirements](docs/MASTER_PLAN.md), [roadmap](docs/ROADMAP.md), [next acceptance criterion](docs/plans/current.md), [format operation evidence](docs/FORMAT_SUPPORT.md), [tests](docs/TESTING.md), [dependencies](docs/DEPENDENCIES.md), [GitHub status](docs/GITHUB_STATUS.md). The complete Melee/Rivals/Dragon Ball/legacy, channel/material, optimization and DCC scope is preserved.

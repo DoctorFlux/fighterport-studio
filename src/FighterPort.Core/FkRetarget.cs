@@ -13,6 +13,8 @@ public static class FkRetarget
     public static CharacterProject Transfer(CharacterProject source,int clipIndex,CharacterProject target,MappingProfile profile)
     {
         ProjectStore.Validate(source);ProjectStore.Validate(target);
+        if(source.Clips[clipIndex].Transfer!=null||source.Clips[clipIndex].TransformTracks.Count>0)throw new InvalidDataException("Strict scalar FK does not accept native quaternion/retarget-layer clips");
+        if(source.Bones.Concat(target.Bones).Any(b=>b.RestMatrix.Length>0))throw new InvalidDataException("Native rest matrices require the separately validated rest-delta path");
         void Require(bool ok,string why){if(!ok)throw new InvalidDataException(why);}
         Require(profile.Version==1&&profile.Approved,"Review and explicitly approve the mapping profile first");
         Require(profile.SourceFingerprint==Animation.Fingerprint(source)&&profile.TargetFingerprint==Animation.Fingerprint(target),"Stale/incompatible skeleton fingerprint");

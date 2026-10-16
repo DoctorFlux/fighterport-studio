@@ -11,3 +11,14 @@ Nine scalar channels: scale XYZ 0–2, rotation XYZ 3–5, translation XYZ 6–8
 Worker protocol: `v1 operation input output`, typed JSON contract, one request/process, redirected completion/error, 45-second timeout, cancellation kills process tree, unique job dirs cleaned on completion. It is crash isolation, NOT a security sandbox. Upstream contains unsafe parsers and dialog-based errors; process timeout bounds hangs, but complete hostile-file hardening/resource quotas/progress remain M2.C. Do not enable automatic untrusted library scans.
 
 Native originals preserve shaders and undeclared channels opaquely. Neutral renderer does not evaluate them. Native model rewriting is not exposed; CHR0 export validates the declared editable subset. Branch field is metadata only at this checkpoint; full source/target branch manager still pending.
+
+
+## Continuation extensions (2026-10-16)
+
+Canonical v1 has additive optional fields: Bone.RestMatrix for exact native local binds, Mesh material/subindex/extra-attribute data, Clip.TransformTracks for native quaternion samples, explicit Losses, and a nonnested PoseTransfer source layer. Legacy scalar projects keep their interpretation. Native rest matrices must agree with fingerprinted inverse binds; native attributes are bounded/finite. Scalar editing refuses quaternion/transfer/native-matrix projects until an explicit measured bake or suitable editor exists.
+
+Ultimate imports through a separate supervised Python worker using pinned ssbh_data_py. Native quaternions use normalized shortest-sign linear interpolation per inspected ssbh_wgpu code; translation/scale are linear. No Euler turns are inferred from quaternion samples. Rigid native meshes are converted from parent-bone local geometry to bind-world geometry with one influence. Weighted meshes use canonical inverse-bind skinning. Native material/visibility/constraint resources remain opaque and texture dependencies external. Display defaults: standalone CHR0 30 fps, bundle CHR0 and NUANMB 60 fps, explicitly not a native fps claim.
+
+WorkerProcess is shared process supervision: exact completion protocol, 45-second deadline, bounded 16 Ki-character stdout/stderr, 32 MiB output and monitored 512 MiB working set, cleanup and process-tree termination. These are observed supervision limits, not hard OS allocation limits or a hostile-parser sandbox. NativePreflight validates a bounded common header/dictionary subset for MDL0 v9/v11 and CHR0 v4; deeper unsafe parser payloads and PAC containers still rely on isolation.
+
+Brawl export uses the pinned native encoder's I12 path to retain explicit values/tangents, followed by native decode/key/quarter-frame checks and atomic create-new publication. Ultimate skeletal export uses actual AnimData.save and decoded transform comparison; omitted ancillary nodes require explicit approval. NativeBake is explicit and separately measured, never inserted silently behind export.

@@ -47,10 +47,10 @@ public sealed class MappingSession
         LoadProfile(JsonSerializer.Deserialize<MappingProfile>(File.ReadAllText(path),ProjectStore.Json)??throw new InvalidDataException("Empty profile"));
     }
     public void SaveProfile(string path)=>ProjectStore.AtomicWrite(path,JsonSerializer.SerializeToUtf8Bytes(profile,ProjectStore.Json));
-    public CharacterProject Preview(int clipIndex)=>FkRetarget.Transfer(source,clipIndex,target,profile);
-    public void SaveResult(int clipIndex,string newPath)
+    public CharacterProject Preview(int clipIndex,bool restDelta=false)=>restDelta?RestPoseRetarget.Transfer(source,clipIndex,target,profile):FkRetarget.Transfer(source,clipIndex,target,profile);
+    public void SaveResult(int clipIndex,string newPath,bool restDelta=false)
     {
-        var result=Preview(clipIndex);ProjectStore.Validate(result);
+        var result=Preview(clipIndex,restDelta);ProjectStore.Validate(result);
         ProjectStore.AtomicWrite(newPath,JsonSerializer.SerializeToUtf8Bytes(result,ProjectStore.Json),overwrite:false);
     }
 }

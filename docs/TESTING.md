@@ -1,6 +1,21 @@
 # Testing and evidence
 
-Current increment: **27 passed / 0 failed** in `artifacts/tests/20261016-165712` (23 core including mapping/export validator; four native integration cases). All previous cases retained. `./scripts/gui-smoke.ps1 -Mapping` passed actual assignment/approval/reload/rejection/immutable-input/new-target checks and captured dual skinned previews. Screenshot review found and corrected viewport aspect framing. Optional Python SKEL fixture self-test passed separately, as did supplied reference skeleton reads. These counts do not imply game compatibility.
+## Current continuation evidence — supersedes historical counts/limitations above
+
+Final core/native/SSBH/local suite: **38 passed, 0 failed**, artifacts/tests/20261016-181042; 35 portable/original cases plus three opt-in commercial-local cases. Command: ./scripts/test.ps1 -Native -Ultimate -LocalAssets. Existing 27 cases retained. Optional Ultimate tests require local Python 3.10 and pinned packages; LocalAssets reads ignored configuration/reports and never belongs in public CI.
+
+Added: worker crash/deadline/cancel/log/output/protocol/missing-response tests; 12 deterministic malformed MDL0/CHR0 cases; export validation/cancel/crash/destination-race atomicity. Semantic ambiguity/correction/stale/missing-toe/tail cases; independent changed-axis/parent rest-relative poses and asymmetric rig skinning. Original genuine SSBH writer-generated model/animation, independent rigid/blended fractional poses, exact-bind/attribute negative cases, NUANMB export/decode. Original same-rig CHR0↔NUANMB measured bakes, excessive-error rejection and genuine exports. The dense CHR0 regression exposed backend tangent regeneration; using genuine I12 fixed it without changing tolerances.
+
+Supplied Brawl main v9 geometry and Wait1 skeletal playback compared with BrawlLib native fractional world matrices; supplied Ultimate c00 full geometry/rig and idle transform tracks imported/reopened/skinned. Ancillary loss guard rejects unapproved export. All 688 input hashes unchanged. Local test data/projects/captures stay ignored. These are skeletal subset tests, not native material/constraint/game correctness.
+
+Updated mapping GUI smoke passed strict and rest-delta UI modes, approval invalidation, save/reopen and fractional dual skin previews. Original screenshot reviewed. Actual supplied-project playback/save/reopen smoke passed for both; commercial captures stayed local and were not sent to image services. Native-tool GUIs, Modkit/cook, DCC, game runs, fresh-machine setup and remote CI remain unrun.
+
+Bake measurements use a fixed quarter-frame grid and sampled vertices; narrow extrema, adaptive error, loop tangent continuity, all end-effectors and contact preservation remain acceptance work. CHR0 scalar validator tolerances remain .001 scale / .05 degrees / .01 cm; NUANMB decoded matrix element tolerance is .001. Shared encoders/decoders can share bugs.
+## Historical verification details
+
+
+
+Earlier increment: **27 passed / 0 failed** in `artifacts/tests/20261016-165712` (23 core including mapping/export validator; four native integration cases). All previous cases retained. `./scripts/gui-smoke.ps1 -Mapping` passed actual assignment/approval/reload/rejection/immutable-input/new-target checks and captured dual skinned previews. Screenshot review found and corrected viewport aspect framing. Optional Python SKEL fixture self-test passed separately, as did supplied reference skeleton reads. These counts do not imply game compatibility.
 
 Every CHR0 export now validates the encoded file before atomic create-new publication: version/frame-count/loop match, original key values (including loop-end key), native quarter-frame scalar samples including default unanimated channels. Absolute tolerances: scale 0.001, Euler rotation 0.05 degrees, translation 0.01 cm; no modulo-angle comparison. Maximum one million scalar samples. Failures/cancellation leave no published file. Negative tests cover lost 360-degree turns, NaN, truncated samples, unintended channel motion, timing mismatch, and excessive sample budget. This is a bounded scalar grid with shared-library encode/decode, not continuous/world-space pose error proof or native-tool/in-game validation.
 
