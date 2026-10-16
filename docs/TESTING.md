@@ -1,0 +1,10 @@
+# Testing and evidence
+
+`./scripts/build.ps1 -Native`; `./scripts/test.ps1 -Native`; `./scripts/gui-smoke.ps1`.
+The assertion runner is a normal executable that returns nonzero on any failure; use these commands, not `dotnet test` (no test-SDK adapter). Core tests require no commercial assets, network, hosts or licenses after SDK setup. Native tests additionally require the locally built BrawlLib worker; omission is printed as SKIP, not counted as pass.
+
+First checkpoint: 17 passed / 0 failed, including three native scenarios. Covers original rig complexity/blended weights, rest inverse-bind identity, actual skinned motion, independent transform/Hermite expectations, Euler winding, fractional times/holds/loop endpoints, normals under nonuniform scale, key edit/undo/redo/save/reopen, malformed hierarchy/weights/indices/numbers/bindings/schema/keys, retained-resource hashes, genuine MDL0+CHR0 edit/reopen/export/decode, native scale/loop/tangent/winding, corrupt-header/unsupported-step rejection and source immutability. Quarter-frame error measured 0.000012993813; MDL0 fixture 126148 bytes, edited CHR0 240 bytes.
+
+Windows GUI smoke actually launched at 1280x820, WPF rendering tier 2; rendered screenshots inspected. Script exercises scrub/key edit/undo/redo/save/reopen and captures frames; this is not a full automated pixel correctness/UI interaction suite. Native-tool GUI, retail assets, Modkit/cooking, in-game checks and remote CI are UNRUN. BrawlLib encode/decode can share bugs; independent analytic math and source mesh comparisons supplement, not replace native-tool validation.
+
+Generated results/screenshots/native/project files stay in ignored artifacts. Fixture source is deterministic original code; no game assets in CI. Known negative experiments and corrections are documented in decisions/0002-native-worker.md. Current status overrides old checkpoint counts when more criteria are added.

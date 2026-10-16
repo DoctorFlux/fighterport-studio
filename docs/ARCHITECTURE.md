@@ -1,0 +1,13 @@
+# Architecture
+
+Five small projects: Core (no UI/DCC dependencies), CLI (same core APIs), Desktop (Windows WPF), NativeWorker (.NET Framework 4.7.2 x86, BrawlLib boundary), executable assertion suite. Shared DTO source avoids runtime coupling across CLR versions. See decisions/0001-platform.md and 0002-native-worker.md.
+
+Canonical v1 JSON is the master, not DAE/FBX. DAE writer exists only to feed original fixtures to BrawlLib. Native MDL0 importer reads actual decoded geometry; it never sees Demo or the original project. Sources remain read-only and are retained as hash-verified base64 resources inside project JSON, not cache paths. 8 MiB native input / 32 MiB project/output limits apply. Atomically staged saves use same-directory unique temp files.
+
+Coordinates: centimeters, right-handed, +Y up, +Z toward viewer; UV canonical V follows fixture COLLADA, invert native Brawl V at import. System.Numerics uses row vectors; matrices are row-major arrays, translation elements 12–14. Local S * Rx * Ry * Rz * T, then local * parent world. Euler angles remain degrees with unbounded winding; no shortest-path quaternion conversion. Skin = sum(weight * position * inverseBind * animatedWorld). Normals use inverse-transpose per influence then normalize. Inverse binds are retained exactly; demo binds are explicitly computed at generation.
+
+Nine scalar channels: scale XYZ 0–2, rotation XYZ 3–5, translation XYZ 6–8. Hermite tangents in value/frame; Linear and Step canonical evaluation supported. Clip frame count follows CHR0; loop period is FrameCount, optional endpoint key may be at FrameCount. Nonloop last frame is count-1. Native CHR0 does not store fps: initial import display rate is explicitly 30, CLI API can specify it. Integer native keys; fractional evaluation tested. Dual keys/segment compensation/billboards are rejected. Scale/shear generality is not claimed.
+
+Worker protocol: `v1 operation input output`, typed JSON contract, one request/process, redirected completion/error, 45-second timeout, cancellation kills process tree, unique job dirs cleaned on completion. It is crash isolation, NOT a security sandbox. Upstream contains unsafe parsers and dialog-based errors; process timeout bounds hangs, but complete hostile-file hardening/resource quotas/progress remain M2.C. Do not enable automatic untrusted library scans.
+
+Native originals preserve shaders and undeclared channels opaquely. Neutral renderer does not evaluate them. Native model rewriting is not exposed; CHR0 export validates the declared editable subset. Branch field is metadata only at this checkpoint; full source/target branch manager still pending.

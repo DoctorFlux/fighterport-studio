@@ -1,0 +1,24 @@
+name: Manual original-fixture build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: 10.0.402
+      - name: Build pinned native backend and application
+        shell: pwsh
+        run: ./scripts/build.ps1 -Native
+      - name: Test only original generated fixtures
+        shell: pwsh
+        run: ./scripts/test.ps1 -Native
+# GUI smoke requires an interactive Windows session and is run locally.
+# No push/PR/schedule trigger, uploads, publication or automatic dispatch.

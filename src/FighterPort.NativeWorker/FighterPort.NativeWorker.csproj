@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net472</TargetFramework><PlatformTarget>x86</PlatformTarget><LangVersion>latest</LangVersion><AllowUnsafeBlocks>true</AllowUnsafeBlocks><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile><AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/Model.cs" Link="Model.cs" />
+    <Reference Include="BrawlLib"><HintPath>../../.deps/BrawlCrate/BrawlLib/bin/x86/Release/net472/BrawlLib.dll</HintPath></Reference>
+    <Reference Include="System.Web.Extensions" /><Reference Include="System.Windows.Forms" />
+    <Reference Include="OpenTK"><HintPath>../../.deps/BrawlCrate/BrawlLib/OpenTK.dll</HintPath></Reference>
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+# ADR 0002 — Pin BrawlLib and preserve native evidence
+
+2026-10-16. BrawlCrate source d56cbac89dc2cd0e5c3f923e1d03041b16902add inspected and built. APIs: Collada.ImportModel (fixture-only), MDL0Node/NodeFactory.FromFile, BoneCache/InverseBindMatrix, PrimitiveManager facepoint data, CHR0Node.CreateEntry/Export, CHR0EntryNode.GetKeyframe/SetKeyframe/GetFrameValue. The pinned private `_triangles` field is read reflectively because upstream exposes no public triangle accessor. Changes to that ABI fail explicitly. No invented library APIs.
+
+Legacy x86 net472 is required in this tested configuration. An attempted x64 build compiled but failed model import and CHR0 export (pointer/overflow assumptions); it is not supported. The x86 backend's reversed-float return passes through x87 and can quiet signaling-NaN bit patterns, corrupting real big-endian output. Original geometry at 129.51561 was read back as 129.76561. The local one-line bfloat writer fix transfers reversed bits through uint, and the unchanged geometry test now passes. scripts/prepare-native.ps1 applies the exact small fix plus the SDK resource package compatibility change. These are modified LGPL library source changes, not a replacement native exporter.
+
+Fixture COLLADA omits zero weights: upstream otherwise chooses multi-influence world storage before removing zero influences, causing rigid vertices to receive bind translation twice. Native UV V is reversed back into canonical convention. Float vertex/normal/UV writing is explicit. Generated fixture model names are deterministic, not job UUIDs.
+
+Preservation is distinct from canonical editing. Native whole-file bytes retained with SHA256. Only CHR0 v4 write is exposed to users. MDL0 v11 generation is a fixture pipeline, not a general destination exporter. Native-tool checks with BrawlCrate share BrawlLib and cannot constitute fully independent validation.

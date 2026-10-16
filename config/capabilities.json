@@ -1,0 +1,951 @@
+{
+  "schemaVersion": 1,
+  "checkedDate": "2026-10-16",
+  "operations": [
+    {
+      "game": "Original",
+      "format": "FPPROJ",
+      "version": "1",
+      "operation": "create",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/Program.cs",
+      "limitations": "Declared scalar FK/mesh subset only; later canonical fields remain roadmap."
+    },
+    {
+      "game": "Original",
+      "format": "FPPROJ",
+      "version": "1",
+      "operation": "edit",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/Program.cs",
+      "limitations": "Declared scalar FK/mesh subset only; later canonical fields remain roadmap."
+    },
+    {
+      "game": "Original",
+      "format": "FPPROJ",
+      "version": "1",
+      "operation": "evaluate",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/Program.cs",
+      "limitations": "Declared scalar FK/mesh subset only; later canonical fields remain roadmap."
+    },
+    {
+      "game": "Original",
+      "format": "FPPROJ",
+      "version": "1",
+      "operation": "save-reopen",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/Program.cs",
+      "limitations": "Declared scalar FK/mesh subset only; later canonical fields remain roadmap."
+    },
+    {
+      "game": "Original",
+      "format": "FPPROJ",
+      "version": "1",
+      "operation": "validate",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/Program.cs",
+      "limitations": "Declared scalar FK/mesh subset only; later canonical fields remain roadmap."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "read",
+      "state": "SyntheticTested",
+      "evidence": "M2 genuine MDL0 test",
+      "limitations": "Original fixtures only; geometry/binds/UV0/normals/1-4 weights; native materials opaque."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "evaluate",
+      "state": "SyntheticTested",
+      "evidence": "M2 genuine MDL0 test",
+      "limitations": "Original fixtures only; geometry/binds/UV0/normals/1-4 weights; native materials opaque."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "preserve",
+      "state": "SyntheticTested",
+      "evidence": "M2 genuine MDL0 test",
+      "limitations": "Original fixtures only; geometry/binds/UV0/normals/1-4 weights; native materials opaque."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "validate",
+      "state": "SyntheticTested",
+      "evidence": "M2 genuine MDL0 test",
+      "limitations": "Original fixtures only; geometry/binds/UV0/normals/1-4 weights; native materials opaque."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "fixture-write",
+      "state": "SyntheticTested",
+      "evidence": "ColladaFixture + pinned BrawlLib",
+      "limitations": "Generator only, not general canonical-to-native model export."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "native-tool-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "real-asset-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "MDL0",
+      "version": "11",
+      "operation": "in-game-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "read",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "write",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "edit",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "evaluate",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "preserve",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "validate",
+      "state": "SyntheticTested",
+      "evidence": "M2 native motion tests",
+      "limitations": "Integer Hermite keys; exact-name bindings, unbounded Euler turns; no dual keys, step export or special scale semantics."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "native-tool-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "real-asset-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "in-game-check",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": ""
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "PAC/PCS/BRRES",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "TEX0/PLT0/VIS0/SRT0/PAT0/CLR0/SHP0/SCN0",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Melee",
+      "format": "HSD DAT/AnimJoint/FigaTree",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Ultimate",
+      "format": "NUMDLB/NUMSHB/NUSKTB/NUMATB/NUANMB/NUTEXB",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Rivals II",
+      "format": "Editable Modkit source/package",
+      "version": "Installed version TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash Wii U",
+      "format": "NUD/NUT/VBN/OMO investigation",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 3DS",
+      "format": "BCH and native pipeline investigation",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Smash 64",
+      "format": "Native container/model/animation",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "write",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "edit",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "package",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Interchange",
+      "format": "FBX/glTF/GLB/DAE/SMD/ANIM",
+      "version": "Declared subsets TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Formats remain investigation scope, not verified support. Split rows per tested version/resource on implementation."
+    },
+    {
+      "game": "Sparking! ZERO",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Sparking! ZERO",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Sparking! ZERO",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Sparking! ZERO",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Dragon Ball FighterZ",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Dragon Ball FighterZ",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Dragon Ball FighterZ",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Dragon Ball FighterZ",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 1",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 1",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 1",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 1",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 2",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "read",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 2",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "evaluate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 2",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "preserve",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    },
+    {
+      "game": "Xenoverse 2",
+      "format": "Native source assets",
+      "version": "TBD",
+      "operation": "validate",
+      "state": "Planned",
+      "evidence": "",
+      "limitations": "Source only. No native export requirement."
+    }
+  ]
+}
