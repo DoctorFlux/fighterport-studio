@@ -30,10 +30,16 @@ public sealed class MappingSession
         if(profile.RootTranslation!=policy){profile.RootTranslation=policy;profile.Approved=false;}
     }
     public void Approve(bool approved)=>profile.Approved=approved;
+    public void SetNonRootPolicy(string policy)
+    {
+        if(policy is not ("Reject" or "RestParentDelta"))throw new InvalidDataException("Unknown nonroot translation policy");
+        if(profile.NonRootTranslation!=policy){profile.NonRootTranslation=policy;profile.Approved=false;}
+    }
     public void Reset()=>profile=FkRetarget.Template(source,target);
     public void Clear(){profile.BoneIds.Clear();profile.Approved=false;}
     public void LoadProfile(MappingProfile candidate)
     {
+        RestPoseRetarget.ValidatePolicies(candidate);
         if(candidate.Version!=1||candidate.SourceFingerprint!=Animation.Fingerprint(source)||candidate.TargetFingerprint!=Animation.Fingerprint(target))
             throw new InvalidDataException("Profile fingerprint mismatch: select its exact source and target skeletons");
         if(candidate.RootTranslation is not ("Reject" or "CopyDelta")||candidate.BoneIds.Count>source.Bones.Count||candidate.BoneIds.Values.Distinct().Count()!=candidate.BoneIds.Count)

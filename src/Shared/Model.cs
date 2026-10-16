@@ -88,6 +88,9 @@ namespace FighterPort.Core
         public string TargetFingerprint { get; set; } = "";
         public bool Approved { get; set; }
         public string RootTranslation { get; set; } = "Reject";
+        public string NonRootTranslation { get; set; } = "Reject";
+        public string ScalePolicy { get; set; } = "UnitOnly";
+        public string HelperPolicy { get; set; } = "TargetRest";
         public Dictionary<string,string> BoneIds { get; set; } = new Dictionary<string,string>();
     }
     public class PoseTransfer
@@ -95,7 +98,7 @@ namespace FighterPort.Core
         public List<Bone> SourceBones { get; set; } = new List<Bone>();
         public Clip SourceClip { get; set; } = null!;
         public MappingProfile Mapping { get; set; } = null!;
-        public string Method { get; set; } = "WorldRestDelta-v1";
+        public string Method { get; set; } = "WorldRestDelta-v2";
     }
     public class TransformTrack
     {

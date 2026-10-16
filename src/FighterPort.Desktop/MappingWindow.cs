@@ -17,6 +17,7 @@ internal sealed class MappingWindow : Window
     private readonly StackPanel rows=new();
     private readonly Dictionary<string,ComboBox> assignments=new();
     private readonly ComboBox clips=new(){MinWidth=140},policy=new(){ItemsSource=new[]{"Reject","CopyDelta"},Width=110};
+    private readonly ComboBox nonRootPolicy=new(){ItemsSource=new[]{"Reject","RestParentDelta"},Width=145};
     private readonly CheckBox approval=new(){Content="I reviewed and approve this mapping",Margin=new(8),Foreground=Brushes.White};
     private readonly Slider time=new(){Minimum=0,Width=330};
     private readonly TextBlock message=new(){TextWrapping=TextWrapping.Wrap,Margin=new(8),Foreground=Brushes.LightSteelBlue};
@@ -55,6 +56,8 @@ internal sealed class MappingWindow : Window
         approval.Checked+=(_,_)=>{if(!refreshing){session.Approve(true);Invalidate();}};approval.Unchecked+=(_,_)=>{if(!refreshing){session.Approve(false);Invalidate();}};
         time.ValueChanged+=(_,_)=>{if(!refreshing)Draw();};
         options.Children.Add(restDelta);restDelta.Click+=(_,_)=>{session.Approve(false);SyncApproval();};
+        options.Children.Add(new TextBlock{Text=" Nonroot translation: ",Foreground=Brushes.White,VerticalAlignment=VerticalAlignment.Center});options.Children.Add(nonRootPolicy);
+        nonRootPolicy.SelectionChanged+=(_,_)=>{if(refreshing)return;session.SetNonRootPolicy((string)nonRootPolicy.SelectedItem);SyncApproval();};
         Refresh();clips.SelectedIndex=Math.Clamp(clipIndex,0,Math.Max(0,source.Clips.Count-1));
     }
     private Clip? SelectedClip=>clips.SelectedIndex>=0&&clips.SelectedIndex<source.Clips.Count?source.Clips[clips.SelectedIndex]:null;
@@ -75,6 +78,7 @@ internal sealed class MappingWindow : Window
         names.Text=$"SOURCE: {source.Name} ({source.Bones.Count} bones)       TARGET: {target.Name} ({target.Bones.Count} bones) • right preview is rest pose until transfer";
         int old=clips.SelectedIndex;clips.ItemsSource=source.Clips.Select(c=>c.Name).ToArray();clips.SelectedIndex=source.Clips.Count>0?Math.Clamp(old,0,source.Clips.Count-1):-1;
         policy.SelectedItem=profile.RootTranslation;approval.IsChecked=profile.Approved;time.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);
+        nonRootPolicy.SelectedItem=profile.NonRootTranslation;
         var choices=new[]{new Choice("","— unassigned —")}.Concat(target.Bones.Select(b=>new Choice(b.Id,b.Name))).ToArray();
         foreach(var bone in source.Bones)
         {

@@ -1261,6 +1261,15 @@
       "state": "SyntheticTested",
       "evidence": "generate-ultimate-fixture.py and UltimateTests.cs",
       "limitations": "Original two-bone rigid/blended skin through genuine native writer; neutral test material is not a game shader. Not a general model-export API."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "PoseTransfer",
+      "version": "WorldRestDelta-v2",
+      "operation": "quaternion-and-translation-transfer",
+      "state": "SyntheticTested",
+      "evidence": "QuaternionRetargetTests.cs; 30 portable cases",
+      "limitations": "UnitOnly scale, explicit root CopyDelta/nonroot RestParentDelta, TargetRest helpers. No compensation/twist/proportion/IK/contact; commercial maps unapproved."
     }
   ]
 }

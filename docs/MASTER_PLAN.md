@@ -336,3 +336,11 @@ Source access:
 Use official .NET, Avalonia, Blender, Autodesk, and Epic documentation for the selected versions. If network access is unavailable, clearly mark unverified assumptions and work from available inspectable code. No invented interfaces or unsupported compatibility claims.
 
 **Begin now: verify the workspace, establish the minimal persistent project and private repository safely, then implement and test the first runnable workbench/native-integration slice.**
+
+## Unified editor continuation — M3.A2 checkpoint
+
+Read the complete CODEX_UNIFIED_RESOURCE_EDITOR_AND_FULL_CHARACTER_PIPELINE.md. Preserve all existing requirement IDs and scope; add M1.E resource workspace, M3.C1 synchronized VIS0, M3.D1 texture/material approximation and M1.C2 bounded external-source workspace storage as child criteria. All four destinations remain peers; four mapping layers (bone, visibility, material, shape) stay distinct. Native model/package writers remain required after the first visible workspace.
+
+M3.A2 first executable subset tested: WorldRestDelta-v2 evaluates retained native quaternion sources at fractional times on changed rest axes/parents. UnitOnly admits constant unit scale but rejects actual scale motion; root CopyDelta and nonroot RestParentDelta are explicit approved policies. Nonroot translation deltas transform through source-parent rest basis into target-parent rest basis, without automatic proportion scaling. Unmapped target helpers retain rest locals; animated source coverage remains mandatory. Unsupported compensation, twist distribution, IK/contact and uncertain commercial mapping remain blocked/pending. Legacy v1 layers reopen with their old policy subset.
+
+Baseline build/native/SSBH/local suite: 38 passed in artifacts/tests/20261016-183139. Increment portable suite: 30 passed in artifacts/tests/20261016-183315, including three independent quaternion/translation/native-matrix cases. The completed native-failure milestone was retained, not reimplemented. Next immediate product criterion: M1.E + M3.C1/D1 Brawl native resource tree, real material-bound textures and synchronized VIS0 on a single timeline, with original genuine multi-channel fixtures and opt-in Mario checks. Full target-rig Mario transfer still requires reviewed mapping/loss policies.

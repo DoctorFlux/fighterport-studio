@@ -140,6 +140,7 @@ if(args.Contains("--native"))
 else Console.WriteLine("SKIP native integration: pass --native after building the worker.");
 await WorkerFailureTests.Run(output,Test,args.Contains("--native"));
 await SemanticTests.Run(output,Test);
+await QuaternionRetargetTests.Run(output,Test);
 if(args.Contains("--ultimate"))await UltimateTests.Run(output,Test,args.Contains("--native"));
 else Console.WriteLine("SKIP optional Ultimate backend: pass --ultimate with pinned local Python dependencies installed");
 if(args.Contains("--local-assets"))await LocalReferenceTests.Run(output,Test);

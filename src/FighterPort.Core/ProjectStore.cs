@@ -73,11 +73,11 @@ public static class ProjectStore
         {
             if(clip.Transfer is { } layer)
             {
-                Require(layer.Method=="WorldRestDelta-v1"&&layer.SourceClip!=null&&layer.SourceClip.Transfer==null&&layer.Mapping!=null&&clip.Curves.Count==0&&clip.TransformTracks.Count==0,"Invalid/nested retarget layer");
+                Require(layer.Method is "WorldRestDelta-v1" or "WorldRestDelta-v2"&&layer.SourceClip!=null&&layer.SourceClip.Transfer==null&&layer.Mapping!=null&&clip.Curves.Count==0&&clip.TransformTracks.Count==0,"Invalid/nested retarget layer");
                 var source=new CharacterProject{Bones=layer.SourceBones,Clips=[layer.SourceClip!]};Validate(source);
                 Require(layer.Mapping!.Approved&&layer.Mapping.SourceFingerprint==Animation.Fingerprint(source)&&layer.Mapping.TargetFingerprint==Animation.Fingerprint(p),"Stale/unapproved retarget layer");
                 Require(layer.Mapping.BoneIds.Values.Distinct().Count()==layer.Mapping.BoneIds.Count&&layer.Mapping.BoneIds.All(x=>source.Bones.Any(b=>b.Id==x.Key)&&p.Bones.Any(b=>b.Id==x.Value)),"Invalid retarget mapping");
-                Require(source.Bones.Concat(p.Bones).All(b=>b.Scale.All(s=>Math.Abs(s-1)<.0001f))&&!layer.SourceClip!.Curves.Any(c=>c.Channel<3),"Unsupported retarget scale");
+                if(layer.Method=="WorldRestDelta-v1")Require(layer.SourceClip!.TransformTracks.Count==0&&layer.Mapping.NonRootTranslation=="Reject","Legacy rest layer cannot opt into new policies");
                 RestPoseRetarget.ValidateMapping(source,layer.SourceClip!,p,layer.Mapping!);
                 Require(clip.FrameCount==layer.SourceClip!.FrameCount&&clip.Loop==layer.SourceClip.Loop&&clip.FramesPerSecond==layer.SourceClip.FramesPerSecond,"Retarget timing mismatch");
             }

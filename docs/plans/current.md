@@ -1,6 +1,8 @@
 # Next executable acceptance criterion
 
-**M3.A2 — Quaternion-aware rest transfer with explicit translation/scale/helper policies.**
+**M1.E / M3.C1 / M3.D1 — Unified Brawl resource workspace, material-bound textures and synchronized VIS0.**
+
+M3.A2 quaternion/rest-parent-translation subset now passes independent original tests; full mapping/twist/contact work below remains. Execute the complete unified editor instruction, retaining the older pending criteria below.
 
 M2.C2 is tested; M3.A1 semantic suggestions/manual corrections and scalar WorldRestDelta-v1 are tested subsets. M5.B1 supplied Brawl/Ultimate geometry/rig/skeletal playback and genuine original SSBH fixtures now work. Original same-rig CHR0↔NUANMB bakes/export/decode pass. Neither that nor a semantic profile proves Mario cross-rig conversion.
 

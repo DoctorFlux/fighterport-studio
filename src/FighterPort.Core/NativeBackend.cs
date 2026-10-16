@@ -23,6 +23,7 @@ public sealed class NativeBackend(string workerPath,string jobsDirectory,IWorker
     public async Task ExportClip(CharacterProject p,Clip clip,string path,CancellationToken cancellation=default)
     {
         ProjectStore.Validate(p);
+        if(clip.Losses.Any(s=>s.Contains("native nodes")))throw new InvalidDataException("CHR0 skeletal export would omit retained ancillary nodes; a separately reviewed partial-output conversion is required");
         if(clip.Transfer!=null||clip.TransformTracks.Count>0)throw new InvalidDataException("Retarget/quaternion clip needs an explicit measured native bake; direct CHR0 export is not implemented");
         if(clip.SkeletonFingerprint!=Animation.Fingerprint(p))throw new InvalidDataException("Skeleton mismatch");
         if(p.Resources.Any(r=>r.Name.Equals(Path.GetFileName(path),StringComparison.OrdinalIgnoreCase)))throw new IOException("Choose a new output name; source resources are read-only");
