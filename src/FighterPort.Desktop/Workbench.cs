@@ -61,8 +61,9 @@ public sealed class Workbench : Window
         Button(tools,"Save Project",()=>{var d=new SaveFileDialog{Filter="FighterPort project|*.fpproj",FileName="character.fpproj"};if(d.ShowDialog()==true){ProjectStore.Save(P,d.FileName);SetStatus("Saved with native resources and hashes.");}});
         Button(tools,"Import MDL0",()=>Native(async()=>{var d=new OpenFileDialog{Filter="MDL0 v11|*.mdl0"};if(d.ShowDialog()==true)SetProject(await Backend.ImportModel(d.FileName,operation!.Token));}));
         Button(tools,"Attach CHR0",()=>Native(async()=>{if(P.Bones.Count==0)throw new InvalidOperationException("Load a model first.");var d=new OpenFileDialog{Filter="CHR0 v4|*.chr0"};if(d.ShowDialog()==true){P.Clips.Add(await Backend.ImportClip(P,d.FileName,30,operation!.Token));Refresh();SetStatus("Bound by exact bone names; 30 fps display rate (CHR0 does not encode fps). Native originals retained.");}}));
-        Button(tools,"Export CHR0",()=>Native(async()=>{var c=SelectedClip??throw new InvalidOperationException("Select a clip.");var d=new SaveFileDialog{Filter="CHR0 v4|*.chr0",FileName="edited.chr0"};if(d.ShowDialog()==true){await Backend.ExportClip(P,c,d.FileName,operation!.Token);SetStatus("Exported CHR0 v4. Native-tool/in-game compatibility is not yet checked.");}}));
+        Button(tools,"Export CHR0",()=>Native(async()=>{var c=SelectedClip??throw new InvalidOperationException("Select a clip.");var d=new SaveFileDialog{Filter="CHR0 v4|*.chr0",FileName="edited.chr0"};if(d.ShowDialog()==true){await Backend.ExportClip(P,c,d.FileName,operation!.Token);SetStatus("Exported CHR0 v4 after decoded key and quarter-frame error checks. Native-tool/in-game compatibility is not yet checked.");}}));
         Button(tools,"Cancel job",()=>operation?.Cancel());
+        Button(tools,"Map / Retarget",()=>new MappingWindow(P,clips.SelectedIndex){Owner=this}.Show());
         DockPanel.SetDock(status,Dock.Bottom);dock.Children.Add(status);
         var playback=new WrapPanel{Margin=new(10)};DockPanel.SetDock(playback,Dock.Bottom);dock.Children.Add(playback);
         Button(playback,"Play / Pause",()=>playing=!playing);playback.Children.Add(clips);playback.Children.Add(timeline);playback.Children.Add(skeleton);playback.Children.Add(skin);
@@ -93,6 +94,7 @@ public sealed class Workbench : Window
             Loaded+=async(_,_)=>await Smoke(args[1]);
         }
         if(args.Length==2&&args[0]=="--project")SetProject(ProjectStore.Load(args[1]));
+        if(args.Length==2&&args[0]=="--mapping-smoke")Loaded+=async(_,_)=>{var window=new MappingWindow(P,2){Owner=this};window.Show();await window.Smoke(args[1]);};
     }
     private static string FindRoot()
     {

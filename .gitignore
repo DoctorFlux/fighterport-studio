@@ -4,6 +4,9 @@
 .local/
 artifacts/
 assets-local/
+# User-supplied commercial reference data: never stage any file from these roots.
+/Brawl mario/
+/Smash Ultimate mario/
 **/bin/
 **/obj/
 .vs/
@@ -25,6 +28,15 @@ assets-local/
 *.brres
 *.mdl0
 *.chr0
+*.nusktb
+*.numdlb
+*.numshb
+*.numatb
+*.nuanmb
+*.nutexb
+*.nuhlpb
+*.numshexb
+*.adjb
 *.dat
 *.fbx
 *.blend

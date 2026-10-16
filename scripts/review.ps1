@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $files = @(git diff --cached --name-only)
 foreach ($file in $files) {
-    if ($file -match '(^|/)(artifacts|assets-local|\.deps|\.tools|\.local|bin|obj)/|\.(pac|pcs|brres|mdl0|chr0|dat|iso|wbfs|nsp|xci|exe|dll|zip|pem|key|pfx)$|(^|/)\.env') { throw "Forbidden staged path: $file" }
+    if ($file -match '(^|/)(Brawl mario|Smash Ultimate mario|artifacts|assets-local|\.deps|\.tools|\.local|bin|obj)/|\.(pac|pcs|brres|mdl0|chr0|dat|nusktb|numshb|numdlb|numatb|nuanmb|nutexb|nuhlpb|numshexb|adjb|iso|wbfs|nsp|xci|exe|dll|zip|pem|key|pfx|fpproj)$|(^|/)\.env') { throw "Forbidden staged path: $file" }
     if ((Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 1MB) { throw "Review required for large source: $file" }
 }
 git diff --cached --check

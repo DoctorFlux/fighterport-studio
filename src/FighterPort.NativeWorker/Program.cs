@@ -26,6 +26,28 @@ internal static class Program
             if(File.Exists(output)) throw new IOException("Worker output must be new");
             switch(op)
             {
+                case "inspect-bundle":
+                    using(var node=NodeFactory.FromFile(null,input))
+                    {
+                        if(node==null)throw new InvalidDataException("Unrecognized resource");
+                        var models=new List<object>();var resources=new Dictionary<string,int>();int visited=0;
+                        Action<ResourceNode,int> walk=null;
+                        walk=(n,depth)=>
+                        {
+                            if(++visited>25000||depth>32)throw new InvalidDataException("Resource traversal quota");
+                            string type=n.GetType().Name;resources[type]=resources.ContainsKey(type)?resources[type]+1:1;
+                            if(n is MDL0Node m)
+                            {
+                                m.Populate();var bones=m.BoneCache.Cast<MDL0BoneNode>().ToArray();
+                                if(bones.Length>4096)throw new InvalidDataException("Bone quota");
+                                models.Add(new { name=m.Name,version=m.Version,bones=bones.Select(b=>new { name=b.Name,index=b.BoneIndex,parent=(b.Parent as MDL0BoneNode)?.BoneIndex??-1,translation=Vec(b.Translation),rotation=Vec(b.Rotation),scale=Vec(b.Scale),inverseBind=Mat(b.InverseBindMatrix),segmentScaleCompensate=b.SegScaleCompApply }).ToArray() });
+                                return; // Skeleton inspection only; do not decode mesh or texture data.
+                            }
+                            foreach(var child in n.Children)walk(child,depth+1);
+                        };
+                        walk(node,0);Write(output,new { backend="BrawlLib d56cbac",scope="read-only skeleton/resource inspection; no container import/export support claim",models,resources });
+                    }
+                    break;
                 case "fixture-model":
                     // Only accepts our generated DAE job input. General DAE import is not exposed.
                     Collada._importOptions=new Collada.ImportOptions { ModelVersion=11,SetOriginalPath=false,BlenderFBXBoneFix=false,ForceFloatVertices=true,ForceFloatNormals=true,ForceFloatUVs=true };
@@ -50,6 +72,7 @@ internal static class Program
                     using(var node=NodeFactory.FromFile(null,input))
                     {
                         var clip=(CHR0Node)node;var samples=new Dictionary<string,float[]>();
+                        if((long)clip.Children.Count*9*clip.FrameCount*4>1000000)throw new InvalidDataException("Native sample quota");
                         foreach(CHR0EntryNode b in clip.Children) for(int channel=0;channel<9;channel++)
                         { var values=new List<float>();for(float t=0;t<clip.FrameCount;t+=.25f)values.Add(b.GetFrameValue(channel,t));samples[b.Name+":"+channel]=values.ToArray(); }
                         Write(output,samples);

@@ -953,8 +953,8 @@
       "version": "1",
       "operation": "exact-name-template",
       "state": "SyntheticTested",
-      "evidence": "M1.D tests; packaged CLI exercised",
-      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
+      "evidence": "M1.D/D2 core tests; actual desktop mapping smoke",
+      "limitations": "Desktop/CLI/core restricted FK: matching axes/hierarchy, unit rest scale; explicit approval/root policy. No anatomy/IK/rebinding."
     },
     {
       "game": "Original / canonical rigs",
@@ -962,8 +962,8 @@
       "version": "1",
       "operation": "approved-profile-save",
       "state": "SyntheticTested",
-      "evidence": "M1.D tests; packaged CLI exercised",
-      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
+      "evidence": "M1.D/D2 core tests; actual desktop mapping smoke",
+      "limitations": "Desktop/CLI/core restricted FK: matching axes/hierarchy, unit rest scale; explicit approval/root policy. No anatomy/IK/rebinding."
     },
     {
       "game": "Original / canonical rigs",
@@ -971,8 +971,53 @@
       "version": "1",
       "operation": "restricted-fk-transfer",
       "state": "SyntheticTested",
-      "evidence": "M1.D tests; packaged CLI exercised",
-      "limitations": "CLI/core only. Matching rest axes and hierarchy, unit rest scales. Rotations plus explicit root delta policy. No automatic anatomy/IK/rebinding."
+      "evidence": "M1.D/D2 core tests; actual desktop mapping smoke",
+      "limitations": "Desktop/CLI/core restricted FK: matching axes/hierarchy, unit rest scale; explicit approval/root policy. No anatomy/IK/rebinding."
+    },
+    {
+      "game": "Original / canonical rigs",
+      "format": "MappingProfile",
+      "version": "1",
+      "operation": "desktop-manual-preview",
+      "state": "SyntheticTested",
+      "evidence": "artifacts/gui-mapping-smoke; eight core mapping cases",
+      "limitations": "Snapshot inputs, approval invalidation, profile persistence, new target output. Restricted FK only."
+    },
+    {
+      "game": "Brawl / Project M / Project+",
+      "format": "CHR0",
+      "version": "4",
+      "operation": "validate-before-publication",
+      "state": "SyntheticTested",
+      "evidence": "M2.C validator and native integration tests",
+      "limitations": "Key and quarter-frame scalar checks only; shared backend; scale .001 / rotation .05 deg / translation .01 cm; one-million-sample quota."
+    },
+    {
+      "game": "Brawl reference",
+      "format": "PAC containing MDL0",
+      "version": "MDL0 11",
+      "operation": "inspect-skeleton",
+      "state": "LocalReferenceTested",
+      "evidence": "scripts/inspect-skeleton.py; local reports excluded from Git",
+      "limitations": "Supplied model and shadow skeleton names/parents/binds only. No full container import/write, gameplay or compatibility claim."
+    },
+    {
+      "game": "Ultimate reference",
+      "format": "SKEL / NUSKTB",
+      "version": "1.0",
+      "operation": "inspect-skeleton",
+      "state": "LocalReferenceTested",
+      "evidence": "ssbh_data_py 0.9.1; local c00 report excluded from Git",
+      "limitations": "Native names/parents/matrices only; no canonical conversion, mesh/animation or full native writer."
+    },
+    {
+      "game": "Original",
+      "format": "SKEL / NUSKTB",
+      "version": "1.0",
+      "operation": "fixture-write-read",
+      "state": "SyntheticTested",
+      "evidence": "scripts/inspect-skeleton.py self-test",
+      "limitations": "Two original bones; library-generated native format. No skinned Ultimate model/animation fixture yet."
     }
   ]
 }

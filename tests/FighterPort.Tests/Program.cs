@@ -55,6 +55,34 @@ await Test("M1.D full turns retained and root motion requires policy",()=>Sync((
 }));
 await Test("M1.D automatic template is only an unapproved exact-name suggestion",()=>Sync(()=>{var target=RenamedTarget();var template=FkRetarget.Template(demo,target);Assert(!template.Approved&&template.BoneIds.Count==0);Reject(()=>FkRetarget.Transfer(demo,2,target,template));}));
 
+await Test("M1.D2 mapping session approval transitions and snapshot isolation",()=>Sync(()=>
+{
+    var s=new MappingSession(demo,demo);s.Approve(true);s.Assign(demo.Bones[10].Id,null);Assert(!s.Profile.Approved);s.Assign(demo.Bones[10].Id,demo.Bones[10].Id);s.Approve(true);s.SetRootPolicy("CopyDelta");Assert(!s.Profile.Approved);
+    s.Approve(true);s.Reset();Assert(!s.Profile.Approved);var copy=s.Source;copy.Name="mutated";Assert(s.Source.Name==demo.Name);s.Clear();s.Approve(true);Reject(()=>s.Preview(2));
+}));
+await Test("M1.D2 invalid profile load transactional and duplicate assignment rejected",()=>Sync(()=>
+{
+    var s=new MappingSession(demo,demo);s.Approve(true);var p=s.Profile;p.TargetFingerprint="bad";Reject(()=>s.LoadProfile(p));Assert(s.Profile.Approved);Reject(()=>s.Assign(demo.Bones[1].Id,demo.Bones[2].Id));Assert(s.Profile.BoneIds[demo.Bones[1].Id]==demo.Bones[1].Id);
+    string path=Path.Combine(output,"mapping.json");s.SaveProfile(path);s.Clear();s.LoadProfile(path);Assert(s.Profile.Approved&&s.Profile.BoneIds.Count==demo.Bones.Count);
+}));
+await Test("M1.D2 new result only; existing target cannot be overwritten",()=>Sync(()=>
+{
+    var s=new MappingSession(demo,demo);s.Approve(true);string path=Path.Combine(output,"mapping-target.fpproj");s.SaveResult(2,path);byte[] before=File.ReadAllBytes(path);bool rejected=false;try{s.SaveResult(2,path);}catch(IOException){rejected=true;}Assert(rejected&&before.SequenceEqual(File.ReadAllBytes(path)));Assert(ProjectStore.Load(path).Branch=="target/fk");Assert(s.Source.Clips.Count==demo.Clips.Count&&s.Target.Clips.Count==demo.Clips.Count);
+}));
+
+await Test("M2.C encoded validator rejects error, winding loss, missing samples and nonfinite data",()=>Sync(()=>
+{
+    var clip=demo.Clips[5];var samples=new Dictionary<string,float[]>();
+    foreach(string bone in clip.Curves.Select(c=>c.Bone).Distinct())for(int channel=0;channel<9;channel++)
+    {
+        var curve=clip.Curves.SingleOrDefault(c=>c.Bone==bone&&c.Channel==channel);
+        samples[bone+":"+channel]=Enumerable.Range(0,clip.FrameCount*4).Select(i=>curve==null?(channel<3?1f:0f):Animation.Evaluate(curve,i*.25f)).ToArray();
+    }
+    EncodedClipValidator.Validate(clip,clip,samples);var id=clip.Curves[0].Bone+":4";var good=samples[id].ToArray();samples[id][180]-=360;Reject(()=>EncodedClipValidator.Validate(clip,clip,samples));samples[id]=good.ToArray();samples[id][1]=float.NaN;Reject(()=>EncodedClipValidator.Validate(clip,clip,samples));samples[id]=good[..^1];Reject(()=>EncodedClipValidator.Validate(clip,clip,samples));samples[id]=good;
+    string unanimated=clip.Curves[0].Bone+":6";samples[unanimated][3]=.02f;Reject(()=>EncodedClipValidator.Validate(clip,clip,samples));samples[unanimated][3]=0;
+    var decoded=ProjectStore.Clone(clip);decoded.Loop=!decoded.Loop;Reject(()=>EncodedClipValidator.Validate(clip,decoded,samples));var oversized=ProjectStore.Clone(clip);oversized.FrameCount=100000;Reject(()=>EncodedClipValidator.CheckBudget(oversized));
+}));
+
 if(args.Contains("--native"))
 {
     var backend=new NativeBackend(Path.Combine(Environment.CurrentDirectory,"src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),Path.Combine(Environment.CurrentDirectory,".local/jobs"));

@@ -18,12 +18,12 @@ public static class ProjectStore
     {
         Validate(p); AtomicWrite(path,JsonSerializer.SerializeToUtf8Bytes(p,Json));
     }
-    public static void AtomicWrite(string path,byte[] bytes)
+    public static void AtomicWrite(string path,byte[] bytes,bool overwrite=true)
     {
         if(bytes.Length>MaxBytes) throw new InvalidDataException("Output exceeds quota");
         path=Path.GetFullPath(path); Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         string temp=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        try { File.WriteAllBytes(temp,bytes); File.Move(temp,path,true); } finally { if(File.Exists(temp)) File.Delete(temp); }
+        try { File.WriteAllBytes(temp,bytes); File.Move(temp,path,overwrite); } finally { if(File.Exists(temp)) File.Delete(temp); }
     }
     public static void Retain(CharacterProject p,string path)
     {

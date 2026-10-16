@@ -11,5 +11,7 @@ Checked 2026-10-16. Dependencies are local ignored tools, not vendored binaries.
 | System.IO.Hashing | 8.0.0 | BrawlLib/worker NuGet, .NET MIT; content hashes locked. |
 | System.Resources.Extensions | 8.0.0 | Legacy resource loading under SDK MSBuild, .NET MIT; content hashes locked. |
 | System.Buffers, System.Memory, System.Numerics.Vectors, Unsafe | see lockfiles | NuGet transitive framework dependencies; preserve package license metadata. |
+| ssbh_data_py | 0.9.1, CPython 3.10 Windows x64 wheel | Optional local skeleton inspector; Rust ssbh_data bindings. Upstream MIT license verified; packaged skel_data.pyi and METADATA inspected and actual read/write calls executed. Not included in desktop distribution. |
+| NumPy | 2.2.6, CPython 3.10 Windows x64 wheel | Optional inspector matrix dependency; BSD-3-Clause plus bundled-component notices in package license. Not included in desktop distribution. |
 
 Core/UI/CLI have no third-party NuGet dependencies. Worker and BrawlLib restore lockfiles are retained. `scripts/prepare-native.ps1` applies two documented modifications to the pinned source. `scripts/publish.ps1` stages local executables, backend license, NuGet license/third-party notices, upstream source archive and local patch under ignored artifacts; this is not permission or a claim of readiness for external binary redistribution. Do not bundle commercial game files. Original fixture code/assets may be redistributed under this project's fixture notice (tests/FIXTURES.md).

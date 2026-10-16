@@ -1,5 +1,7 @@
 # FighterPort Studio master plan
 
+Checkpoint addendum, 2026-10-16: M1.D2 manual desktop mapping and restricted target preview are tested. M2.C1 now validates decoded CHR0 scalar samples before publishing new output. User-supplied Brawl/Ultimate folders supersede the original absence of commercial references; those folders and all derived reports stay local/read-only and excluded from Git. Read-only PAC/MDL0 and SKEL 1.0 skeleton inspection is evidence for those operations alone. Official Rivals rig/texture requirements are recorded in docs/REFERENCE_INSPECTION.md. All original requirements below remain preserved; full cross-game conversion, native model export, editor/cook and in-game checks remain incomplete.
+
 The full source specification below remains normative. No later milestone is removed by the first implemented subset. Stable requirement groups map to its numbered sections; acceptance IDs map to the roadmap and tests.
 
 | IDs | Source section | Acceptance ownership |

@@ -1,5 +1,9 @@
 # Testing and evidence
 
+Current increment: **27 passed / 0 failed** in `artifacts/tests/20261016-165712` (23 core including mapping/export validator; four native integration cases). All previous cases retained. `./scripts/gui-smoke.ps1 -Mapping` passed actual assignment/approval/reload/rejection/immutable-input/new-target checks and captured dual skinned previews. Screenshot review found and corrected viewport aspect framing. Optional Python SKEL fixture self-test passed separately, as did supplied reference skeleton reads. These counts do not imply game compatibility.
+
+Every CHR0 export now validates the encoded file before atomic create-new publication: version/frame-count/loop match, original key values (including loop-end key), native quarter-frame scalar samples including default unanimated channels. Absolute tolerances: scale 0.001, Euler rotation 0.05 degrees, translation 0.01 cm; no modulo-angle comparison. Maximum one million scalar samples. Failures/cancellation leave no published file. Negative tests cover lost 360-degree turns, NaN, truncated samples, unintended channel motion, timing mismatch, and excessive sample budget. This is a bounded scalar grid with shared-library encode/decode, not continuous/world-space pose error proof or native-tool/in-game validation.
+
 `./scripts/build.ps1 -Native`; `./scripts/test.ps1 -Native`; `./scripts/gui-smoke.ps1`.
 The assertion runner is a normal executable that returns nonzero on any failure; use these commands, not `dotnet test` (no test-SDK adapter). Core tests require no commercial assets, network, hosts or licenses after SDK setup. Native tests additionally require the locally built BrawlLib worker; omission is printed as SKIP, not counted as pass.
 

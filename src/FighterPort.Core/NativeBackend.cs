@@ -46,9 +46,20 @@ public sealed class NativeBackend(string workerPath,string jobsDirectory)
         if(clip.SkeletonFingerprint!=Animation.Fingerprint(p))throw new InvalidDataException("Skeleton mismatch");
         if(p.Resources.Any(r=>r.Name.Equals(Path.GetFileName(path),StringComparison.OrdinalIgnoreCase)))throw new IOException("Choose a new output name; source resources are read-only");
         if(File.Exists(path))throw new IOException("Choose a new export path");
+        var candidate=ProjectStore.Clone(p);candidate.Clips=[ProjectStore.Clone(clip)];ProjectStore.Validate(candidate);
+        EncodedClipValidator.CheckBudget(clip);
         string temp=Path.Combine(Path.GetFullPath(jobsDirectory),Guid.NewGuid()+".json");Directory.CreateDirectory(Path.GetDirectoryName(temp)!);
-        try { await File.WriteAllTextAsync(temp,JsonSerializer.Serialize(clip,ProjectStore.Json),cancellation);ProjectStore.AtomicWrite(path,await Run("export-clip",temp,cancellation)); }
-        finally { File.Delete(temp); }
+        string encoded=temp+".chr0";
+        try
+        {
+            await File.WriteAllTextAsync(temp,JsonSerializer.Serialize(clip,ProjectStore.Json),cancellation);
+            byte[] bytes=await Run("export-clip",temp,cancellation);await File.WriteAllBytesAsync(encoded,bytes,cancellation);
+            var decoded=JsonSerializer.Deserialize<Clip>(await Run("import-clip",encoded,cancellation),ProjectStore.Json)??throw new InvalidDataException("Empty encoded clip");
+            var samples=JsonSerializer.Deserialize<Dictionary<string,float[]>>(await Run("sample-clip",encoded,cancellation))??throw new InvalidDataException("Empty encoded samples");
+            EncodedClipValidator.Validate(clip,decoded,samples);cancellation.ThrowIfCancellationRequested();
+            ProjectStore.AtomicWrite(path,bytes,overwrite:false);
+        }
+        finally { File.Delete(temp);File.Delete(encoded); }
     }
     public async Task GenerateModelFixture(CharacterProject original,string path)
     {
