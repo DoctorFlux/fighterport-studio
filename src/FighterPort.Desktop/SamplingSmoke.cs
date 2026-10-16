@@ -34,21 +34,22 @@ internal static class SamplingSmoke
                     for(int c=0;c<4;c++){int error=Math.Abs(pixel[c]-expected[c]);maxError=Math.Max(maxError,error);if(error>3)errors.Add($"{u}/{v} ({px},{py}) c{c}: {pixel[c]} != {expected[c]}");}checks++;
                 }
             }
-            var project=new CharacterProject{Materials=[new(){Id="a",Textures=[new(){RestSrt=[-1.25f,.75f,0,.125f,-.25f]}]},new(){Id="b",Textures=[new(){RestSrt=[.5f,-1,0,-.5f,.125f]}]}]};
+            var project=new CharacterProject{Materials=[new(){Id="a",Textures=[new(){RestSrt=[-1.25f,.75f,0,.125f,-.25f]}]},new(){Id="b",PreviewSlot=1,Textures=[new(){Slot=1,UVSet=1,RestSrt=[.5f,-1,0,-.5f,.125f]}]}]};
             var group=new UvGroup{FrameCount=21,Loop=true,MatrixMode="MatrixMaya",Tracks=[new(){MaterialName="a",MaterialId="a",Curves=[new(){Channel=3,Keys=[new(){Frame=0,Value=0,Tangent=.025f},new(){Frame=20,Value=.5f,Tangent=.025f}]}]}]};
             // Two distinct material submissions/UV ranges in one viewport, reversed scale and fractional seek/reset.
             foreach(float frame in new[]{0,5.25f,20.5f,21.25f,-.25f,10,0})foreach(bool enabled in new[]{true,false})
             {
                 group.Enabled=enabled;
                 var corners=new[]{new Point(-1,-1),new Point(2,-1),new Point(2,2),new Point(-1,2)};
-                Point[] Sample(string id)=>corners.Select(p=>UvEvaluator.Sample(project,id,group,frame,new((float)p.X,(float)(1-p.Y)))).Select(p=>new Point(p.X,p.Y)).ToArray();
+                var mesh=new Mesh{Vertices=corners.Select(p=>new Vertex{UV=[(float)p.X,(float)(1-p.Y)]}).ToList(),NativeAttributes=new(){["BrawlUV1"]=corners.Select(p=>new[]{(float)(.25+.5*p.X),(float)(1-(-.25+.75*p.Y))}).ToArray()}};
+                Point[] Sample(string id)=>UvEvaluator.MeshCoordinates(project,mesh,id,group,frame).Select(p=>new Point(p.X,p.Y)).ToArray();
                 var left=sampling.Prepare(image,Sample("a"),"Repeat","Clamp","Linear");var right=sampling.Prepare(image,Sample("b"),"Mirror","Repeat","Linear");
                 var rendered=Render(left.Brush,left.Coordinates,right.Brush,right.Coordinates);
                 for(int side=0;side<2;side++)foreach(int px in new[]{8,24,40,56})foreach(int py in new[]{16,48,80,112})
                 {
                     double u=-1+3*(px+.5)/64,v=-1+3*(py+.5)/128;
                     double f=((frame%21)+21)%21,tx=enabled?Math.Min(f,20)*.025:.125;
-                    double a=side==0?-1.25*(u-tx):.5*(u+.5),b=side==0?1-.75*(1-v+.25):1+(1-v-.125);
+                    double a=side==0?-1.25*(u-tx):.5*(.25+.5*u+.5),b=side==0?1-.75*(1-v+.25):1+(1-(-.25+.75*v)-.125);
                     var expected=Linear(texels,w,h,a,b,side==0?"Repeat":"Mirror",side==0?"Clamp":"Repeat");byte[] pixel=new byte[4];rendered.CopyPixels(new Int32Rect(px+64*side,py,1,1),pixel,4,0);
                     for(int c=0;c<4;c++){int error=Math.Abs(pixel[c]-expected[c]);maxError=Math.Max(maxError,error);if(error>3)errors.Add($"Animated/reset {frame} {enabled} side {side} ({px},{py}) c{c}: {pixel[c]} != {expected[c]}");}checks++;
                 }

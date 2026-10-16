@@ -7,12 +7,14 @@ public static class UvEvaluator
 {
     public static string Support(CharacterProject project,UvGroup group,UvTrack track)
     {
-        var sampler=project.Materials.SingleOrDefault(m=>m.Id==track.MaterialId)?.Textures.SingleOrDefault(t=>t.Slot==track.Slot);
+        var material=project.Materials.SingleOrDefault(m=>m.Id==track.MaterialId);
+        var sampler=material?.Textures.SingleOrDefault(t=>t.Slot==track.Slot);
         if(sampler==null)return "Unresolved material/sampler; retained unevaluated";
-        if(track.Indirect||track.Slot!=0||sampler.UVSet!=0)return "Indirect/additional sampler/UV channel retained unevaluated";
+        if(track.Indirect||track.Slot!=material!.PreviewSlot)return "Indirect/nonselected sampler retained unevaluated";
+        if(!DirectCoordinates(sampler))return "Unsupported texture-coordinate generation; retained unevaluated";
         if(!Known(group.MatrixMode)||!Known(sampler.MatrixMode))return "Unknown UV matrix retained unevaluated";
         if(group.MatrixMode=="MatrixMaya"&&(sampler.RestSrt[2]!=0||track.Curves.Where(c=>c.Channel==2).Any(c=>c.Keys.Any(k=>k.Value!=0||k.Tangent!=0))))return "Rotating Maya UV matrix retained unevaluated (backend rotation-only discrepancy)";
-        return "Evaluated: direct "+group.MatrixMode+" sampler 0 UV0";
+        return "Evaluated: direct "+group.MatrixMode+" isolated sampler "+track.Slot+" UV"+sampler.UVSet+"; composition unsupported";
     }
     public static void Validate(CharacterProject project,UvGroup group)
     {
@@ -33,13 +35,14 @@ public static class UvEvaluator
     }
     public static Vector2 Sample(CharacterProject project,string materialId,UvGroup? group,float frame,Vector2 uv)
     {
-        var binding=project.Materials.SingleOrDefault(m=>m.Id==materialId)?.Textures.SingleOrDefault(t=>t.Slot==0);
-        if(binding==null||binding.UVSet!=0||!Known(binding.MatrixMode))return uv;
+        var material=project.Materials.SingleOrDefault(m=>m.Id==materialId);
+        var binding=material?.Textures.SingleOrDefault(t=>t.Slot==material.PreviewSlot);
+        if(binding==null||!DirectCoordinates(binding)||!Known(binding.MatrixMode))return uv;
         var values=binding.RestSrt.ToArray();
         string mode=binding.MatrixMode;
         if(group is {Enabled:true})
         {
-            var track=group.Tracks.SingleOrDefault(t=>t.MaterialId==materialId&&t.Slot==0&&!t.Indirect);
+            var track=group.Tracks.SingleOrDefault(t=>t.MaterialId==materialId&&t.Slot==binding.Slot&&!t.Indirect);
             if(track!=null&&Support(project,group,track).StartsWith("Evaluated:"))
             {
                 float f=group.Loop?((frame%group.FrameCount)+group.FrameCount)%group.FrameCount:Math.Clamp(frame,0,group.FrameCount-1);
@@ -50,6 +53,15 @@ public static class UvEvaluator
         return Transform(mode,values,uv);
     }
     private static bool Known(string mode)=>mode is "MatrixMaya" or "MatrixXSI" or "Matrix3dsMax";
+    public static bool DirectCoordinates(TextureBinding binding)=>binding.UVSet is >=0 and <=7&&binding.Projection is "" or "ST"&&binding.Texgen is "" or "Regular";
+    public static Vector2[] MeshCoordinates(CharacterProject project,Mesh mesh,string materialId,UvGroup? group,float frame)
+    {
+        var material=project.Materials.Single(m=>m.Id==materialId);var binding=material.Textures.Single(t=>t.Slot==material.PreviewSlot);
+        if(!DirectCoordinates(binding))throw new InvalidDataException("Unsupported native texgen/projection; neutral fallback");
+        var uv=binding.UVSet==0?mesh.Vertices.Select(v=>v.UV).ToArray():mesh.NativeAttributes.GetValueOrDefault("BrawlUV"+binding.UVSet);
+        if(uv==null||uv.Length!=mesh.Vertices.Count||uv.Any(v=>v.Length!=2))throw new InvalidDataException("Selected native UV set is absent on this mesh; neutral fallback");
+        return uv.Select(v=>Sample(project,materialId,group,frame,new(v[0],v[1]))).ToArray();
+    }
     public static Vector2 Transform(string mode,float[] srt,Vector2 uv)
     {
         if(srt.Length!=5||srt.Any(v=>!float.IsFinite(v))||!float.IsFinite(uv.X)||!float.IsFinite(uv.Y))throw new InvalidDataException("Nonfinite/invalid UV transform");

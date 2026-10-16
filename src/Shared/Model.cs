@@ -165,6 +165,7 @@ namespace FighterPort.Core
     {
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
+        public int PreviewSlot { get; set; }
         public List<TextureBinding> Textures { get; set; } = new List<TextureBinding>();
         public List<string> Limitations { get; set; } = new List<string>();
     }
@@ -179,6 +180,10 @@ namespace FighterPort.Core
         public string WrapU { get; set; } = "Clamp";
         public string WrapV { get; set; } = "Clamp";
         public string Filter { get; set; } = "Linear";
+        public string MinFilter { get; set; } = "";
+        public float LodBias { get; set; }
+        public string Projection { get; set; } = "";
+        public string Texgen { get; set; } = "";
         public string Status { get; set; } = "Unresolved";
         public float[] RestSrt { get; set; } = new float[]{1,1,0,0,0};
         public string MatrixMode { get; set; } = "MatrixMaya";

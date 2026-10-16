@@ -2,6 +2,7 @@
 
 Read `CODEX_START_FROM_ZERO.md` (unaltered source requirements), `docs/MASTER_PLAN.md`,
 `docs/DEVELOPMENT_STATUS.md`, `docs/plans/current.md`, and `docs/CODEX_CONTINUE_ALL_GAME_WORKBENCH.md` before continuing.
+Also read `docs/CODEX_BRAWL_TEXTURE_FIX_AND_SRT0_CONTINUATION.md` completely and `docs/TEXTURE_DIAGNOSIS.md` for the tested boundary and remaining limitations.
 Also read `docs/CODEX_UNIFIED_RESOURCE_EDITOR_AND_FULL_CHARACTER_PIPELINE.md`; its unified resource workspace queue supersedes the older format-button workflow.
 
 - Existing standalone, local/non-AI Windows character workbench. No runtime cloud or DCC requirement.

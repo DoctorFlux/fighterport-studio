@@ -179,7 +179,7 @@ internal static class Program
             mesh.Indices=triangles._indices.Select(i=>checked((int)i)).ToList(); project.Meshes.Add(mesh);
         }
         project.TargetProfile="Brawl MDL0 v"+model.Version;
-        project.Limitations.Add("MDL0 v"+model.Version+" geometry/skeleton/UV0/normal/1-4 weights subset. Native shaders, other UV/color channels and ancillary resources retained opaque only; neutral preview. No general MDL0 rewrite.");
+        project.Limitations.Add("MDL0 v"+model.Version+" geometry/skeleton/UV0/normal/1-4 weights subset. Available extra UV arrays retained; native shaders, color channels and ancillary resources retained opaque only; neutral preview. No general MDL0 rewrite.");
         return project;
     }
     internal static Clip ReadClip(CHR0Node node)

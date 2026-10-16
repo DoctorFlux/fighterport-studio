@@ -156,13 +156,14 @@ internal static partial class ResourceOperations
         foreach(var mat in materials)
         {
             var result=new PreviewMaterial{Id=Id(mat),Name=mat.Name};
-            result.Limitations.Add("Source approximation: bound sampler 0 UV0 and decoded color/alpha only. Native TEV, lighting, alpha-test, additional samplers, nearest/mip filtering and animated materials remain unevaluated.");
+            result.Limitations.Add("Source approximation: one selected direct sampler / native UV and decoded color/alpha only. Native TEV, lighting, alpha-test, sampler composition, nearest/mip filtering and animated materials remain unevaluated.");
             foreach(var sampler in mat.Children.OfType<MDL0MaterialRefNode>())
             {
                 var matches=resources.OfType<TEX0Node>().Where(t=>t.Name==sampler.Texture).ToArray();string scope="owning BRRES";
                 if(matches.Length==0){matches=banks.SelectMany(b=>b.Children.SelectMany(g=>g.Children)).OfType<TEX0Node>().Where(t=>t.Name==sampler.Texture).ToArray();scope="ARC TextureData matching/global group";}
                 var palettes=matches.Length==1?(matches[0].BRESNode?.Children.SelectMany(g=>g.Children).OfType<PLT0Node>().Where(p=>p.Name==sampler.Palette).ToArray()??new PLT0Node[0]):new PLT0Node[0];
                 var binding=new TextureBinding{Slot=sampler.Index,Name=sampler.Texture??"",PaletteName=sampler.Palette??"",UVSet=sampler.TextureCoordId,WrapU=sampler.UWrapMode.ToString(),WrapV=sampler.VWrapMode.ToString(),Filter=sampler.MagFilter.ToString()};
+                binding.MinFilter=sampler.MinFilter.ToString();binding.LodBias=sampler.LODBias;binding.Projection=sampler.Projection.ToString();binding.Texgen=sampler.Type.ToString();
                 binding.RestSrt=Enumerable.Range(0,5).Select(i=>sampler._bindState[i]).ToArray();binding.MatrixMode=sampler._bindState.MatrixMode.ToString();
                 if(matches.Length==1&&(!matches[0].HasPalette||palettes.Length==1))
                 {binding.Texture.NodeId=Id(matches[0]);binding.PaletteId=palettes.Length==1?Id(palettes[0]):"";binding.Status="Resolved by native material reference: "+scope;}
@@ -177,7 +178,7 @@ internal static partial class ResourceOperations
             foreach(var draw in obj._drawCalls)project.Meshes[i].Draws.Add(new MeshDraw{MaterialId=draw.MaterialNode==null?"":Id(draw.MaterialNode),VisibilityBoneId=draw.VisibilityBoneNode==null?"":"mdl0-"+draw.VisibilityBoneNode.BoneIndex,DefaultVisible=draw._render,Pass=draw.DrawPass.ToString()});
         }
         project.Limitations.RemoveAll(s=>s.Contains("neutral preview"));
-        project.Limitations.Add("Source appearance approximation: sampler 0 / UV0, decoded color/alpha; native TEV, alpha-test, nearest/mip filtering, other color channels, material/UV/shape animation and edited model export remain unevaluated. Original source documents retained through verified external links.");
+        project.Limitations.Add("Source appearance approximation: one selected direct sampler / native UV, decoded color/alpha; native TEV, alpha-test, nearest/mip filtering, other color channels, material/shape and unsupported UV animation and edited model export remain unevaluated. Original source documents retained through verified external links.");
     }
     private static VisibilityGroup ReadVisibility(VIS0Node node)
     {
@@ -256,6 +257,7 @@ internal static partial class ResourceOperations
                     var sampler=material.Children.OfType<MDL0MaterialRefNode>().FirstOrDefault();
                     if(sampler==null){sampler=new MDL0MaterialRefNode();material.AddChild(sampler);}
                     sampler.Texture="OriginalQuadrants";sampler.Coordinates=BrawlLib.Wii.Graphics.TexSourceRow.TexCoord0;
+                    var extra=new MDL0MaterialRefNode();material.AddChild(extra);extra.Texture="OriginalQuadrants";extra.Coordinates=BrawlLib.Wii.Graphics.TexSourceRow.TexCoord1;extra.UWrapMode=MatWrapMode.Mirror;extra.VWrapMode=MatWrapMode.Clamp;
                 }
                 foreach(MDL0ObjectNode mesh in model._objList)foreach(var draw in mesh._drawCalls)draw.VisibilityBoneNode=model.BoneCache.OfType<MDL0BoneNode>().First(b=>b.Name==(mesh==model._objList.Last()?"LeftHand":"Root"));
             }

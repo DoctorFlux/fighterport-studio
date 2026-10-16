@@ -38,6 +38,7 @@ public static class ProjectStore
         Require(p.Version==1,"Unsupported project version; migration required");
         Require(p.Bones.Count<=512&&p.Meshes.Count<=128&&p.Clips.Count<=256,"Project quota exceeded");
         Require(p.Materials.Count<=128&&p.Materials.Select(m=>m.Id).Distinct().Count()==p.Materials.Count,"Material identity/quota");
+        foreach(var material in p.Materials)Require(material.PreviewSlot is >=0 and <=7&&(material.PreviewSlot==0||material.Textures.Any(t=>t.Slot==material.PreviewSlot))&&material.Textures.All(t=>float.IsFinite(t.LodBias)),"Invalid preview sampler/LOD metadata");
         foreach(var material in p.Materials)Require(material.Textures.Count<=8&&material.Textures.Select(t=>t.Slot).Distinct().Count()==material.Textures.Count&&material.Textures.All(t=>t.Slot>=0&&t.Slot<=7&&Finite(t.RestSrt,5)),"Sampler identity/quota/rest state");
         Require(p.Bones.Select(b=>b.Name).Distinct().Count()==p.Bones.Count,"Duplicate bone names need explicit binding");
         Require(p.Bones.Select(b=>b.Id).Distinct().Count()==p.Bones.Count,"Duplicate bone IDs");

@@ -70,6 +70,19 @@ internal static class WorkspaceTests
             return Task.CompletedTask;
         });
         await AncillaryTests.Run(output,test);
+        await test("M3.D1 isolated native sampler UV1, texgen guards and persisted preview selection",async()=>
+        {
+            string worker=Path.GetFullPath("src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),jobs=Path.GetFullPath(".local/jobs");var transport=new WorkerProcess(worker,jobs);
+            var ws=new ResourceWorkspace(worker,jobs,"scripts/ssbh-worker.py");ws.Load(Path.Combine(output,"workspace.fpwork"));var p=ws.Data.Project;var material=p.Materials[0];var mesh=p.Meshes[0];material.PreviewSlot=1;
+            var binding=material.Textures.Single(t=>t.Slot==1);Check(binding.UVSet==1&&binding.WrapU=="Mirror"&&binding.WrapV=="Clamp"&&binding.Projection=="ST"&&binding.Texgen=="Regular"&&binding.MinFilter!="","Native sampler metadata");
+            var coordinates=UvEvaluator.MeshCoordinates(p,mesh,material.Id,null,0);for(int i=0;i<coordinates.Length;i++)Check(coordinates[i]==new System.Numerics.Vector2(mesh.NativeAttributes["BrawlUV1"][i][0],mesh.NativeAttributes["BrawlUV1"][i][1]),"Selected UV1 ignored");
+            var motion=ws.Data.Documents.Single(d=>d.Path.EndsWith("workspace-motion.pac"));var inventory=await Inventory(ws,motion);await ws.ActivateUv(new(){DocumentId=motion.Id,NodeId=inventory.Single(e=>e.Name=="OriginalUvEditable").Id});
+            Check(ws.Data.Uv!.Tracks.Single(t=>t.Slot==1&&!t.Indirect).Status.StartsWith("Evaluated:"),"Selected direct track not evaluated");
+            await CheckUv(ws,transport,Path.Combine(output,"uv1-native-probe.json"),ws.Document(ws.Data.ActiveModel!).Path,motion.Path);
+            string save=Path.Combine(output,"sampler-uv1.fpwork");ws.Save(save);ws.Load(save);Check(ws.Data.Project.Materials[0].PreviewSlot==1,"Preview selection lost");
+            binding.Projection="STQ";Check(!UvEvaluator.DirectCoordinates(binding),"Projected texgen silently accepted");binding.Projection="ST";binding.Texgen="EmbossMap";Check(!UvEvaluator.DirectCoordinates(binding),"Emboss texgen silently accepted");
+            binding.Texgen="Regular";mesh.NativeAttributes.Remove("BrawlUV1");bool rejected=false;try{UvEvaluator.MeshCoordinates(p,mesh,material.Id,null,0);}catch(InvalidDataException){rejected=true;}Check(rejected,"Missing UV1 substituted UV0");
+        });
         await UvEditingTests.Run(output,test);
     }
     internal static async Task RunLocal(string output,Func<string,Func<Task>,Task> test)
@@ -87,6 +100,7 @@ internal static class WorkspaceTests
             await ws.ActivateClip(new(){DocumentId=b.Id,NodeId="0/1/0/0/5"});await ws.ActivateUv(new(){DocumentId=b.Id,NodeId="0/1/0/2/1"});
             Check(ws.Data.Uv!.Tracks.Count(t=>t.Status.StartsWith("Evaluated:"))==4,"Expected four bound eye sampler-0 tracks");
             await CheckUv(ws,transport,Path.Combine(output,"local-uv-request.json"),model,motion);
+            await ws.ExportUv(Path.Combine(output,"mario-wait2-preserved.srt0"));
             ws.Save(Path.Combine(output,"mario-workspace.fpwork"));foreach(var doc in ws.Data.Documents)ResourceWorkspace.Verify(doc);
             Console.WriteLine($"  Mario {textures.Length} unique resolved textures; {ws.Data.Uv.Tracks.Count} retained SRT tracks / 4 evaluated; native UV comparison <= 0.00001");
         });
@@ -101,7 +115,7 @@ internal static class WorkspaceTests
             var native=JsonSerializer.Deserialize<Dictionary<string,float[]>>(await transport.Run("resource-uv-pose",request),ProjectStore.Json)!;
             foreach(var track in group.Tracks.Where(t=>UvEvaluator.Support(p,group,t).StartsWith("Evaluated:")))
             {
-                var uv=UvEvaluator.Sample(p,track.MaterialId,group,frame,new(.25f,.75f));var expected=native[track.MaterialId+":0"];
+                var uv=UvEvaluator.Sample(p,track.MaterialId,group,frame,new(.25f,.75f));var expected=native[track.MaterialId+":"+track.Slot];
                 Check(Math.Abs(uv.X-expected[0])<.00001f&&Math.Abs(uv.Y-expected[1])<.00001f,"Native SRT matrix mismatch at "+frame);
                 if(System.Numerics.Vector2.Distance(uv,UvEvaluator.Sample(p,track.MaterialId,group,0,new(.25f,.75f)))>.00001)moves=true;
             }

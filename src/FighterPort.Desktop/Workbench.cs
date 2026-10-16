@@ -60,11 +60,11 @@ public sealed partial class Workbench : Window
         var left=new TabControl{Margin=new(8)};DockPanel.SetDock(left,Dock.Left);dock.Children.Add(left);
         left.Items.Add(new TabItem{Header="Resources",Content=resourceTree});left.Items.Add(new TabItem{Header="Skeleton",Content=tree});
         var right=new StackPanel{Margin=new(8)};DockPanel.SetDock(right,Dock.Right);dock.Children.Add(right);
-        right.Children.Add(new TextBlock{Text="PROPERTIES",Foreground=Brushes.LightSteelBlue,Margin=new(12)});right.Children.Add(inspector);right.Children.Add(resourceProperties);
+        right.Children.Add(new TextBlock{Text="PROPERTIES",Foreground=Brushes.LightSteelBlue,Margin=new(12)});right.Children.Add(inspector);right.Children.Add(new Expander{Header="Resource / material details",IsExpanded=true,Content=resourceProperties,Foreground=Brushes.White});
         channels.ItemsSource=new[]{"Scale X","Scale Y","Scale Z","Rotate X °","Rotate Y °","Rotate Z °","Translate X cm","Translate Y cm","Translate Z cm"};channels.SelectedIndex=5;
         right.Children.Add(channels);right.Children.Add(value);Button(right,"Set key at current frame",EditKey);Button(right,"Undo",()=>{session.Undo();Render();});Button(right,"Redo",()=>{session.Redo();Render();});
         Button(right,"Frame character",()=>{yaw=.35;pitch=.12;FitCharacter();Render();});
-        right.Children.Add(new TextBlock{Text="Drag: orbit\nShift + drag: pan\nWheel: zoom\n\nKeys preserve Euler turns and Hermite tangents. Editing adds a locked key.\n\nSource appearance is approximate (sampler 0 / UV0). TEV, alpha-test and material and other UV animation remain unevaluated. Right-click a resource for applicable actions.",Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)});
+        right.Children.Add(new TextBlock{Text="Drag: orbit\nShift + drag: pan\nWheel: zoom\n\nKeys preserve Euler turns and Hermite tangents. Editing adds a locked key.\n\nSource appearance uses one selected direct sampler (default 0). Native TEV composition, alpha-test and material/shape animation remain unevaluated. Right-click a resource for applicable actions.",Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)});
         var border=new Border{Background=new SolidColorBrush(Color.FromRgb(22,30,42)),CornerRadius=new(8),Margin=new(0,10,0,0),Child=viewport};
         dock.Children.Remove(left);dock.Children.Remove(right);
         var area=new Grid();area.ColumnDefinitions.Add(new(){Width=new GridLength(290),MinWidth=180});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(1,GridUnitType.Star),MinWidth=300});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(260),MinWidth=200});
@@ -140,6 +140,7 @@ public sealed partial class Workbench : Window
     }
     private void EditKey()
     {
+        uvHistoryActive=false;
         if(SelectedClip==null||P.Bones.Count==0)throw new InvalidOperationException("Select a character and clip.");
         session.EditKey(clips.SelectedIndex,P.Bones[selectedBone].Name,channels.SelectedIndex,(float)Math.Round(timeline.Value),float.Parse(value.Text,CultureInfo.InvariantCulture));Render();SetStatus("Key changed; undo/redo available. Save Project to retain edits.");
     }
@@ -164,8 +165,7 @@ public sealed partial class Workbench : Window
             for(int di=0;di<draws.Length;di++)if(state.DrawVisibility[mi][di])
             {
                 var drawnGeometry=geometry.Clone();
-                if(sourceMaterials.IsChecked==true)drawnGeometry.TextureCoordinates=new PointCollection(mesh.Vertices.Select(v=>{var uv=UvEvaluator.Sample(P,draws[di].MaterialId,workspace.Data.Uv,(float)timeline.Value,new(v.UV[0],v.UV[1]));return new Point(uv.X,uv.Y);}));
-                Brush appearance=sourceMaterials.IsChecked==true?MaterialBrush(draws[di].MaterialId,drawnGeometry)??brush:brush;
+                Brush appearance=sourceMaterials.IsChecked==true?MaterialBrush(draws[di].MaterialId,drawnGeometry,mesh)??brush:brush;
                 var material=new DiffuseMaterial(appearance);scene.Children.Add(new GeometryModel3D(drawnGeometry,material){BackMaterial=material});
             }
         }

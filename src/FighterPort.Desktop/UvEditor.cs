@@ -11,9 +11,10 @@ namespace FighterPort.Desktop;
 public sealed partial class Workbench
 {
     private UvEditSession? uvEdit;
+    private bool uvHistoryActive;
     private bool UvHistory(bool redo)
     {
-        if(uvEdit==null||workspace.Data.Uv!=uvEdit.Group)return false;
+        if(!uvHistoryActive||uvEdit==null||workspace.Data.Uv!=uvEdit.Group)return false;
         if(redo)uvEdit.Redo();else uvEdit.Undo();workspace.Data.Uv=uvEdit.Group;Render();return true;
     }
     private bool KeepUvEdits()
@@ -25,6 +26,7 @@ public sealed partial class Workbench
     }
     private void EditUv(bool smoke=false)
     {
+        uvHistoryActive=true;
         var source=workspace.Data.Uv??throw new InvalidOperationException("Activate an SRT0 first");
         if(uvEdit==null||uvEdit.Group!=source)uvEdit=new(P,source);
         var edit=uvEdit;workspace.Data.Uv=edit.Group;
