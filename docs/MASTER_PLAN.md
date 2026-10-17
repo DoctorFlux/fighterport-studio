@@ -8,6 +8,9 @@ native-output goals. Implemented status comes only from FORMAT_SUPPORT.md and cu
 The user's 2026-10-17 source-upload instruction supersedes the reset's local-only restriction
 for publishing this replacement to the existing origin/main while preserving history.
 It does not authorize automatic future pushes or binary releases.
+Supplement: [reviewed continuation milestone](FighterPort_Next_Codex_Milestone_2026-10-17.md),
+preserved as supplied (reviewed snapshot 20a8dc5). Its R2/readiness/R3/R4 refinements
+continue this application. They do not create a second current-task queue.
 
 | Requirement | Permanent scope |
 |---|---|
@@ -40,16 +43,34 @@ Ordered executable milestones (only one current acceptance criterion lives in pl
    safety; original native GUI open/preview/animate/edit/save-new/reopen and source hashes.
 3. R2: first functional File > Open Source loose-folder path through existing native editors.
    The initial folder slice and explicit persistent MDL0/TEX0/CHR0 companion slice now pass their
-   original-fixture gates. Continue provider discovery and persistent multiple roots/overrides,
-   cancellation/cache/resource budgets,
-   installation providers, separate platform image/container readers and corruption checks.
+   original-fixture gates. Persistent multi-root loose discovery now passes its bounded
+   original-fixture/native GUI gates: scoped ordered file overrides, cancellation, quotas,
+   selected-file staging and pinned identities across restart. Installation providers,
+   separate platform image/container readers and corruption checks remain queued.
+   Next Brawl readiness: opt-in actual configured resource/version inventory; native nested
+   ARC/PAC/PCS/BRRES lineage and container-preserving output; palettes/alpha/mips, multiple
+   materials, nontrivial blended skinning and genuinely animated SRT0/PAT0/CLR0/VIS0/SHP0/SCN0
+   fixtures. Read/preview/edit/preserve/write/package evidence stays separate. No flattening
+   a fighter package into BRRES and calling it a package round trip.
 4. R3: game-neutral character projects plus native original retention, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,
    loop-seam and post-export decoded-motion tolerances. Channel remapping remains separately declared.
+   Versioned projects must persist actual edits/undo, native originals, binds/weights,
+   curves/tangents/winding/fractional and event timing, materials/outfits, mappings,
+   per-clip correction/contact layers and independent targets. They are not .fpcompanion.
+   Reviewed fingerprint/chain profiles and batches must handle or reject changed axes,
+   parents, proportions, bone counts, helpers/twist and scale/compensation explicitly.
+   Prove genuine rig A -> different rig B -> native output -> decoded target poses/skinning,
+   contacts and loop seams against configured tolerances; test both directions independently.
+   Then prove a non-Brawl native/interchange adapter through that same core. Matching names
+   alone are not rig equivalence. Do not defer this work behind every game's source provider.
 5. R4: inspect actual installed Rivals Modkit version/schemas/interfaces; assemble configured Goku
    sources; transfer selected clips to the chosen target rig; correct contacts; bake/export; import
    using the real supported Modkit path; minimal state/attack; build/playtest when available.
+   Verify actual installed tools/templates/import/build interfaces, imported skeletal mesh,
+   skeleton and baked animation assets. Keep movement states, one attack and target gameplay
+   build/playtest distinct from the animation export; no playable claim from interchange alone.
 6. R5: broaden Melee/Ultimate peer routes, Wii U/3DS/64 and Dragon Ball sources/targets, all channels,
    complete character asset/package writers, native gameplay compilers, optimization and DCC round
    trips. A missing proprietary tool blocks its validation, not independent original-fixture work.

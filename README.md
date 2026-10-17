@@ -21,6 +21,15 @@ editors. Save edited work separately as a native BRRES: the resolution records s
 choices and rebuilds from those pinned originals, rather than storing pending edits.
 Verify this slice with `./scripts/test.ps1 -Companions -Gui`.
 
+For matching loose-dump/override folder layouts, open Brawl Companions > Dump folders.
+Add non-overlapping roots, set priorities (larger numbers win) and Save roots. Discover
+pages of candidate files; the list shows winners, shadowed sources and unresolved ties
+for each complete relative file path. Stage only chosen files, return to companions,
+choose native resources and Save resolution. Scans never replace pinned choices.
+Cancellation and budget exhaustion leave saved work intact. PAC/PCS/container nesting,
+compressed data and images are explicitly outside this provider. Check the original
+fixture workflow with `./scripts/test.ps1 -DumpSources -Gui`.
+
 Preferences, source-root registrations and staged edits live in `UserData` beside the
 executable. Set `FIGHTERPORT_DATA_ROOT` to an absolute local folder to choose another
 location. Preserve that folder when updating the application; staged edits are not

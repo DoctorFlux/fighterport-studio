@@ -34,6 +34,7 @@ internal static partial class NativeSmoke
     private static int Main(string[] args)
     {
         if (args.Length == 2 && args[0] == "--verify-companions") return VerifyCompanionRestart(args[1]);
+        if (args.Length == 2 && args[0] == "--verify-dump") return VerifyDumpRestart(args[1]);
         if (args.Length == 2 && args[0] == "--guard-live")
         {
             try
@@ -75,7 +76,7 @@ internal static partial class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui" }.Contains(args[0]))
+        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui" }.Contains(args[0]))
         {
             Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
@@ -95,6 +96,12 @@ internal static partial class NativeSmoke
             // pumping can create WinForms handles on this STA thread.
             if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if (args[0].StartsWith("--dump", StringComparison.Ordinal))
+            {
+                ExerciseDump(args[0].EndsWith("gui", StringComparison.Ordinal));
+                Log("PASS: completed " + args[0] + "; no commercial inputs or game test");
+                return 0;
+            }
             if (args[0].StartsWith("--companions", StringComparison.Ordinal))
             {
                 ExerciseCompanions(args[0].EndsWith("gui", StringComparison.Ordinal));

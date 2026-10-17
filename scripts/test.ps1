@@ -1,4 +1,5 @@
-param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions)
+param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions, [switch]$DumpSources)
+if ($Companions -and $DumpSources) { throw 'Select one focused suite at a time; existing suites remain available separately.' }
 . $PSScriptRoot/environment.ps1
 $project = Join-Path $repoRoot 'tests/NativeSmoke/NativeSmoke.csproj'
 $logDir = Join-Path $repoRoot 'artifacts/restart'
@@ -12,6 +13,10 @@ if ($Gui) { $modes += 'gui' }
 if ($Companions) {
     $modes = @('companions-native')
     if ($Gui) { $modes += 'companions-gui' }
+}
+if ($DumpSources) {
+    $modes = @('dump-native')
+    if ($Gui) { $modes += 'dump-gui' }
 }
 foreach ($mode in $modes) {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'

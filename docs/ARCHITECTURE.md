@@ -19,7 +19,9 @@ Folder source workflow: read-only mount -> bounded signature inventory -> verifi
 native export/save paths. No arbitrary source script executes. Native File > Open remains.
 The first provider is a narrow loose uncompressed Brawl resource slice. The companion
 workspace below assembles explicitly selected Brawl resources; game-install, encrypted
-image, arbitrary archive and automatic companion-discovery providers remain pending.
+image and arbitrary archive providers remain pending. Configured Brawl loose dumps
+now have the bounded file-level discovery provider described below; it does not
+automatically choose native resources or discover installations.
 
 The source browser reads immediate directories lazily (512 entries per listing), stages
 one file at a time (64 MiB maximum), validates its declared resource layout and matches
@@ -35,7 +37,7 @@ explicitly. Even one matching candidate requires a choice. Multiple matches rema
 ambiguous until selected. The implemented gate is MDL0 v11, TEX0 v1 RGBA8 without palettes,
 and CHR0 v4 with exact matching bone names; no cross-rig correction is performed.
 
-Version 1 `.fpcompanion` XML records absolute source paths, complete-file SHA256, indexed
+Version 2 `.fpcompanion` XML (with version 1 loading retained) records absolute source paths, complete-file SHA256, indexed
 native resource paths, type/name identities, native versions and texture bindings. Loading
 rejects relative/network source paths before file access and verifies hashes before
 native parsing and again after staging; missing/changed sources
@@ -57,6 +59,46 @@ selected-source assembly budget, 64 texture bindings, and 128 retained work sess
 1 GiB under `DataRoot/CompanionWorkspaces`. Existing per-file staging quotas also apply.
 Work sessions and source receipts remain until the user archives them. This path does
 not discover installations, unpack containers or act as an intermediate for other games.
+
+`BrawlDumpProfile` records up to 16 stable mount IDs, local roots, labels, enabled state
+and integer priorities (-999..999; higher wins). Configuration is saved independently
+in `DataRoot/SourceProfiles/brawl-loose.xml`; snapshots accompany companion resolutions.
+Overlapping roots are rejected. Enabled existing roots use SourceFolderSession protections;
+missing/unavailable/reparse roots are diagnosed rather than traversed.
+
+File > Brawl Companions > Dump folders opens `BrawlDumpSourcesForm`. `BrawlLooseDumpProvider`
+is a resumable breadth-first metadata cursor: each explicit page visits at most 128
+filesystem entries by default. SourceFolderSession probes at most 16 header bytes per
+file; there is no full-file hashing, staging or native decoding during discovery.
+Candidates are tentative BRRES/TEX0/CHR0 files, not parsed resources. Header recognition
+does not establish validity or operation coverage. A fresh scan replaces the catalogue,
+not the working companion inventory or choices. No persistent content cache is trusted.
+
+The override key is the entire normalized relative file/container path within the matching
+dump layouts, using Windows case-insensitive path semantics. Native resource names never
+form a global override key. Different character/container paths remain distinct. Highest
+priority is recommended with its reason; equal highest priorities are ambiguous. Partial,
+cancelled, unavailable or truncated catalogues never assert a guaranteed final winner.
+Every stage action is an explicit user choice, including choosing a lower-priority or
+tied source. Native bindings still require explicit choices after selected-file decoding.
+
+Budgets: 512 entries per directory, 8,192 visited entries, 16 directory levels, 1,024
+directories, 2,048 candidate files, 128 KiB conservatively charged header I/O, 4 MiB
+estimated queued/candidate metadata, and 128 diagnostics of at most 800 characters.
+Lower budgets are testable; raising the hard defaults is rejected. These bound catalogue
+work, not hostile native-parser peak allocation. Cancellation disposes the directory
+cursor and reports partial results without modifying saved work. Unsupported containers,
+compression/images and skipped paths are reported explicitly, not hidden as a complete scan.
+
+Only Stage selected file invokes CompanionWorkspace.AddDiscoveredSource. It verifies
+root/relative-file identity and discovery metadata, stages through the existing validator,
+pins the full source SHA256 and native indexed identity, and retains mount/path/priority/
+selection-reason lineage. Stale metadata, missing inputs or changed pinned hashes fail.
+Native inventory is additionally capped at 4,096 entries; the previous 16-file, 128 MiB
+inventory and 64 MiB selected assembly limits remain. A priority change/rescan cannot
+rebind a pinned resource. Its selection-time lineage is retained independently of the
+current root configuration. Assembly still refuses implicit replacement of embedded
+base resources. Resolution snapshots preserve source choices, not pending native edits.
 
 `FighterPortPaths.DataRoot` selects portable `UserData` beside the executable, or an
 explicit absolute local `FIGHTERPORT_DATA_ROOT`. The application and BrawlLib settings

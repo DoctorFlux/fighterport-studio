@@ -4,6 +4,8 @@ Read docs/CODEX_CLEAN_BRAWLCRATE_RESTART.md completely, then UPSTREAM.md,
 THIRD_PARTY_NOTICES.md, docs/MASTER_PLAN.md, docs/ARCHITECTURE.md,
 docs/DEVELOPMENT_STATUS.md, docs/FORMAT_SUPPORT.md, docs/TESTING.md and
 docs/plans/current.md. The clean restart supersedes the earlier bridge/WPF strategy.
+Read docs/FighterPort_Next_Codex_Milestone_2026-10-17.md as a supplementary milestone
+plan. It continues this codebase; plans/current.md is the only next executable task.
 
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.
@@ -17,6 +19,9 @@ docs/plans/current.md. The clean restart supersedes the earlier bridge/WPF strat
   timing, native originals/opaque records and separate target branches with explicit losses.
 - Build/test each increment; update evidence, capabilities/status and the single next task.
   Commands: scripts/build.ps1, test.ps1, run.ps1, doctor.ps1, review.ps1.
+- Dump discovery must remain separate from selected-file staging/decoding. Overrides use
+  complete logical file/container paths, never global native resource names. Preserve
+  explicit hash-pinned choices across scans; root configuration is not a character project.
 - Publication requires explicit user authorization. On 2026-10-17 the user authorized
   uploading this source replacement to the existing public origin/main; that instruction
   supersedes the reset's local-only restriction for this upload. Automatic pushes remain off.

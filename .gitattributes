@@ -4,3 +4,5 @@
 *.json text eol=lf
 *.ps1 text eol=lf
 *.yml text eol=lf
+# Preserve the supplied milestone brief's intentional Markdown hard-break spaces.
+docs/FighterPort_Next_Codex_Milestone_2026-10-17.md whitespace=-blank-at-eol

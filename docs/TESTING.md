@@ -10,6 +10,7 @@ repository root:
 ./scripts/test.ps1
 ./scripts/test.ps1 -Gui
 ./scripts/test.ps1 -Companions -Gui
+./scripts/test.ps1 -DumpSources -Gui
 ./scripts/run.ps1
 ```
 
@@ -93,3 +94,41 @@ resolution identities persisted by the product and observes normal exits. Applic
 window captures and native framebuffer captures are visually inspected separately.
 The resolution stores pinned source choices; save native edits to a separate BRRES.
 See DEVELOPMENT_STATUS.md for exact latest paths, hashes and tested scope.
+
+Multi-root original-fixture verification (`-DumpSources`, add `-Gui` for real controls):
+
+- Three matching dump roots contain a model-only BRRES, separate same-name texture
+  alternatives and a loose CHR0; an unrelated character has the same texture name.
+  Discovery pages visit lightweight headers only. No staged directory may exist after
+  discovery. It checks ordered winners, equal-priority ambiguity and explicit selection
+  of a lower-priority file whose decoded pixels differ from the recommended source.
+- A later priority change recommends a different file but must leave the explicit
+  selected resource/hash unchanged. Root IDs/priorities and selection-time lineage
+  survive two independent verification processes. A cancelled rescan leaves saved
+  resolution bytes and pinned choices unchanged. Separate negative copies cover stale
+  metadata, changed full hashes and missing inputs; originals are not mutated.
+- Lower entry, depth, directory, candidate, header-byte and metadata budgets must
+  report incomplete/truncated discovery. Missing roots, overlap, relative/network
+  roots, unsupported compression/containers and a real Windows junction are checked.
+- GUI checks operate the actual dump list/page/stage buttons, existing companion
+  selectors, native OpenGL preview/Play/numeric editor and separate Save/reopen.
+  All ten original inputs retain SHA256. Folder and Save As pickers are bypassed.
+
+To verify the standalone entrypoint rather than the harness host, use a generated
+original-fixture `dump-ui.fpcompanion` from the latest dump GUI evidence directory:
+
+```powershell
+./tests/NativeSmoke/VerifyDumpProduct.ps1 -Resolution <absolute-original-fixture-resolution-path>
+```
+
+This launches the actual FighterPort.Studio.exe twice with an isolated profile,
+opens Dump folders to capture restored roots/priorities, returns to the companion
+workspace, opens the assembled native copy, compares exact root/source/hash/resource
+records persisted by the product, and observes normal exits. The second launch uses
+the product's last resolution. It stores app-only captures and JSON under ignored
+artifacts/restart/dump-product-*. Inspect the captures; this is Win32 control automation,
+not manual clicking or independent native-tool/game validation. This script is for
+original fixture resolutions; commercial derivatives/captures must remain local.
+
+Run the existing default and `-Companions` suites separately; the new selection does
+not replace them. Companion checks also verify version 1 resolution compatibility.

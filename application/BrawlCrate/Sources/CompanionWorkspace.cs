@@ -21,8 +21,15 @@ namespace BrawlCrate.Sources
         public string Kind { get; internal set; }
         public int Version { get; internal set; }
         public string Detail { get; internal set; }
+        public string MountId { get; internal set; }
+        public string MountRoot { get; internal set; }
+        public string MountLabel { get; internal set; }
+        public int MountPriority { get; internal set; }
+        public string LogicalPath { get; internal set; }
+        public string SelectionReason { get; internal set; }
         public string Identity => SourceHash + ":" + TreePath + ":" + Kind + ":" + Name;
-        public override string ToString() => Name + " — " + Kind + " v" + Version + " — " + SourcePath + " [" + TreePath + "]";
+        public override string ToString() => Name + " — " + Kind + " v" + Version + " — " +
+            (MountId == null ? SourcePath : MountLabel + " (priority " + MountPriority + ") / " + LogicalPath) + " [" + TreePath + "]";
     }
 
     /// <summary>Brawl-specific explicit dependency choices, not a game-neutral project or retargeter.</summary>
@@ -41,6 +48,13 @@ namespace BrawlCrate.Sources
         public CompanionResource Model { get; private set; }
         public CompanionResource Motion { get; private set; }
         public string StorageRoot => _storageRoot;
+        public BrawlDumpProfile DumpProfile { get; private set; } = new BrawlDumpProfile();
+        public void SetDumpProfile(BrawlDumpProfile profile)
+        {
+            var snapshot = profile.Snapshot();
+            foreach (var mount in snapshot.Mounts.Where(m => m.Enabled && Directory.Exists(m.Root))) new SourceFolderSession(mount.Root, _storageRoot);
+            DumpProfile = snapshot;
+        }
         public IReadOnlyList<CompanionResource> Resources => _sources.SelectMany(s => s.Resources).ToList();
         public IReadOnlyList<string> RequiredTextures => _required.AsReadOnly();
         public IReadOnlyDictionary<string, CompanionResource> TextureSelections => _textures;
@@ -56,7 +70,25 @@ namespace BrawlCrate.Sources
             _storageRoot = SourceWriteGuard.NormalizePath(storageRoot ?? FighterPortPaths.DataRoot);
         }
 
-        public void AddSource(string path, CancellationToken token)
+        public void AddDiscoveredSource(BrawlDumpProfile profile, DumpCandidate candidate, string reason, CancellationToken token)
+        {
+            profile.Validate();
+            var mount = profile.Mounts.SingleOrDefault(m => m.Id == candidate.MountId && m.Enabled);
+            if (mount == null || mount.Root != candidate.Root || mount.Priority != candidate.Priority)
+                throw new IOException("Root configuration changed; restart discovery before staging a new selection.");
+            ValidateOrigin(candidate.Path, mount.Root, candidate.RelativePath);
+            var session = new SourceFolderSession(mount.Root, _storageRoot);
+            SourceEntry current = session.ProbeLoosePath(candidate.Path);
+            if (!current.CanOpen || current.Signature != candidate.Signature || current.Length != candidate.Length || current.LastWriteTicks != candidate.LastWriteTicks)
+                throw new IOException("Candidate is missing or changed since discovery; rescan and explicitly select it again: " + candidate.Path);
+            // A rescan must never replace a previously pinned file/hash, even at the same path.
+            VerifySources(token);
+            AddSource(candidate.Path, token, candidate, "Explicit file choice: " + reason);
+            SetDumpProfile(profile);
+        }
+
+        public void AddSource(string path, CancellationToken token) { AddSource(path, token, null, null); }
+        private void AddSource(string path, CancellationToken token, DumpCandidate origin, string reason)
         {
             path = SourceWriteGuard.NormalizePath(path);
             if (_sources.Any(s => string.Equals(s.File.SourcePath, path, StringComparison.OrdinalIgnoreCase))) return;
@@ -73,6 +105,8 @@ namespace BrawlCrate.Sources
                 Walk(root, "", (node, treePath) =>
                 {
                     token.ThrowIfCancellationRequested();
+                    if (_sources.Sum(s => s.Resources.Count + s.OtherResources.Count) + source.Resources.Count + source.OtherResources.Count >= 4096)
+                        throw new IOException("Companion inventory exceeds 4096 native resources. Select smaller source files.");
                     string kind = node is MDL0Node ? "MDL0" : node is TEX0Node ? "TEX0" : node is CHR0Node ? "CHR0" : null;
                     if (kind == null)
                     {
@@ -82,16 +116,25 @@ namespace BrawlCrate.Sources
                     int version = node is MDL0Node model ? model.Version : node is TEX0Node texture ? texture.Version : ((CHR0Node)node).Version;
                     source.Resources.Add(new CompanionResource { SourcePath = path, SourceHash = source.File.Sha256,
                         TreePath = treePath, Name = node.Name, Kind = kind, Version = version,
+                        MountId = origin?.MountId, MountRoot = origin?.Root, MountLabel = origin?.RootLabel, MountPriority = origin?.Priority ?? 0,
+                        LogicalPath = origin?.RelativePath, SelectionReason = reason,
                         Detail = node is TEX0Node t ? t.Format + (t.HasPalette ? " with palette" : "") : "" });
                 });
             }
             if (source.Resources.Count == 0) throw new IOException("No model, texture or skeletal motion was found in this file.");
+            if (origin != null)
+            {
+                var now = new SourceFolderSession(origin.Root, _storageRoot).ProbeLoosePath(path);
+                if (!now.CanOpen || now.Length != origin.Length || now.LastWriteTicks != origin.LastWriteTicks || now.Signature != origin.Signature)
+                    throw new IOException("Candidate changed during selection; no choices were applied.");
+            }
             _sources.Add(source);
         }
 
         public void SelectModel(CompanionResource resource)
         {
             RequireMember(resource, "MDL0");
+            if (Model == resource) return; // Refreshing the same model must not clear explicit texture choices.
             using (ResourceNode root = OpenSource(resource))
             {
                 if (!(root is BRRESNode)) throw new IOException("The model must be selected from a BRRES so its other native resources can be retained.");
@@ -240,12 +283,20 @@ namespace BrawlCrate.Sources
         {
             SourceWriteGuard.ThrowIfProtected(path);
             var doc = new XmlDocument { XmlResolver = null };
-            XmlElement root = doc.CreateElement("fighterportCompanions"); root.SetAttribute("version", "1");
+            XmlElement root = doc.CreateElement("fighterportCompanions"); root.SetAttribute("version", "2");
             root.SetAttribute("scope", ScopeNotice); root.SetAttribute("otherNativeResources", AdditionalResourceNotice); doc.AppendChild(root);
+            root.AppendChild(DumpProfile.Write(doc));
             foreach (Source source in _sources)
             {
                 XmlElement file = doc.CreateElement("source"); file.SetAttribute("path", source.File.SourcePath);
                 file.SetAttribute("sha256", source.File.Sha256); root.AppendChild(file);
+                CompanionResource origin = source.Resources.First();
+                if (origin.MountId != null)
+                {
+                    file.SetAttribute("mountId", origin.MountId); file.SetAttribute("mountRoot", origin.MountRoot);
+                    file.SetAttribute("mountLabel", origin.MountLabel); file.SetAttribute("mountPriority", origin.MountPriority.ToString());
+                    file.SetAttribute("logicalPath", origin.LogicalPath); file.SetAttribute("selectionReason", origin.SelectionReason);
+                }
             }
             if (Model != null) WriteChoice(doc, root, "model", "", Model);
             if (Motion != null) WriteChoice(doc, root, "motion", "", Motion);
@@ -273,11 +324,13 @@ namespace BrawlCrate.Sources
             var doc = new XmlDocument { XmlResolver = null };
             using (var reader = System.Xml.XmlReader.Create(path, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 1024 * 1024 })) doc.Load(reader);
             XmlElement root = doc.DocumentElement;
-            if (root?.Name != "fighterportCompanions" || root.GetAttribute("version") != "1") throw new IOException("Unsupported companion resolution version.");
+            if (root?.Name != "fighterportCompanions" || (root.GetAttribute("version") != "1" && root.GetAttribute("version") != "2")) throw new IOException("Unsupported companion resolution version.");
             var files = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "source").ToList();
             var choices = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "choice").ToList();
-            if (files.Count > 16 || choices.Count > 128 || root.ChildNodes.OfType<XmlElement>().Any(e => e.Name != "source" && e.Name != "choice")) throw new IOException("Invalid or excessive companion records.");
+            var profiles = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "brawlDumpRoots").ToList();
+            if (files.Count > 16 || choices.Count > 128 || profiles.Count > 1 || root.ChildNodes.OfType<XmlElement>().Any(e => e.Name != "source" && e.Name != "choice" && e.Name != "brawlDumpRoots")) throw new IOException("Invalid or excessive companion records.");
             var result = new CompanionWorkspace(storageRoot);
+            if (profiles.Count == 1) result.SetDumpProfile(BrawlDumpProfile.Read(profiles[0]));
             foreach (XmlElement file in files)
             {
                 string sourcePath = file.GetAttribute("path");
@@ -292,6 +345,21 @@ namespace BrawlCrate.Sources
                 result.AddSource(sourcePath, token);
                 Source staged = result._sources.Single(s => string.Equals(s.File.SourcePath, SourceWriteGuard.NormalizePath(sourcePath), StringComparison.OrdinalIgnoreCase));
                 if (staged.File.Sha256 != file.GetAttribute("sha256")) throw new IOException("Changed companion source: " + sourcePath + ". Explicitly reselect it; saved choices were not applied.");
+                if (file.HasAttribute("mountId"))
+                {
+                    string mountRoot = BrawlDumpProfile.LocalAbsolute(file.GetAttribute("mountRoot"));
+                    ValidateOrigin(sourcePath, mountRoot, file.GetAttribute("logicalPath"));
+                    if (!Guid.TryParseExact(file.GetAttribute("mountId"), "N", out _) || !int.TryParse(file.GetAttribute("mountPriority"), out int priority) || priority < -999 || priority > 999 ||
+                        file.GetAttribute("mountLabel").Length > 120 || file.GetAttribute("selectionReason").Length > 2048)
+                        throw new IOException("Invalid saved source lineage.");
+                    // Keep the selection's original lineage even if today's profile was deliberately changed.
+                    foreach (var resource in staged.Resources)
+                    {
+                        resource.MountId = file.GetAttribute("mountId"); resource.MountRoot = mountRoot;
+                        resource.MountLabel = file.GetAttribute("mountLabel"); resource.MountPriority = priority;
+                        resource.LogicalPath = file.GetAttribute("logicalPath"); resource.SelectionReason = file.GetAttribute("selectionReason");
+                    }
+                }
             }
             foreach (XmlElement choice in choices.OrderBy(c => c.GetAttribute("role") == "model" ? 0 : 1))
             {
@@ -311,6 +379,13 @@ namespace BrawlCrate.Sources
             XmlElement e = doc.CreateElement("choice"); e.SetAttribute("role", role); e.SetAttribute("binding", binding);
             e.SetAttribute("source", resource.SourcePath); e.SetAttribute("tree", resource.TreePath); e.SetAttribute("identity", resource.Identity);
             e.SetAttribute("nativeVersion", resource.Version.ToString()); root.AppendChild(e);
+        }
+        private static void ValidateOrigin(string source, string root, string relative)
+        {
+            source = BrawlDumpProfile.LocalAbsolute(source); root = BrawlDumpProfile.LocalAbsolute(root);
+            if (!SourceWriteGuard.IsWithin(source, root) || string.Equals(source, root, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(source.Substring(root.TrimEnd('\\', '/').Length + 1).Replace('\\', '/'), relative, StringComparison.OrdinalIgnoreCase))
+                throw new IOException("Source/root/logical-file identity is inconsistent.");
         }
         private void RequireMember(CompanionResource resource, string kind)
         {
@@ -342,8 +417,13 @@ namespace BrawlCrate.Sources
         }
         private static string HashFile(string path)
         {
+            SourceWriteGuard.EnsureNoReparsePoints(path);
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var hash = SHA256.Create()) return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+            using (var hash = SHA256.Create())
+            {
+                if (stream.Length < 16 || stream.Length > SourceFolderSession.MaxFileBytes) throw new IOException("Source changed or exceeds the 64 MiB hash budget: " + path);
+                return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+            }
         }
     }
 }

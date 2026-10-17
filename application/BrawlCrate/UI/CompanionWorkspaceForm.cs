@@ -44,6 +44,11 @@ namespace BrawlCrate.UI
             for (int i = 0; i < 10; i++) layout.RowStyles.Add(new RowStyle(i == 5 ? SizeType.Percent : SizeType.AutoSize, i == 5 ? 100 : 0));
             layout.Controls.Add(new Label { AutoSize = true, Text = "Select source files, then choose a model, every texture binding, and one motion. Sources stay read-only." });
             _actions = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill };
+            AddAction("Dump folders…", "companionDumpFolders", () =>
+            {
+                using (var form = new BrawlDumpSourcesForm(_workspace)) form.ShowDialog(this);
+                RefreshChoices(); return Task.CompletedTask;
+            });
             AddAction("Add source files…", "companionAdd", async () =>
             {
                 using (var dialog = new OpenFileDialog { Title = "Add Brawl companion sources", Multiselect = true, Filter = "Brawl resources|*.brres;*.tex0;*.chr0|All files|*.*" })

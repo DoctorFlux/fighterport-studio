@@ -3,7 +3,12 @@
   "baseline": "d56cbac89dc2cd0e5c3f923e1d03041b16902add",
   "evidencePolicy": "inherited source does not imply tested support",
   "originalBrawlFixture": {
-    "formats": ["BRRES", "MDL0 v11", "CHR0 v4", "TEX0 v1 RGBA8"],
+    "formats": [
+      "BRRES",
+      "MDL0 v11",
+      "CHR0 v4",
+      "TEX0 v1 RGBA8"
+    ],
     "nativeEncodeDecode": "original-fixture-tested",
     "animationEditSaveNewReopen": "original-fixture-tested",
     "gui": "actual-native-controls-and-OpenGL-visually-verified",
@@ -19,12 +24,21 @@
     "nativeWriteGuards": "selected export/save/stream/map/hardlink and concurrent persistent mount paths tested",
     "distinct8dot3Alias": "skipped on D volume; focused C probe separate",
     "limits": "64 MiB/file; 512 entries/list; 16 container levels; 4096 entries; 1 GiB staging; 1024 sessions; 256 retained roots",
-    "unsupported": ["compressed or opaque container children", "automatic companion discovery", "installations/images", "hostile-parser or arbitrary-script sandbox"]
+    "unsupported": [
+      "compressed or opaque container children",
+      "installations/images",
+      "hostile-parser or arbitrary-script sandbox",
+      "automatic installation/container companion discovery"
+    ]
   },
   "explicitBrawlCompanions": {
     "status": "native-and-real-GUI-tested",
-    "formats": ["base BRRES with MDL0 v11", "TEX0 v1 RGBA8 without palette", "CHR0 v4 with exact bone names"],
-    "persistence": "version 1 fpcompanion XML: absolute source paths, SHA256, native tree/type/name identities, versions and explicit bindings",
+    "formats": [
+      "base BRRES with MDL0 v11",
+      "TEX0 v1 RGBA8 without palette",
+      "CHR0 v4 with exact bone names"
+    ],
+    "persistence": "version 2 fpcompanion XML with version 1 loading: source SHA256, native identities, root snapshots and selection-time mount/container path/priority/reason",
     "selection": "missing and ambiguous reported; no automatic first candidate; explicit second same-name texture tested",
     "restore": "separate-process restoration plus two actual FighterPort executable launches with exact persisted identities",
     "nativeOutput": "new assembled BRRES freshly decoded before open; native key edit and separate save/reopen verified",
@@ -32,7 +46,15 @@
     "sourceHashes": "all 4 model/texture/motion source files unchanged across restart/edit/save/reopen",
     "evidence": "artifacts/restart/companions-gui-20261017-090351-036/result.txt",
     "limits": "16 files; 128 MiB inventory; 64 MiB/file and conservative selected-source assembly budget; 64 texture bindings; 128 work sessions / 1 GiB",
-    "unsupported": ["paletted textures", "other native versions", "cross-rig correction", "ARC/PAC companion assembly", "automatic discovery", "dirty-edit project persistence", "other game formats"],
+    "unsupported": [
+      "paletted textures",
+      "other native versions",
+      "cross-rig correction",
+      "ARC/PAC companion assembly",
+      "dirty-edit project persistence",
+      "other game formats",
+      "automatic native-resource binding or installation/container discovery"
+    ],
     "inGame": "unrun"
   },
   "independentSettings": "scalar, XML/binary, collections, complex viewer settings, scoped reset and separate-process reload tested",
@@ -40,5 +62,36 @@
   "existingCommercialInputs": "679 files matched verified recovery hashes; not loaded into tests",
   "externalNativeToolAndModkitValidation": "unrun",
   "otherGames": "planned per format/version/operation; full scope in MASTER_PLAN.md",
-  "retargetingGameplayAndPlayableFighters": "not implemented in restarted product"
+  "retargetingGameplayAndPlayableFighters": "not implemented in restarted product",
+  "brawlLooseDumpProvider": {
+    "status": "original-fixture-native-and-real-GUI-tested",
+    "discovery": "lazy pages, metadata and at most 16 header bytes per file; no dump staging/hashing/native decoding",
+    "formats": "BRRES/TEX0/CHR0 candidates only; selected decoding retains existing native version gates",
+    "overrides": "complete relative logical file/container path, Windows case-insensitive; higher integer priority recommended; equal highest priorities ambiguous",
+    "choices": "every file and native binding explicit; lower-priority manual choice tested with different decoded pixels; rescans and new recommendations never replace existing hash pins",
+    "persistence": "up to 16 stable roots/enabled flags/priorities saved separately; version 2 companion snapshots retain selection-time lineage independently of current priorities",
+    "verification": [
+      "base/override/conflict fixtures",
+      "unrelated same-name resources",
+      "six lowered budgets",
+      "mid-discovery cancellation preserves saved bytes and pins",
+      "missing/stale/changed/grown input",
+      "real junction/reparse rejection",
+      "two independent reload processes",
+      "actual list/stage/companion controls and native preview/play/key edit/separate save/reopen",
+      "two standalone product launches with roots/priorities/source/hash/native choices restored"
+    ],
+    "limits": "512 entries/directory; 8192 visited entries; depth 16; 1024 directories; 2048 candidates; 128 KiB charged header I/O; 4 MiB estimated metadata plus 128 bounded diagnostics. Selected inventory: 4096 native entries; prior 16 files / 128 MiB / 64 MiB assembly limits retained.",
+    "sourceHashes": "all 10 original fixture inputs unchanged; negative cases use disposable copies",
+    "evidence": "artifacts/restart/dump-gui-20261017-094930-512/result.txt",
+    "unsupported": [
+      "installation/image discovery",
+      "PAC/PCS/ARC companion nesting",
+      "compression",
+      "palettes/other native versions",
+      "retargeting",
+      "pending-edit character projects",
+      "fighter package write/game validation"
+    ]
+  }
 }

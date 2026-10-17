@@ -17,6 +17,10 @@ namespace BrawlCrate.Sources
         public bool IsDirectory { get; internal set; }
         public bool CanOpen { get; internal set; }
         public string Description { get; internal set; }
+        public string Signature { get; internal set; }
+        public long Length { get; internal set; }
+        public long LastWriteTicks { get; internal set; }
+        public bool Truncated { get; internal set; }
     }
 
     public sealed class StagedSource
@@ -65,6 +69,51 @@ namespace BrawlCrate.Sources
             if (!SourceWriteGuard.IsWithin(full, RootPath)) throw new IOException("The path is outside this source root.");
             SourceWriteGuard.EnsureNoReparsePoints(full);
             return full;
+        }
+
+        // Lightweight discovery: at most 16 header bytes, no hash, copy, native parser or resource tree.
+        // Full validation remains mandatory when Stage() is invoked for an explicitly selected file.
+        public SourceEntry ProbeLoosePath(string path)
+        {
+            var entry = new SourceEntry { Path = path };
+            try
+            {
+                path = CheckedSourcePath(path);
+                entry.Path = path;
+                entry.IsDirectory = (File.GetAttributes(path) & FileAttributes.Directory) != 0;
+                if (entry.IsDirectory) { entry.Description = "Folder; children discovered on demand"; return entry; }
+                var info = new FileInfo(path);
+                entry.Length = info.Length; entry.LastWriteTicks = info.LastWriteTimeUtc.Ticks;
+                if (entry.Length < 16 || entry.Length > MaxFileBytes) { entry.Description = "Unavailable: file must be 16 bytes to 64 MiB"; return entry; }
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    byte[] header = ReadAt(stream, 0, 16);
+                    entry.Signature = Encoding.ASCII.GetString(header, 0, 4);
+                    entry.CanOpen = entry.Signature == "bres" || entry.Signature == "TEX0" || entry.Signature == "CHR0";
+                    entry.Description = entry.CanOpen ? entry.Signature + " header only; selection validates native data" :
+                        "Unsupported loose companion input: PAC/PCS/ARC, compression, images and other formats require separate providers";
+                }
+            }
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+            {
+                entry.IsDirectory = entry.CanOpen = false; entry.Description = "Unavailable: " + error.Message;
+            }
+            return entry;
+        }
+
+        public IEnumerable<SourceEntry> DiscoverDirectory(string directory)
+        {
+            string full = CheckedSourcePath(directory);
+            int count = 0;
+            foreach (string path in Directory.EnumerateFileSystemEntries(full))
+            {
+                if (count++ >= MaxDirectoryEntries)
+                {
+                    yield return new SourceEntry { Path = full, Truncated = true, Description = "Directory limit reached (512 entries); choose a more specific root" };
+                    yield break;
+                }
+                yield return ProbeLoosePath(path);
+            }
         }
 
         public IList<SourceEntry> EnumerateDirectory(string directory, CancellationToken cancellationToken)

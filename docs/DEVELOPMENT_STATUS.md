@@ -10,9 +10,9 @@ upload does not add GUI/game evidence or resolve the distribution audit. Publica
 success must be established by comparing the remote main SHA with the uploaded commit.
 Automatic publication remains disabled; settings, inputs, builds and evidence remain local.
 
-Current checkpoint: [persistent companion resolution](#persistent-companion-resolution--2026-10-17)
-is implemented and verified. The initial restart receipts below remain historical;
-the companion entry records the latest executable, checks and next-task boundary.
+Current checkpoint: [multi-root Brawl loose dumps](#multi-root-brawl-loose-dumps--2026-10-17)
+is implemented and verified. Earlier restart/companion receipts remain historical;
+the latest entry records the current executable, checks and next-task boundary.
 
 ## Initial restart receipts
 
@@ -171,3 +171,93 @@ discovery or dirty-edit project persistence. Base-resource presence/metadata che
 do not prove arbitrary opaque-field fidelity. Existing licensing/distribution gaps
 remain unchanged. All work stays on the local restart branch with no publication.
 Next: the single dump-folder/multiple-root acceptance criterion in plans/current.md.
+
+## Multi-root Brawl loose dumps — 2026-10-17
+
+Continued actual HEAD `20a8dc572446bff036c3388c0a101ddf98407ce2` on the existing
+codex/clean-brawlcrate-restart branch. Only the supplied supplementary continuation
+brief was initially untracked; no newer implementation work was discarded. The brief
+is preserved at docs/FighterPort_Next_Codex_Milestone_2026-10-17.md, SHA256
+`deffced27759919733f5aceed11cc58d55d4e7eb27409a194853c905de3a2718`.
+The application/runtime/renderer/upstream pin and verified external recovery are unchanged.
+This increment is local; the previous upload was not permanent future push permission.
+
+R2 configured multi-root loose discovery is complete for the declared subset.
+File > Brawl Companions > Dump folders configures/saves stable roots, enabled flags
+and priorities, pages through lightweight file candidates, shows complete relative-
+file/container scope and priority/conflict reasons, and stages only explicit choices.
+The current Companion Workspace and native editor perform selected decoding, assembly
+and editing. No dump is passed wholesale through AddSource. Root configuration and
+version 2 companion snapshots preserve selection-time mount/container/native identity,
+full source hash and explicit-choice reason; version 1 resolution loading still works.
+Rescans/new priorities never change pins. Embedded base resources are not overwritten.
+Working-set limits remain; native inventory is additionally capped at 4,096 entries.
+All discovery budgets and partial/cancelled/unavailable diagnostics are documented in ARCHITECTURE.
+
+Executed original-fixture checks:
+
+- Doctor found installed MSBuild 17.14.10, net472 targeting pack and x86 runtime path;
+  Cargo remains unavailable. Actual application build passed, 0 warnings / 0 errors.
+- `scripts/test.ps1 -DumpSources -Gui` passed: base/override/conflict roots, genuine
+  different texture pixels, priority winner, equal-priority ambiguity, unrelated
+  same-name resources in different character paths and explicit lower-priority choice.
+- Discovery construction/pages create no staged copies. Empty/disposed cursors never
+  claim completeness. Six lowered budgets report truncation; missing roots, stale discovery metadata, changed full hashes, missing
+  selected input, grown pinned-file hash limits, overlapping/relative/network roots,
+  unsupported compression/container signatures and actual junction/reparse traversal/root rejection passed. Negative
+  tests change only separate disposable copies, never the original fixture inputs.
+- Mid-discovery cancellation passed. Cancelled rediscovery leaves a saved resolution
+  byte-for-byte unchanged and keeps explicit native-resource pins. Two independent
+  processes restored roots/priorities and historical selection lineage even after a
+  different file became the highest-priority recommendation.
+- Actual GUI page/stage buttons feed the existing companion selectors. Native texture/
+  material controls and visible four-color OpenGL poses were inspected; Play advanced
+  to frame 16. Actual numeric edit changed 60 to 35 degrees, protected-source Save was
+  refused without losing dirty state, separate BRRES Save succeeded and MainForm
+  reopened it. Native decoding verifies the edited key and declared geometry/binds/
+  texture/timing subset. All ten original input hashes stayed unchanged.
+- `tests/NativeSmoke/VerifyDumpProduct.ps1` launched the actual product executable
+  twice through normal file-open startup, opened the real Dump folders window with
+  restored roots/priorities, returned to companions and opened assembled native output.
+  Exact root/source/hash/choice records persisted identically; both processes exited
+  normally. The second launch used the product's last resolution, not the harness host.
+- Existing default native/GUI regressions and companion native/GUI regressions were
+  retained and rerun. Their seven/four original input hashes stayed unchanged. D:
+  distinct 8.3 aliases remain a skip, not newly passed. Version 1 compatibility is
+  now explicitly exercised by the companion suite.
+
+Evidence (ignored/local):
+
+- `artifacts/restart/dump-native-20261017-094925-375/result.txt`
+- `artifacts/restart/dump-gui-20261017-094930-512/result.txt`, `dump-source.sha256`,
+  catalogue/companion choices, texture/material, OpenGL poses, 35-degree edit and reopen captures
+- `artifacts/restart/dump-product-20261017-095000-283/result.json`, roots/resume/native-open captures
+- `artifacts/restart/native-20261017-094429-619/result.txt`, `gui-20261017-094431-266/result.txt`
+- `artifacts/restart/companions-native-20261017-095033-796/result.txt`,
+  `companions-gui-20261017-094540-243/result.txt`
+- `artifacts/restart/dump-final-source-hashes.json` (ten inputs rechecked after final product launches)
+- `artifacts/restart/build-Release.log`, `test-build-Release.log`
+
+Executable: `D:/Users/ChatGPT/ROA2TOOL/application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe`.
+SHA256: `160dfbb66906f02b6a0b3f4f6d6bdafdc579a9b51a16851179f73179678c843f`.
+Edited GUI BRRES SHA256: `bc0b14d683e533a4cecf5dd6b2985e35e20a80bc1206d4d7ae03ca14490b00c0`.
+The first compile exposed an XmlReader name ambiguity, corrected by qualification.
+The first dump GUI run exposed a reentrant native checkbox/disposal callback; fixed
+by avoiding rebuilding a ListView inside its ItemChecked notification. Failed evidence
+remains local; only the corrected passing runs above support completion.
+
+Limits remain explicit: file-scoped raw BRRES/TEX0/CHR0 discovery, not installations,
+images, decompression or PAC/PCS companion nesting. Native assembly remains MDL0 v11 /
+TEX0 v1 RGBA8 without palette / CHR0 v4 matching-name subset, not rig equivalence or
+retargeting. Original geometry is still a rigid paddle, not blended skinning. Empty
+SRT0 metadata does not prove animated SRT0 fidelity. No character-edit project, target
+gameplay, separate native tool, Modkit or in-game verification was added. No commercial
+input was decoded in these tests; only the explicit local assets configuration was
+read (Brawl/Ultimate Mario roots, no configured Goku). Distribution/provenance audit
+gaps, optional ColorSmash/Cargo limitation and native-parser sandbox limitations persist.
+
+The next single acceptance criterion is Brawl container-preserving readiness in
+plans/current.md. Full channels, nontrivial fixtures, actual character projects and
+measured A-to-different-B/native-output/non-Brawl retargeting, then installed Rivals
+Modkit movement/attack/build/playtest remain in the preserved milestone/master plan.
+No branch/tag push, PR, remote upload, CI dispatch or binary release occurred this increment.

@@ -107,3 +107,21 @@ two fresh FighterPort.Studio.exe processes reopen the resolution, enable the act
 workspace controls, open a new native BRRES and exit normally using an isolated
 profile. Exact persisted choice XML is compared, since a ListView subitem is not
 ordinary Win32 window text. All input roots and generated native data remain local.
+
+
+Multi-root loose dumps: `scripts/test.ps1 -DumpSources -Gui` uses original matching
+base/override/conflict layouts, unrelated same-name resources, lightweight paged
+header discovery, explicit scoped choices, bounded/cancelled/unavailable discovery
+and two process reloads. It exercises the actual dump list and Stage action before
+native companion preview/Play/key edit/separate Save/reopen. Ten original source
+hashes must stay unchanged. A real Windows junction is created only inside the new
+ignored evidence directory and must be rejected; recovery/game inputs are untouched.
+The source choices and saved work must survive cancelled rediscovery and changed
+priority recommendations. Existing default and companion suites remain separate;
+companion checks include old version 1 resolution loading.
+
+`VerifyDumpProduct.ps1 -Resolution <absolute-original-fixture-dump-ui.fpcompanion>`
+launches FighterPort.Studio.exe twice, checks actual restored root/companion windows,
+compares persisted mount/hash/native identities, opens the new native output and
+observes normal exits. Captures/output remain ignored. OS folder/Save As pickers
+are bypassed throughout; no manual-click, native-tool or game claim follows.
