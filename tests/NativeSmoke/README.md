@@ -1,5 +1,14 @@
 # Native restart smoke checks
 
+The current authoring suite is `./scripts/test.ps1 -Library -Gui`: two original rigs,
+stable source-bound library/project IDs, native motion capture, independent instances,
+session undo/redo and genuine native output/reopen. Run
+`VerifyLibraryProduct.ps1 -Project <absolute-generated-library-ui.fpcharacter>` for
+two fresh executable launches, restored edits/assignments and native export controls.
+See docs/TESTING.md for exact scope, budgets, manual workflow and limitations. The
+library suite uses the product's own camera framing; older suites below set a fixture
+camera explicitly. Full native/gameplay/retargeting fidelity is not implied.
+
 `NativeSmoke` is a new .NET Framework 4.7.2/x86 harness for the imported application.
 It has no legacy FighterPort Core, worker, project-format or renderer dependency.
 Its two-bone paddle, four-color texture, UVs and rotation animation are original

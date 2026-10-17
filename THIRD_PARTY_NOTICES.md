@@ -40,3 +40,5 @@ their unresolved provenance is explicitly recorded, not represented as distribut
 New FighterPort source files mark their modifications/date and compatible terms. Original fixture
 design/output permission is stated in the new test generator; generated game-format fixtures are
 local and ignored. Commercial input folders and their derivatives remain outside all commits.
+The source-bound library/project increment adds original repository-licensed source and
+original procedural rig fixtures; it introduces no new third-party package or binary.

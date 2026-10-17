@@ -49,6 +49,11 @@ FighterPort modifications dated 2026-10-17 are separate from that verified basel
   canonical-header admission and exact unrelated-payload preservation audit, native PAC
   assembly/editor integration, opt-in read-only header inventory and original blended-
   skinning/nonidentity-bind tests. Model/texture/motion version gates remain unchanged.
+- Source-bound character library and version 1 actual-edit projects, immutable native
+  evidence, skeleton fingerprints, manual drafts and independent motion instances,
+  session undo/redo, native editor capture/export/reopen and original different-rig tests.
+  A sparse key enumeration accessor in BrawlLib supports bounded native validation;
+  no native codec or imported license/header was replaced. No new dependency is added.
 
 The baseline manifest remains unchanged as a comparison anchor. Git diffs and local commits record
 each modification. `scripts/verify-upstream.py` reports divergence and validates baseline entries.

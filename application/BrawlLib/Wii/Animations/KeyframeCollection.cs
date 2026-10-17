@@ -378,6 +378,12 @@ namespace BrawlLib.Wii.Animations
 
     public class KeyframeArray
     {
+        // FighterPort addition, 2026-10-17: sparse native key inspection without
+        // exposing the sentinel or scanning every possible frame in a project validator.
+        public IEnumerable<KeyframeEntry> Entries
+        {
+            get { for (var key = _keyRoot._next; key != _keyRoot; key = key._next) yield return key; }
+        }
         internal KeyframeEntry _keyRoot;
         internal int _keyCount;
 

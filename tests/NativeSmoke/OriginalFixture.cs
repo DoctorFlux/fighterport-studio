@@ -2,6 +2,8 @@
 // Permission to use, modify and redistribute this generator and its original output
 // for testing is granted with this notice retained. No game content is embedded.
 using BrawlLib.Imaging;
+using BrawlLib.Internal;
+using BrawlLib.Modeling;
 using BrawlLib.Modeling.Collada;
 using BrawlLib.SSBB.ResourceNodes;
 using BrawlLib.SSBB.Types;
@@ -14,7 +16,7 @@ using System.Linq;
 
 internal static class OriginalFixture
 {
-    public static string Create(string directory, bool blended = false)
+    public static string Create(string directory, bool blended = false, bool differentRig = false)
     {
         Directory.CreateDirectory(directory);
         string dae = Path.Combine(directory, "original-paddle.dae");
@@ -28,6 +30,7 @@ internal static class OriginalFixture
                 .Replace("<node id='Paddle' name='Paddle' sid='Paddle' type='JOINT'><matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1", "<node id='Paddle' name='Paddle' sid='Paddle' type='JOINT'><matrix>1 0 0 0 0 1 0 6 0 0 1 0 0 0 0 1")
                 .Replace("count='32'>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1", "count='32'>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 -6 0 0 1 0 0 0 0 1");
         }
+        if (differentRig) scene = scene.Replace("-3 0 0 3 0 0 3 18 0 -3 18 0", "-5 0 0 5 0 0 5 24 0 -5 24 0");
         File.WriteAllText(dae, scene.Replace('\'', '"'));
         Collada._importOptions = new Collada.ImportOptions
         {
@@ -42,6 +45,15 @@ internal static class OriginalFixture
             model.Name = "OriginalPaddle";
             archive.GetOrCreateFolder<MDL0Node>().AddChild(model);
             model.Populate();
+            if (differentRig)
+            {
+                // Rig B shares misleading Root/Paddle names with A, but has a translated
+                // bind, different proportions, and an additional rotated descendant.
+                var paddle = model.BoneCache.OfType<MDL0BoneNode>().Single(b => b.Name == "Paddle");
+                var tip = new MDL0BoneNode { Name = "OriginalTipB", BindState = new FrameState(new Vector3(1), new Vector3(0,0,90), new Vector3(0,9,0)) };
+                paddle.AddChild(tip); ((MDL0BoneNode)paddle.Parent).RecalcBindState(false,false);
+                model._linker.RegenerateBoneCache(true);
+            }
             Console.WriteLine("Fixture import groups: " + string.Join(", ", model.Children.Select(c => c.Name + "=" + c.Children.Count)));
             using (var bitmap = new Bitmap(32, 32))
             {

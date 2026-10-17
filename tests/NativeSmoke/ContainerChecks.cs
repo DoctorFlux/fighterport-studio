@@ -1,6 +1,7 @@
 // Original FighterPort nested-package and blended-skin fixtures, 2026-10-17.
 // Same original-artwork permission as OriginalFixture.cs; no game data.
 using BrawlCrate.Sources;
+using BrawlCrate.Authoring;
 using BrawlCrate.UI;
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
@@ -72,6 +73,21 @@ internal static partial class NativeSmoke
         using (var root = NodeFactory.FromFile(null, assembled))
         { Find<CHR0Node>(root).Children.OfType<CHR0EntryNode>().Single().SetKeyframe(5, 15, 35); root.Export(edited); }
         VerifyContainerNative(edited, 35); BrawlContainerAudit.VerifyPreserved(source, edited, "0/0");
+        // The new project workflow must preserve the enclosing native package too.
+        var project = new CharacterProject(Path.Combine(_output,"storage"));
+        string character = project.RegisterSource(resolution,"Original nested package");
+        string instance = project.Assign(project.State.Animations.Single().Id,character,"NativePackageDraft");
+        var lease = project.OpenInstance(instance);
+        using (var root = NodeFactory.FromFile(null,lease.Path))
+        {
+            Find<CHR0Node>(root).Children.OfType<CHR0EntryNode>().Single().SetKeyframe(5,15,35);
+            project.CaptureNativeEdits(lease,root,lease.Path);
+        }
+        string projectPath=Path.Combine(_output,"container-project.fpcharacter"); project.Save(projectPath);
+        var restored=CharacterProject.Load(projectPath,Path.Combine(_output,"storage"));
+        string projectNative=Path.Combine(_output,"container-project-edited.pac"); restored.ExportInstance(instance,projectNative);
+        VerifyContainerNative(projectNative,35); BrawlContainerAudit.VerifyPreserved(source,projectNative,"0/0");
+        Log("PASS: actual-edit project retains nested PAC and unrelated payloads through capture/save/load/native export/decode");
         CheckContainerFailures(source, resolution);
         using (var child = Process.Start(new ProcessStartInfo { FileName = Process.GetCurrentProcess().MainModule.FileName,
             Arguments = "--verify-container \"" + _output + "\"", UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden, RedirectStandardOutput = true, RedirectStandardError = true }))

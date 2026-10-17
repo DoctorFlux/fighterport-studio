@@ -37,6 +37,7 @@ internal static partial class NativeSmoke
         if (args.Length == 2 && args[0] == "--verify-dump") return VerifyDumpRestart(args[1]);
         if (args.Length == 3 && args[0] == "--inspect-brawl") return InspectConfiguredBrawl(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--verify-container") return VerifyContainerRestart(args[1]);
+        if (args.Length == 2 && args[0] == "--verify-library") return VerifyLibraryRestart(args[1]);
         if (args.Length == 2 && args[0] == "--guard-live")
         {
             try
@@ -78,7 +79,7 @@ internal static partial class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui" }.Contains(args[0]))
+        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui", "--library-native", "--library-gui" }.Contains(args[0]))
         {
             Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
@@ -98,6 +99,11 @@ internal static partial class NativeSmoke
             // pumping can create WinForms handles on this STA thread.
             if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if (args[0].StartsWith("--library", StringComparison.Ordinal))
+            {
+                ExerciseLibrary(args[0].EndsWith("gui", StringComparison.Ordinal));
+                Log("PASS: completed " + args[0] + "; original rigs only; no retargeting/gameplay/game test"); return 0;
+            }
             if (args[0].StartsWith("--container", StringComparison.Ordinal))
             {
                 ExerciseContainers(args[0].EndsWith("gui", StringComparison.Ordinal));

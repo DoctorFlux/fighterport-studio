@@ -25,6 +25,10 @@ provisioning requirements. These extend the product; they do not restart the app
 - Dump discovery must remain separate from selected-file staging/decoding. Overrides use
   complete logical file/container paths, never global native resource names. Preserve
   explicit hash-pinned choices across scans; root configuration is not a character project.
+- .fpcharacter v1 stores actual native motion edits; .fpcompanion stores source choices.
+  Preserve immutable source/library identities and independent instances. Native edit capture
+  requires an explicit current instance lease; semantic roles remain unapproved and different-
+  rig assignment rejects until reviewed mapping/baking exists. Undo history is session-only.
 - Standing user authorization, 2026-10-17: push each completed, passing source update
   to the existing public origin/main after committing and reviewing it. This supersedes
   the earlier one-upload/local-only restriction. No repeat permission request is needed

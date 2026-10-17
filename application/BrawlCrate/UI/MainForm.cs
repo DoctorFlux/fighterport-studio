@@ -110,6 +110,10 @@ namespace BrawlCrate.UI
                 new ToolStripMenuItem("Brawl &Companions...", null,
                     (sender, args) => CompanionWorkspaceForm.ShowWorkspace(this))
                 { Name = "companionWorkspaceToolStripMenuItem" });
+            fileToolStripMenuItem.DropDownItems.Insert(4,
+                new ToolStripMenuItem("Character &Library...", null,
+                    (sender, args) => CharacterLibraryForm.ShowProject(this))
+                { Name = "characterLibraryToolStripMenuItem" });
             checkForUpdatesToolStripMenuItem.Text = "Upstream updates disabled";
             checkForUpdatesToolStripMenuItem.Enabled = false;
             Text = Program.AssemblyTitleFull;

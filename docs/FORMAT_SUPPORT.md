@@ -13,6 +13,7 @@ No previous FighterPort counts or capabilities transfer to this codebase.
 | Raw nested ARC/PAC 0x0101 -> BRRES companions | Explicit indexed container/native identities; enclosing PAC assembly, native edit/new-save/reopen; exact unrelated payload hashes/entry IDs; cancellation/bounds/depth/header-loss/collision/stale-input rejection tested | Actual selectors, texture/material panels, native blended-skin OpenGL playback/key edit and separate PAC reopen observed; standalone product restores choices | Canonical raw known children only; no PCS/opaque/redirect/noncanonical-header path or retail fighter/gameplay claim |
 | Original MDL0 v11 blended fixture | Two bones with nonidentity child bind/inverse bind, 25/75 and 75/25 vertex blends, exact expected geometry/material/all RGBA8 pixels, timing/loop/key checked through native PAC output | Native weighted poses compared with analytic LBS at declared key frames; GUI visible deformation/play/edit observed | Two-bone subset only; no arbitrary rest/scale/helper/retarget or continuous-error bound claim |
 | Base SRT0 v4 preservation | Original empty-entry fixture name, 17-frame timing and loop flag retained through assembly/native edit/save/reopen | No SRT0 authoring/preview claim added | Does not prove arbitrary channel/opaque-field preservation |
+| Source-bound library / .fpcharacter v1 | Two different original native rigs, stable source/clip IDs, full native evidence, actual motion edits, independent instances, manual drafts, atomic project save/load and session undo/redo tested; missing/changed/stale/tampered inputs reject or diagnose | Actual library selectors/assignment and inherited model preview/playback/key edit/capture/undo/redo/native export/reopen tested; fresh executable restarts checked separately | One CHR0 per profile, same-source assignments only; no semantic approval, cross-rig transfer, native attack compiler or playable mod |
 | Other inherited Brawl editors/resources | Source retained; operation-specific tests pending | Inherited controls retained, unverified | No universal fidelity claim |
 | Smash 64, Melee, Wii U, 3DS, Ultimate | Planned per game/version | Planned | Planned native output/gameplay/game checks |
 | Rivals II installed sources / Modkit projects | Planned separately from cooked extraction | Planned actual Modkit validation | Planned import/build/playtest |
@@ -55,6 +56,6 @@ TEX0 v1, CHR0 v4, CLR0 v3 and SRT0 v4, plus opaque/EFLS/REFF/REFT entries. This 
 bounded read-only metadata inspection with unchanged source hashes, not native decoding,
 preview/edit/export or game verification. MDL0 v9 is still outside companion assembly.
 No Goku source is configured. Full Brawl/Project M/Project+ scope and all channel/format
-fidelity rows remain required. No character library/projects, semantic rigs/IK/FK,
-attack translators, native templates or managed tool provisioning were implemented by
-this container increment; those are traceable requirements in the new master spec/plan.
+fidelity rows remain required. The first library/project subset above now exists; wider
+project authoring, semantic rigs/IK/FK, attack translators, native templates and managed
+tool provisioning remain traceable requirements in the new master spec/plan.

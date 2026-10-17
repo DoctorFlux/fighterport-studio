@@ -573,6 +573,13 @@ Full changelog: see the preserved upstream Changelog.txt and FighterPort develop
                 return true;
             }
 
+            // FighterPort addition: actual edit projects are distinct from source resolutions.
+            if (path.EndsWith(".fpcharacter", StringComparison.OrdinalIgnoreCase))
+            {
+                CharacterLibraryForm.ShowProject(MainForm.Instance, path);
+                return true;
+            }
+
             if (path.EndsWith(".gct", StringComparison.OrdinalIgnoreCase) ||
                 path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {

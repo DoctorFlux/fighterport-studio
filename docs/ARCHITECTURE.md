@@ -147,13 +147,62 @@ animation/retargeting services; separate target asset writers and gameplay compi
 Other games will not be encoded through MDL0/CHR0 as a universal intermediate. Modern/64-bit
 workers may isolate large archives or incompatible dependencies without a speculative UI rewrite.
 
-The product's planned authoring domain is now explicit: SourceCharacterProfile owns
-exact native model/rig provenance and reviewed characterization; AnimationAsset owns
-source-bound motion; MoveAsset owns actual attack evidence or an explicitly authored
-draft; MoveInstance owns non-destructive target/slot/correction/gameplay overrides.
-Versioned character projects persist actual edits/native originals, independent target
-branches and a defined transactional/undo policy. These are planned services, not new
-classes implemented by .fpcompanion. Animation-only input never invents attack behavior.
+`Authoring/CharacterProject` now implements the first authoring domain in-process.
+File > Character Library and native File > Open / command-line .fpcharacter opening
+use CharacterLibraryForm alongside the inherited editors. This is a versioned actual
+edit project, distinct from .fpcompanion. Registering a resolved companion selection
+pins a stable SourceCharacterProfile ID/revision, exact source bytes/hashes, the full
+resolution XML (including mount/logical/container identities), original native MDL0/CHR0
+payload hashes, an assembled enclosing native archive and serialized native model hash.
+Skeleton snapshots retain indexed parents, names, rest S/R/T, bind/inverse matrices,
+bone and billboard flags. The deterministic fingerprint and fixed interpretation
+record native XYZ/Euler degrees/native units with unknown physical scale. No semantic
+roles or matching-name compatibility are approved.
+
+AnimationAsset binds the selected native CHR0 to that profile/fingerprint, independent
+of the viewport, display names or source order. Registration creates no MoveAsset.
+Explicitly authored manual drafts persist notes/startup/active/recovery/damage and have
+no parsed native attack commands. MoveInstance pins animation revision, draft ID,
+target profile/fingerprint, slot, revision and its own native blob. Assignments currently
+require the same source profile; different rigs/profiles reject pending reviewed transfer.
+Slot names are project assignments, not compiled native gameplay slots. Multiple independent
+instances keep source/library revision 1 unchanged.
+
+Open instance writes a separate copy and binds an edit lease to that project/instance,
+baseline revision and exact native open path. The actual model wrapper/preview and CHR0
+editor handle editing. After inherited queued viewer settings, the product selects the
+bound motion and frames the model bounds. Capture validates a fresh native decode,
+unchanged model/rig and every other selected-BRRES entry, plus enclosing ARC metadata
+and unrelated payloads. Only that selected CHR0 may change. Stale/unbound capture and
+unsupported model/resource changes reject; dirty native edits remain available separately.
+Each successful capture renews its bound baseline so further native edits can be captured
+as separate transactions without reopening or mutating a library source.
+Undo/redo restores project snapshots and reopens the bound instance in the native editor.
+Capture is required before project save or abandoning a bound edit. Other native editing
+workflows remain available outside this first project capture subset.
+
+Version 1 .fpcharacter is bounded XML with deduplicated SHA256-addressed base64 native
+blobs. It retains full native originals, archive edits/curves and immutable source/library
+data rather than reconstructing curves from a lossy schema. Detached public record snapshots
+cannot mutate committed state. Commands validate a candidate metadata snapshot before commit;
+undo/redo keeps at most 32 commands / 16 MiB metadata in memory. Saved state persists;
+history deliberately clears on load. Save writes a guarded temporary file then atomically
+replaces the project, retaining .previous. Fresh loads check blob hashes, original payloads,
+resolution bindings, rig interpretation/fingerprints and native instance revisions. Missing
+or changed external inputs leave the saved state recoverable and previewable, with visible
+diagnostics; assignment/capture/export block until original identities are valid again.
+
+Budgets: 8 profiles with one selected CHR0 each, 64 drafts/instances, 512 blobs / 32 MiB
+combined native/session-revision data, 1 MiB metadata and 48 MiB serialized document;
+DTD/entities are prohibited. Native files retain existing admission/staging/audit gates.
+Working copies are capped at 256 files / 128 MiB per project session, with 256 sessions /
+1 GiB at session creation. Save/reload discards unused blob revisions. Native export
+requires a new file and the original enclosing .brres/.pac extension, then checks output hash.
+The shared service is local and adds no dependencies; only its Brawl adapter exists today.
+
+Reviewed semantics, game-neutral editable curves/constraints, outfits/material/mesh edits,
+correction layers, versioned source revisions and more clips per profile remain queued.
+Animation-only input never invents attack behavior.
 The shared rigging core must separate fingerprint/template/heuristic recognition and
 review from FK transfer, editor-only IK controls, interval contacts and measured target
 baking. Aerial attacks receive no default ground locks. Native gameplay compilers and

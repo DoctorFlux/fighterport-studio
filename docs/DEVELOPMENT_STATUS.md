@@ -12,10 +12,11 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [raw nested Brawl containers](#raw-nested-brawl-containers--2026-10-17)
-is implemented and verified. Earlier receipts are historical. The animation/attack
-library specification is reconciled into requirements; its authoring services are not
-implemented by this container checkpoint.
+Current checkpoint: [source-bound library and projects](#source-bound-library-and-projects--2026-10-17).
+The first authoring increment follows the completed container checkpoint, preserving HEAD
+9f9405fb925f50b4df33ec1ae41e17b1dd77b6dc and all newer passing work. Earlier receipts
+below describe their historical checkpoints. docs/plans/current.md remains the only
+authoritative next executable acceptance criterion.
 
 ## Initial restart receipts
 
@@ -365,9 +366,100 @@ separate native tool, Modkit, in-game or broad retail-character validation ran. 
 licensing/corresponding-source audit and legacy parser sandbox limitations remain open.
 No assets, derivatives, captures, settings, binaries or recovery contents enter Git.
 
-The next executable task in plans/current.md is the first visible source-bound library
-and persistent edit-project increment on two genuinely different original rigs. Complete
+At that checkpoint, the next task was the first visible source-bound library and
+persistent edit-project increment on two genuinely different original rigs. Complete
 Brawl fidelity, all wider game/target routes, native attack conversion, bidirectional Mario/
 Snake proof, Melee and real Goku/Rivals template/attack/build/playtest remain required.
 Source publication follows standing authorization after exact public-origin verification,
 review and normal history-preserving push; publication success is verified separately.
+
+## Source-bound library and projects — 2026-10-17
+
+The first R3 authoring acceptance is implemented inside the existing application.
+File > Character Library and .fpcharacter file opening provide source model groups,
+source-bound clips, native previews, explicit manual drafts and independent slot instances.
+Version 1 saves actual edited native archives and complete original native/source evidence,
+resolution/mount/container identities, stable IDs/revision pins and skeleton/rest/bind/
+inverse-bind/axis/unit interpretation fingerprints. The physical unit scale is unknown;
+semantic roles are unapproved. Registration creates animation-only data, never hitboxes.
+Draft startup/active/recovery/damage are explicit user-authored project values, not parsed
+native attacks or compiled game slots. Revision 1 library sources stay immutable.
+
+Observed/tested:
+
+- Original rig A: two bones, identity binds, rigid four-vertex paddle. Rig B: shared
+  misleading Root/Paddle names, three bones, child bind y=6, rotated helper descendant,
+  larger proportions and 25/75 blended weights. Duplicate character/model/clip names
+  and reordered profile records retain correct stable associations. Different-profile/
+  rig assignment rejects even when names match; no transfer was silently performed.
+- Actual native key edits (60 -> 35, GUI -> 25 degrees), separate native output and
+  reopen pass. Decoded key/poses match independent intended rotation/LBS calculations
+  within 0.001 degrees / 0.002 native position units. Native binds, texture samples,
+  hierarchy, timing/loop and the second instance's unchanged 60-degree motion survive.
+  The source library clip also stays at 60. This is sampled native editing, not a new
+  retargeter, continuous curve proof or arbitrary model/channel fidelity certification.
+- Real library assignment controls, inherited native preview/Play/numeric edit, Capture,
+  project Undo/Redo, Save project, Export native copy and MainForm reopen were exercised.
+  Undo/redo restores the actual native document. The bounded 32-command history was
+  tested independently. History is session-only; actual saved state persists across load.
+- Changed/missing external sources remain recoverable as saved project/native previews
+  with visible diagnostics; assignment/capture/export block. Stale/unbound edits,
+  unreviewed model/rig changes, tampered blobs/fingerprints and XML entities reject.
+- Two fresh FighterPort.Studio.exe processes restore visible source/draft/assignment data,
+  open the edited instance in the inherited model editor, export the exact persisted
+  native revision, preserve project records on save and exit normally. Standalone checks
+  use normal file opening, not a harness-only startup flag or an external editor.
+- Nested PAC project capture/save/load/export/decode additionally retains enclosing ARC
+  hierarchy and exact unrelated payloads. This extends project evidence without flattening
+  the package. Existing single-source, companion, multi-root and container native/GUI
+  suites pass; their original source hashes remain unchanged. The distinct 8.3 alias
+  probe remains skipped. No commercial assets were loaded for this authoring increment.
+
+The native framebuffer checks caught an inherited queued startup camera reset; product
+framing now runs afterward. Final library captures show both rigs and the edited textured
+pose without a test camera override. Earlier failed/partial evidence remains local and
+does not support this checkpoint. Win32 product-window captures may omit OpenGL content;
+the inspected native framebuffer captures are the visible geometry evidence. GUI actions
+are control automation; no manual clicking, separate native-tool or in-game check is claimed.
+
+Limits: 8 profiles with one selected CHR0 each, 64 drafts/instances, 32 MiB deduplicated
+native/session blob data, 1 MiB metadata, 48 MiB document; 32 undo commands / 16 MiB
+metadata. Working copies: 256 files/128 MiB per session; 256 sessions/1 GiB at creation.
+Save/reload discards unused revisions and undo history. Capture supports the selected
+CHR0 only; model/material/texture/other resource edits must be saved separately in the
+native editor for now. Project saves are atomic and retain .previous. Native export
+requires a new .brres/.pac file. No semantic recognition/review, IK/FK/contacts, native
+attack compiler, non-Brawl project adapter, real target templates or provisioning exists yet.
+All Brawl fidelity/version/channel and wider multi-game requirements remain queued.
+
+Recovery remains untouched at D:/Users/ChatGPT/FighterPort-Recovery-20261017-01/workspace.
+The upstream pin is unchanged: d56cbac89dc2cd0e5c3f923e1d03041b16902add. Baseline comparison
+found no missing imported files; intentional product modifications remain identified.
+No dependencies or licenses were replaced. Existing binary distribution audit remains open.
+The single next acceptance is reviewed fingerprint-bound semantic mappings and measured
+original rig A -> different rig B -> genuine native animation -> decoded target validation,
+as specified in plans/current.md. Reverse and non-Brawl directions require independent proof.
+
+Current local receipts (all generated assets/captures/binaries remain ignored):
+
+- `artifacts/restart/library-native-20261017-112129-682/result.txt`
+- `artifacts/restart/library-gui-20261017-112143-057/result.txt`, original hash list,
+  library/model groups, both native framebuffers, edited pose and saved/native-reopen captures
+- `artifacts/restart/library-product-20261017-112238-915/result.json`, two normal exits,
+  exact restored records and native outputs through product controls
+- `artifacts/restart/library-final-source-hashes.json`: four originals unchanged after product runs
+- `artifacts/restart/native-20261017-110654-271/result.txt`, `gui-20261017-110655-808/result.txt`
+- `artifacts/restart/companions-native-20261017-111235-346/result.txt`, `companions-gui-20261017-111239-252/result.txt`
+- `artifacts/restart/dump-native-20261017-111308-271/result.txt`, `dump-gui-20261017-111312-560/result.txt`
+- `artifacts/restart/container-native-20261017-111531-355/result.txt`, `container-gui-20261017-111535-895/result.txt`
+- `artifacts/restart/build-Release.log`: actual application Release/x86/net472, zero warnings/errors
+
+Executable: `D:/Users/ChatGPT/ROA2TOOL/application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe`.
+SHA256: `7c88c1b89f1c3a52ff427c9d78b7ae78c22895ec017e08221992eb280b6d1137`.
+Final edited native BRRES and both product exports SHA256:
+`99affe0bd6106fb12fa034b8bba7b95f9086e34ea1a83eef970f233b45d42944`.
+The master spec remains byte-identical (SHA256
+`63a211fdb31307530b2cbd84500ebd082516329708c8f6299fc1ee06db26a6d0`).
+Publication uses the standing reviewed-source authorization; the exact source commit and
+remote verification are recorded in Git and the local publication receipt after pushing.
+No assets, binaries, releases, public PRs or CI dispatch are part of this source update.

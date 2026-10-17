@@ -176,3 +176,59 @@ model/moveset decoder, records versions/unsupported entries locally and checks t
 input hash. It does not scan a drive, decode commercial geometry or demonstrate gameplay.
 Commercial metadata files/captures/derivatives remain ignored. Header inventory and
 companion admission are separate: unsupported MDL0 versions/opaque contents remain unsupported.
+
+Library/project acceptance:
+
+```powershell
+./scripts/test.ps1 -Library -Gui
+./tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <absolute-original-library-ui.fpcharacter>
+```
+
+The first command generates two original native rigs with duplicate display/model/bone
+names: A has two bones/identity binds/rigid weights; B has three bones, a translated
+Paddle bind, rotated descendant, different proportions and blended weights. Both are
+MDL0 v11 / CHR0 v4 / RGBA8 native sources. Their fingerprints and associations must differ.
+It registers explicit companion resolutions, creates a manual draft (7/3/18 frames,
+9.5 damage, no native attack evidence), assigns independent instances and edits A's
+native key from 60 to 35 degrees. Slot/key undo/redo, atomic save/load, reordered profiles,
+duplicate names, detached records, missing/changed sources, stale leases, unreviewed rig
+edits, blob tampering and prohibited entities are checked. Rejection must retain state.
+
+GUI mode uses the actual library tree, native preview button on B, slot assignment/
+undo/redo, A's native model viewer/Play/numeric editor, capture and project undo/redo.
+It changes the inherited key to 25 degrees, saves .fpcharacter, invokes the native-export
+button and reopens the separate BRRES in MainForm. The product frames its model after
+queued viewer initialization; this suite does not supply a camera correction. Inspect
+the native OpenGL framebuffer captures as well as the library/window captures. A blank
+framebuffer fails. Win32 PrintWindow alone may omit OpenGL and is not geometry evidence.
+Both a fresh service load and an independent harness process must restore actual native
+edits, stable source/move/target associations and the second target's unchanged 60-degree
+motion. The immutable library clip remains at 60. Decoded expected weighted positions
+are compared to analytic rotations about each rig's bind pivot (0.002 native units),
+with 0.001-degree key checks. Four original source/DAE hashes must remain unchanged.
+These are sampled native poses, not cross-rig transfer or full curve-fidelity evidence.
+
+The standalone script copies the original fixture project into ignored evidence, launches
+the actual executable twice with fresh isolated profiles, restores visible source/draft
+data, opens the persisted instance in the inherited model editor, exports through the
+real output path/button, compares native output hashes with the previously decoded
+25-degree revision, saves and compares all project records and observes normal exits.
+No test-specific product startup flag or external editor is involved. Inputs and captures
+stay local. Review all original hashes again after standalone launches.
+
+Manual workflow: File > Brawl Companions, resolve and save .fpcompanion; File > Character
+Library, register that resolution with a display name, select its clip, optionally create
+an explicitly manual draft, select the same source profile as target and assign a slot.
+Open the instance, use native animation controls, return to Capture native edits, then
+Save project. Undo/redo restores the native instance. Enter a new absolute output path
+beside Export native copy, or leave it empty to browse. Reopen .fpcharacter through File
+> Open or command-line file opening; export and reopen a separate native file.
+
+Version 1 supports one selected motion per profile (8 profiles), 64 drafts/instances,
+32 MiB deduplicated native/session blobs, 1 MiB metadata and 48 MiB document. Working
+copies: 256 files/128 MiB per session; 256 sessions/1 GiB at creation. Save/reload discards
+unused revisions. Undo is 32 commands/16 MiB metadata, session-only; saved actual state
+persists, history clears on load. Missing/changed originals leave recovery preview
+available but block assignments/capture/export. Capture accepts selected CHR0 edits only.
+Different source/rig assignments reject. No inferred attacks, compiled gameplay slots,
+retargeting, material/mesh/outfit authoring or game result follows from this increment.

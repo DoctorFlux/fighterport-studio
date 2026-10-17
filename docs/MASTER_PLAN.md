@@ -57,11 +57,13 @@ Ordered executable milestones (only one current acceptance criterion lives in pl
 Primary full authoring targets are Brawl/Project M/Project+, Melee, Ultimate and Rivals II;
 FighterZ, Sparking! ZERO and Xenoverse 1/2 are required model/animation sources. Every
 wider game/native-output/channel/interchange/optional DCC row above remains permanent.
-After current Brawl container/fidelity work, the first useful library increment must
-show two original source-character profiles, correctly associated clips, a visible
-library/preview, honest draft-attack status, target slot assignment and actual edit
-project save/reopen/undo. Then reviewed characterization/FK, IK/contact-aware baking,
-parsed attack transfer and primary target templates prove the defined E2E routes.
+The first useful library/project increment now implements two original source-character
+profiles, correctly associated clips, native previews, honest manual-draft status,
+independent slot assignments and actual native edit/project save/reopen/undo. Its
+declared v1 subset is one selected CHR0 per immutable source profile and motion-only
+instance edits; semantic review and cross-rig application remain unimplemented.
+Next come reviewed characterization/FK, IK/contact-aware baking,
+parsed attack transfer and primary target templates to prove the defined E2E routes.
 Develop managed provisioning alongside the first external adapter: original harmless
 package installation/rejection/rollback tests plus one genuinely integrated pinned tool.
 
@@ -83,13 +85,17 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
    materials, nontrivial blended skinning and genuinely animated SRT0/PAT0/CLR0/VIS0/SHP0/SCN0
    fixtures. Read/preview/edit/preserve/write/package evidence stays separate. No flattening
    a fighter package into BRRES and calling it a package round trip.
-4. R3: first visible source-character-bound library and real edit-project increment (current
-   acceptance), then semantic characterization and retargeting. Preserve native originals,
+4. R3: the first visible source-character-bound library and real edit-project increment
+   passes its original-fixture acceptance (see status/testing). Next: semantic
+   characterization and measured retargeting. Preserve native originals,
    immutable/revisioned source profiles/animations/moves, non-destructive target instances, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,
    loop-seam and post-export decoded-motion tolerances. Channel remapping remains separately declared.
-   Versioned projects must persist actual edits/undo, native originals, binds/weights,
+   Version 1 .fpcharacter persists actual CHR0 edits, full native originals, resolution
+   provenance, skeleton/bind fingerprints, manual draft data and independent instances.
+   Undo/redo is transactional and session-only; saved state persists, history clears on load.
+   Broader projects must persist native originals, binds/weights,
    curves/tangents/winding/fractional and event timing, materials/outfits, mappings,
    per-clip correction/contact layers and independent targets. They are not .fpcompanion.
    Reviewed fingerprint/chain profiles and batches must handle or reject changed axes,
