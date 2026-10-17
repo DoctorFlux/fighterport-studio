@@ -40,6 +40,17 @@ namespace BrawlCrate.Authoring
     }
     internal static partial class BrawlProjectAdapter
     {
+        internal static HumanoidStance CalibrateHumanoidStance(string sourceFile,SourceCharacterProfile source,AnimationAsset animation,string targetFile,SourceCharacterProfile target,AnimationAsset native,HumanoidSetup sp,HumanoidSetup tp,double sourceTime,double targetTime)
+        {
+            using(var sr=NodeFactory.FromFile(null,sourceFile))using(var tr=NodeFactory.FromFile(null,targetFile))
+            {
+                var sm=(MDL0Node)At(sr,source.ModelPath);sm.Populate();var tm=(MDL0Node)At(tr,target.ModelPath);tm.Populate();
+                var reference=CommonSample(tm,Motion(tr,target,native),(float)targetTime,target,tp.Profile);var rig=CommonRig(target);
+                var preferred=HumanoidSolver.Fk(CommonRig(source),sp.Profile,sp.Body,rig,tp.Profile,tp.Body,CommonSample(sm,Motion(sr,source,animation),(float)sourceTime,source,sp.Profile),reference);
+                int pelvis=tp.Profile.Chain("Pelvis").Bones[0];
+                return new HumanoidStance{SourceTime=sourceTime,TargetTime=targetTime,PelvisOffset=rig.World(reference)[pelvis].P-rig.World(preferred)[pelvis].P,Evidence="Explicit clip-specific native source/target pelvis reference alignment; constant world offset, no bind/mesh/length changes or semantic approval."};
+            }
+        }
         private static HPose[] CommonSample(MDL0Node model,CHR0Node motion,float time,SourceCharacterProfile profile,HumanoidProfile humanoid)
         {
             model.ApplyCHR(motion,time+1);var local=new List<HPose>();
@@ -134,24 +145,44 @@ namespace BrawlCrate.Authoring
         private static void WriteHumanoid(ResourceNode root,SourceCharacterProfile target,AnimationAsset native,CHR0Node source,HPose[][] values,Func<double,HPose[]> evaluate,string output,CancellationToken token)
         {
             var old=(CHR0Node)At(root,native.NativePath);var baked=new CHR0Node{Name=old.Name,Version=4,FrameCount=source.FrameCount,Loop=source.Loop};
-            var left=new HPose[values.Length][];var right=new HPose[values.Length][];var steps=new double[values.Length];
-            for(int f=0;f<values.Length;f++){token.ThrowIfCancellationRequested();double a=Math.Max(0,f-.1),b=Math.Min(values.Length-1,f+.1);left[f]=evaluate(a);right[f]=evaluate(b);steps[f]=b-a;}
+            // Fit native Hermite tangents to interior poses at thirds. Differencing
+            // almost coincident native float samples is unstable near a straight knee;
+            // a wide secant also biases endpoint motion. Integer keys stay exact and
+            // fresh quarter-frame decoding remains an independent acceptance sample.
+            var left=new HPose[values.Length-1][];var right=new HPose[values.Length-1][];
+            for(int f=0;f<values.Length-1;f++){token.ThrowIfCancellationRequested();left[f]=evaluate(f+1d/3);right[f]=evaluate(f+2d/3);}
             for(int bone=0;bone<target.Bones.Count;bone++)
             {
                 var entry=baked.CreateEntry(target.Bones[bone].Name);entry.PreserveInterpolation=true;var angles=new double[values.Length][];double[] previous=null;
                 for(int f=0;f<values.Length;f++){angles[f]=HumanoidEuler(values[f][bone].R,previous);previous=angles[f];}
-                var leftAngles=Enumerable.Range(0,values.Length).Select(f=>HumanoidEuler(left[f][bone].R,angles[f])).ToArray();var rightAngles=Enumerable.Range(0,values.Length).Select(f=>HumanoidEuler(right[f][bone].R,angles[f])).ToArray();
+                var leftAngles=Enumerable.Range(0,values.Length-1).Select(f=>HumanoidEuler(left[f][bone].R,angles[f].Zip(angles[f+1],(a,b)=>a+(b-a)/3).ToArray())).ToArray();var rightAngles=Enumerable.Range(0,values.Length-1).Select(f=>HumanoidEuler(right[f][bone].R,angles[f].Zip(angles[f+1],(a,b)=>a+2*(b-a)/3).ToArray())).ToArray();
                 for(int channel=0;channel<9;channel++)
                 {
                     Func<int,double> value=f=>channel<3?1:channel<6?angles[f][channel-3]:channel==6?values[f][bone].P.X:channel==7?values[f][bone].P.Y:values[f][bone].P.Z;
                     double slope=(value(values.Length-1)-value(0))/(values.Length-1);bool linear=Enumerable.Range(0,values.Length).All(f=>Math.Abs(value(f)-value(0)-slope*f)<1e-7);
+                    Func<int,HPose[][],double[][],double> sample=(f,poses,euler)=>channel<3?1:channel<6?euler[f][channel-3]:channel==6?poses[f][bone].P.X:channel==7?poses[f][bone].P.Y:poses[f][bone].P.Z;
+                    // Test interiors too: equal integer values do not prove a constant curve.
+                    linear=linear && Enumerable.Range(0,values.Length-1).All(f=>Math.Abs(sample(f,left,leftAngles)-value(0)-slope*(f+1d/3))<1e-7 && Math.Abs(sample(f,right,rightAngles)-value(0)-slope*(f+2d/3))<1e-7);
+                    var tangents=linear?null:FitHumanoidTangents(Enumerable.Range(0,values.Length).Select(value).ToArray(),Enumerable.Range(0,values.Length-1).Select(f=>sample(f,left,leftAngles)).ToArray(),Enumerable.Range(0,values.Length-1).Select(f=>sample(f,right,rightAngles)).ToArray());
                     foreach(int f in linear?new[]{0,values.Length-1}:Enumerable.Range(0,values.Length))
-                    {var key=entry.SetKeyframe(channel,f,(float)value(f),true);Func<HPose[][],double[][],double> sample=(poses,euler)=>channel<3?1:channel<6?euler[f][channel-3]:channel==6?poses[f][bone].P.X:channel==7?poses[f][bone].P.Y:poses[f][bone].P.Z;key._tangent=linear?(float)slope:(float)((sample(right,rightAngles)-sample(left,leftAngles))/steps[f]);}
+                    {var key=entry.SetKeyframe(channel,f,(float)value(f),true);key._tangent=linear?(float)slope:(float)tangents[f];}
                 }
             }
             var parent=old.Parent;int index=old.Index;parent.InsertChild(baked,index);old.Remove();old.Dispose();
             if(root.CalculateSize(false)>CharacterProject.MaxNativeBytes)throw new IOException("Humanoid native output exceeds 32 MiB before export; working-copy reservation was preserved.");
             root.Export(output);
+        }
+        private static double[] FitHumanoidTangents(double[] values,double[] thirds,double[] twoThirds)
+        {
+            int n=values.Length;var diagonal=new double[n];var off=new double[n-1];var rhs=new double[n];
+            for(int f=0;f<n-1;f++)for(int part=1;part<=2;part++)
+            {
+                double u=part/3d,u2=u*u,u3=u2*u,a=u3-2*u2+u,b=u3-u2;
+                double residual=(part==1?thirds[f]:twoThirds[f])-(2*u3-3*u2+1)*values[f]-(-2*u3+3*u2)*values[f+1];
+                diagonal[f]+=a*a;diagonal[f+1]+=b*b;off[f]+=a*b;rhs[f]+=a*residual;rhs[f+1]+=b*residual;
+            }
+            for(int i=1;i<n;i++){double factor=off[i-1]/diagonal[i-1];diagonal[i]-=factor*off[i-1];rhs[i]-=factor*rhs[i-1];}
+            var result=new double[n];for(int i=n-1;i>=0;i--)result[i]=(rhs[i]-(i+1<n?off[i]*result[i+1]:0))/diagonal[i];return result;
         }
         // Brawl XYZ Euler adapter: choose the nearest equivalent chart, including exact
         // gimbal poses. The generic solver never copies source Euler components.

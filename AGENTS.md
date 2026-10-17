@@ -44,6 +44,10 @@ do not mark them implemented with placeholders. Godot references do not authoriz
   No fake exporters, demo substitution, guessed approved mappings or playable-fighter claims.
 - Game inputs are read-only and excluded from Git. Preserve exact binds, Euler winding,
   timing, native originals/opaque records and separate target branches with explicit losses.
+- Brawl animation previews attach only the explicitly chosen character model, excluding
+  other MDL0 shadows/articles from rendering/playback while preserving native package data.
+  Clip-specific stance calibration is distinct from binds/Idle/Fall and never approves a
+  guessed commercial profile. Keep the independent forward/reverse standing regressions.
 - Build/test each increment; update evidence, capabilities/status and the single next task.
   Commands: scripts/build.ps1, test.ps1, run.ps1, doctor.ps1, review.ps1.
 - Dump discovery must remain separate from selected-file staging/decoding. Overrides use

@@ -1,5 +1,35 @@
 # Testing the restarted application
 
+H3 standing continuation (2026-10-17): run `scripts/test.ps1 -Humanoid -Gui` and
+`scripts/test.ps1 -AnimationBrowser -Gui`, plus all retained native/GUI suites. New original
+checks use independent inner-reach geometry/opposing goals, actual calibration controls,
+undo/redo/project reload and existing random-scrub/loop/full-turn/contact/native gates.
+Browser tests cover both picker and ordinary ARC PreviewAll: zero attached models before
+an explicit multiple-model choice, then exactly one native target/renderable, including
+after switching. Complete source hierarchy is retained. Motion-only files are not model choices.
+
+Opt-in local `--local-humanoid <private XML> <new private evidence>` still accepts the exact
+configured pair. `calibrateStance="true" sourcePhase="10.25"` explicitly aligns that source
+phase to target native phase 0; use separate direction configs, never infer reverse support.
+It preserves duration, exports new PAC and loose CHR0, compares fresh standalone channels at
+quarter times, reloads the exact saved recipe and requires deterministic regenerated native
+hashes. Unreviewed passing diagnostics must still reject approved assignment. GUI mode
+checks single-character scenes, source/FK/corrected playback, real calibration/export/save
+controls and a newly reopened PAC through the main native browser and visible animation list.
+Unexpected GUI exceptions fail the run; a watchdog bounds it. Commercial inputs, configs,
+outputs and captures remain ignored. The old uncalibrated reverse failure is a historical
+negative, not silently changed goals or relaxed tolerances. A first-frame calibration alone
+also failed; the explicit diagnostic phase choice is recorded in the saved recipe.
+
+The native baker fits tangents at thirds and validates freshly decoded quarters; identical
+integer keys alone never establish motion fidelity. Existing original analytic sole/skin
+expectations remain separate from native serialization comparisons. Normal executable
+restart uses VerifyLibraryProduct and preserves exact project state; unreviewed diagnostic
+recipes do not become approved instances on restart. Modkit/game checks remain unobserved.
+VerifyLibraryProduct resolves PAC/BRRES from the selected target record, verifies that exact
+working-file extension/hash and exports the same extension; it no longer assumes BRRES.
+
+
 Ordinary animation regression (2026-10-17):
 
 ```powershell

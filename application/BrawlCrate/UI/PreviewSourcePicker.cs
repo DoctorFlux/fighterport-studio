@@ -54,9 +54,11 @@ namespace BrawlCrate.UI
                     var source=new SourceFolderSession(Path.GetDirectoryName(Path.GetFullPath(path)),storageRoot??host.Workspace.Session?.Project.StorageRoot);
                     return choice.Container==null?source.Stage(path,_work.Token):source.StageContainer(path,choice.Container,_work.Token);
                 });
-                _work.Token.ThrowIfCancellationRequested();var priorModels=_host.Editor._targetModels.ToArray();_host.Editor.OpenFile(staged.StagedPath,_models.Checked,true,false);
-                var addedModels=_host.Editor._targetModels.Except(priorModels).ToArray();
-                if(_models.Checked && addedModels.Length>0)_host.Editor.TargetModel=addedModels.Length==1?addedModels[0]:null;
+                _work.Token.ThrowIfCancellationRequested();_host.Editor.OpenFile(staged.StagedPath,false,true,false);
+                var addedRoot=_host.Editor._openedFiles.Last();
+                var addedModels=_models.Checked?PreviewAnimationBrowser.NativeModels(addedRoot).ToArray():new BrawlLib.Modeling.IModel[0];
+                if(_models.Checked)_host.RecordCharacterSource(addedRoot);
+                if(_models.Checked && addedModels.Length>0)_host.SelectNativeCharacter(addedModels.Length==1?addedModels[0]:null);
                 if(_host.Editor.TargetModel!=null)_host.Editor.EditingAll=false;
                 _host.Editor.SetAuthoringReadOnly(_host.Editor.AuthoringReadOnly);
                 _host.RecordSource(staged);_host.Animations.RefreshClips();_host.FrameNativeModel();

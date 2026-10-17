@@ -165,7 +165,15 @@ namespace BrawlCrate.UI
 
         protected override void OnShown(EventArgs e)
         {
-            if(Document==null && Program.RootNode!=null)modelEditControl1._openedFiles.Add(Program.RootNode);
+            if(Document==null)foreach(var root in _models.OfType<ResourceNode>().Concat(_collisions).Select(n=>n.RootNode).Distinct())modelEditControl1._openedFiles.Add(root);
+
+            // FighterPort: a Brawl archive's shadow/articles are choices, not a
+            // composite character scene. Never infer the character by model order.
+            if(Document==null && _collisions.Count==0 && _models.Count>1 && _models.All(m=>m is MDL0Node))
+            {
+                foreach(var root in _models.Cast<ResourceNode>().Select(n=>n.RootNode).Distinct())RecordCharacterSource(root);
+                _models=new List<IModel>();
+            }
 
             MainForm.Instance.Visible =
                 !Properties.Settings.Default.ViewerSettings.HideMainWindow;

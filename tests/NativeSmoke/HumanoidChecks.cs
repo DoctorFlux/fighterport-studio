@@ -41,6 +41,7 @@ internal static partial class NativeSmoke
         string instance=p.AssignHumanoid(recipe.Id,"Original fitted animation");p.ExportInstance(instance,Path.Combine(_output,"humanoid-output.brres"));VerifyHumanoidFeet(Path.Combine(_output,"humanoid-output.brres"),true);p.Undo();Assert(!p.State.Instances.Any(i=>i.Id==instance),"fit commits one undoable independent instance");p.Redo();
         var reverse=PlantedRecipe(p,bc.Id,ac.Id,false);p.SaveHumanoidRecipe(reverse);var reverseTrial=p.PreviewHumanoid(reverse);Assert(reverseTrial.Report.FkContactError>.1 && reverseTrial.Report.CorrectedContactError<.005,"reverse proportions/contact proof is independent");VerifyHumanoidFeet(reverseTrial.CorrectedPath,false);
         CheckHumanoidDeterminism(p,recipe,a,b);
+        CheckHumanoidReachShell(p,bid);
         CheckHumanoidHandGoals(p,ac.Id,bc.Id);
         var other=new CharacterProject(Path.Combine(_output,"storage"));other.UseSharedClip(ac.Id,1,p.SharedLibrary.Root);other.UseSharedClip(bc.Id,1,p.SharedLibrary.Root);other.DetectHumanoid(aid);other.DetectHumanoid(bid);Assert(other.State.Humanoids.All(h=>h.Reviewed) && other.State.Bodies.All(h=>h.Reviewed),"reviewed rig/body reused across separately saved projects without re-mapping clips");other.Assign(bc.Id,bid,"Untouched other project");string otherFile=Path.Combine(_output,"humanoid-other.fpcharacter");other.Save(otherFile);string otherHash=Hash(otherFile),sourcePin=p.SharedLibrary.Pin("animations",ac.Id).MetadataHash;
         string saved=Path.Combine(_output,"humanoid.fpcharacter");p.Save(saved);var loaded=CharacterProject.Load(saved,Path.Combine(_output,"storage"));loaded.ExportInstance(instance,Path.Combine(_output,"humanoid-reopened.brres"));VerifyHumanoidFeet(Path.Combine(_output,"humanoid-reopened.brres"),true);
@@ -58,6 +59,20 @@ internal static partial class NativeSmoke
     private static void VerifyHumanoidSourcePlant(string file)
     {
         using(var root=NodeFactory.FromFile(null,file)){var model=Find<MDL0Node>(root);model.Populate();var motion=root.Children.SelectMany(g=>g.Children).OfType<CHR0Node>().Single(m=>m.Name=="OriginalPlanted");foreach(float time in new[]{0f,7.25f,15f,23.75f,30f}){model.ApplyCHR(motion,time+1);foreach(string side in new[]{"Left","Right"}){var foot=model.BoneCache.OfType<MDL0BoneNode>().Single(n=>n.Name==side+"Foot");Assert(Math.Abs(foot.Matrix[13]-.5)<.005 && Math.Abs(foot.Matrix[14])<.005,"independently authored source leg cosine-law contact, fractional native decode");}}}
+    }
+    private static void CheckHumanoidReachShell(CharacterProject project,string target)
+    {
+        var rig=project.HumanoidRigFor(target);var setup=project.HumanoidSetupFor(target);var pose=rig.Rest();var rest=rig.World(pose);var ids=setup.Profile.Chain("LeftLeg").Bones;
+        double first=(rest[ids[1]].P-rest[ids[0]].P).Length,second=(rest[ids[2]].P-rest[ids[1]].P).Length,inner=Math.Abs(first-second),distance=inner-.25;
+        var goal=rest[ids[0]].P+new HVec(0,-distance,0)+rest[ids[2]].R.Apply(setup.Body.Landmark("LeftLeg").Local);
+        var recipe=new HumanoidRecipe();recipe.Contacts.Add(new ContactInterval{Chain="LeftLeg",Start=0,End=30,Goal=goal});
+        var solved=HumanoidSolver.Correct(rig,setup.Profile,setup.Body,pose,recipe,15);
+        Assert(Math.Abs(solved.PelvisOffset-.25)<1e-6 && solved.ContactError<1e-6 && solved.Diagnostics.Count==0,"independent unequal-limb inner reach shell requires +.25 pelvis Y, not a maximum-reach ball");
+        var right=setup.Profile.Chain("RightLeg").Bones;recipe.Contacts.Add(new ContactInterval{Chain="RightLeg",Start=0,End=30,Goal=rest[right[0]].P+new HVec(0,distance,0)+rest[right[2]].R.Apply(setup.Body.Landmark("RightLeg").Local)});
+        solved=HumanoidSolver.Correct(rig,setup.Profile,setup.Body,pose,recipe,15);Assert(solved.Diagnostics.Any(d=>d.Contains("conflict")) && solved.ContactError>.1,"opposing inner reach shells diagnose an impossible coupled pelvis instead of stretching");
+        recipe.Contacts.RemoveAt(1);recipe.Stance=new HumanoidStance{PelvisOffset=new HVec(.1,.2,.3)};recipe.Contacts.Clear();solved=HumanoidSolver.Correct(rig,setup.Profile,setup.Body,pose,recipe,0);var shifted=rig.World(solved.Local);
+        Assert((shifted[ids[0]].P-rest[ids[0]].P-new HVec(.1,.2,.3)).Length<1e-9 && Math.Abs((shifted[ids[1]].P-shifted[ids[0]].P).Length-first)<1e-9,"clip-specific stance translates pelvis without changing native limb lengths");
+        Log("PASS: independent unequal-segment lower reach and opposing-contact diagnostics; explicit stance keeps target lengths.");
     }
     private static void VerifyHumanoidFeet(string file,bool stout)
     {
@@ -138,6 +153,9 @@ internal static partial class NativeSmoke
                 {picker.Show(host);Ws<TextBox>(picker,"containerSourcePath").Text=Path.Combine(_output,"selected-inputs","RGB565","RGB565-motions.pac");Ws<Button>(picker,"containerList").PerformClick();WaitFor(()=>Ws<ListBox>(picker,"containerChoices").Items.Count==1,"source clip container list");Ws<ListBox>(picker,"containerChoices").SelectedIndex=0;Ws<Button>(picker,"containerStage").PerformClick();WaitFor(()=>Ws<ListBox>(picker,"containerMotionChoices").Items.Count>0,"selected container motion choices");Pump(20);Ws<ListBox>(picker,"containerMotionChoices").SelectedIndex=0;Ws<Button>(picker,"containerImportClip").PerformClick();WaitFor(()=>p.State.Animations.Count==clips+1 && !session.Busy,"actual source-bound container import");Pump(30);picker.Close();}Assert(p.State.Animations.Count==clips+1,"register once and add selected native motion through actual session dialog");
                 HumanoidClick(host,"humanoidDetect");Assert(Ws<DataGridView>(host,"humanoidChains").Rows.Count>20,"previewer reuses reviewed semantic chains without overwriting them");
                 HumanoidClick(host,"humanoidAdvanced");Assert(Ws<DataGridView>(host,"humanoidLandmarks").Rows.Count==4,"advanced mesh-bound soles/wrists/poles in same workspace");
+                var beforeStance=WorkspaceStateXml(p);editor.SetFrame(1);Ws<NumericUpDown>(host,"humanoidStanceSourcePhase").Value=7.25m;HumanoidClick(host,"humanoidCalibrateStance");
+                Assert(p.State.HumanoidRecipes.Last(r=>r.AnimationId==clip&&r.TargetAnimationId==native).Stance.SourceTime==7.25 && Ws<Label>(host,"humanoidStanceStatus").Text.Contains(7.25.ToString()),"actual calibration control persists explicit fractional source phase and target native phase");
+                WsClick(host,"workspaceUndo");Assert(beforeStance.SequenceEqual(WorkspaceStateXml(p)),"stance calibration is one undoable project command");WsClick(host,"workspaceRedo");p.Save(p.FilePath);Assert(WorkspaceStateXml(CharacterProject.Load(p.FilePath,p.StorageRoot)).SequenceEqual(WorkspaceStateXml(p)),"stance phases and offset survive project reload");WsClick(host,"workspaceUndo");
                 HumanoidClick(host,"humanoidFit");var panel=Ws<HumanoidWorkspacePanel>(host,"humanoidWorkspace");Assert(panel.Trial!=null && panel.Trial.Report.ProfilesReviewed,"actual Fit button generated reviewed native trial");
                 HumanoidClick(host,"humanoidPreviewFk");editor.SetFrame(16);CaptureViewport(editor,"humanoid-fk-native.png");Assert(editor.AuthoringReadOnly && editor.AuthoringDocument.TargetId==target,"FK comparison is explicit read-only target");
                 HumanoidClick(host,"humanoidPreviewCorrected");editor.SetFrame(16);CaptureViewport(editor,"humanoid-corrected-native.png");

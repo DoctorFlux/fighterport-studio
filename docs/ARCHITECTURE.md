@@ -1,5 +1,28 @@
 # Architecture after the clean restart
 
+2026-10-17 H3 standing checkpoint after 04ef3d9: optional `HumanoidStance` in the existing
+recipe pins separate native source/target phases and a constant common-space pelvis offset.
+It is clip calibration, not a bind edit, body resize, Idle/Fall anchor or profile approval.
+The adapter evaluates immutable native inputs; the core applies the saved translation
+before explicit contact intervals. Old recipes omit it and retain their data. Bounds,
+identity checks, transactions, undo and immutable assigned-recipe forks remain enforced.
+Coupled pelvis Y intersects both inner and outer two-bone reach shells; conflicting goals
+remain diagnostics. A bounded tridiagonal least-squares fit chooses native Hermite tangents
+from one-third/two-third poses, preserving exact integer keys and duration. Fresh quarter
+samples validate position/orientation/skinned geometry independently of those fitting times.
+No native codec, renderer, dependency or tolerance changes are involved in this checkpoint.
+
+Native model preview uses explicit constructor models or selected character-source roots,
+not the global last-opened root. Multi-model Brawl archive/picker entrypoints catalogue
+indexed choices without attaching every MDL0. Selecting a character detaches other models
+from both native target and render lists; complete native roots remain available unchanged.
+Motion-only attachments do not register their models as character choices. Bound project
+comparisons keep their explicit single-model ownership. This does not remove shadow/article
+resources from a package or claim that the entire native file is never read into memory.
+Inherited collision/stage scene previews retain their multiple-model workflow; the
+character/animation selection rule does not discard collision-to-model bindings.
+
+
 Ordinary animation browsing amendment (2026-10-17, after bee76e5): ModelForm now hosts
 PreviewAnimationBrowser above the inherited editor, independently of the collapsible
 authoring pane/native left panel. Its splitter/toggle retain viewport/timeline space.

@@ -1,5 +1,13 @@
 # Upstream provenance
 
+2026-10-17 H3 continuation after 04ef3d9: original FighterPort services add optional
+clip-specific stance calibration, complete two-bone reach-shell intersections and bounded
+native Hermite tangent fitting. The inherited ModelForm entrypoint now catalogues multiple
+Brawl MDL0 choices and renders only an explicitly selected character, preserving complete
+native roots. Source/editor/session guards, runtime, renderer, codecs and pinned upstream
+remain unchanged. New original and opt-in private tests add no dependency or published asset.
+
+
 2026-10-17 ordinary-animation continuation: original FighterPort browser/picker/native
 output controls integrate the existing ModelForm, ModelEditControl and native timeline.
 The inherited LeftPanel modification separates read-only animation navigation from

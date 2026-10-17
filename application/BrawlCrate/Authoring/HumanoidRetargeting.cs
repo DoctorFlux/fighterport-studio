@@ -172,6 +172,13 @@ namespace BrawlCrate.Authoring.Humanoid
         public double Weight(double time)
         {if(time<Start || time>End)return 0;if(Margin<=0)return 1;double t=Math.Min(1,Math.Min((time-Start)/Margin,(End-time)/Margin));return t*t*(3-2*t);}
     }
+    public sealed class HumanoidStance
+    {
+        public double SourceTime {get;set;}
+        public double TargetTime {get;set;}
+        public HVec PelvisOffset {get;set;}
+        public string Evidence {get;set;}
+    }
     public sealed class HumanoidRecipe
     {
         public string Id {get;set;}
@@ -188,6 +195,8 @@ namespace BrawlCrate.Authoring.Humanoid
         public string RootPolicy {get;set;}="InPlace";
         public string Algorithm {get;set;}="humanoid-contact-v1";
         public double PelvisBias {get;set;}
+        // Optional clip-specific calibration, distinct from native binds and Idle/Fall.
+        public HumanoidStance Stance {get;set;}
         public List<ContactInterval> Contacts {get;set;}=new List<ContactInterval>();
         public void Validate(int frames)
         {if(Algorithm!="humanoid-contact-v1" || RootPolicy!="InPlace" || !HVec.Finite(PelvisBias) || Contacts==null || Contacts.Count>32)throw new IOException("Unsupported humanoid recipe/root policy or contact budget.");foreach(var c in Contacts){if(!new[]{"LeftLeg","RightLeg","LeftArm","RightArm"}.Contains(c.Chain) || c.Anchor!="World" && c.Anchor!="Head" && c.Anchor!="Spine" || !HVec.Finite(c.Start) || !HVec.Finite(c.End) || !HVec.Finite(c.Margin) || c.Start<0 || c.End<c.Start || c.End>frames-1 || c.Margin<0 || c.Margin>(c.End-c.Start)/2 || !c.Goal.IsFinite || c.UsePoleOverride && (!c.Pole.IsFinite || c.Pole.Length<1e-6) || string.IsNullOrWhiteSpace(c.Evidence) || c.Evidence.Length>2048)throw new IOException("Invalid contact interval/goal/evidence.");}foreach(var group in Contacts.GroupBy(c=>c.Chain)){var sorted=group.OrderBy(c=>c.Start).ToArray();for(int i=1;i<sorted.Length;i++)if(sorted[i].Start<=sorted[i-1].End)throw new IOException("Overlapping contacts on one chain require a multi-goal policy; no silent winner.");}}
@@ -236,21 +245,33 @@ namespace BrawlCrate.Authoring.Humanoid
         public static HumanoidResult Correct(HRig target,HumanoidProfile profile,BodyProfile body,HPose[] preferred,HumanoidRecipe recipe,double time)
         {
             var result=new HumanoidResult{Local=preferred.Select(p=>p.Clone()).ToArray()};var rest=target.World(target.Rest());var world=target.World(result.Local);
+            int pelvis=profile.Chain("Pelvis").Bones[0],parent=target.Bones[pelvis].Parent;
+            if(recipe.Stance!=null)
+            {
+                var offset=recipe.Stance.PelvisOffset;
+                if(!offset.IsFinite)throw new IOException("Non-finite stance calibration.");
+                result.Local[pelvis].P+=parent<0?offset:world[parent].R.Inverse().Apply(offset);world=target.World(result.Local);
+            }
             var active=recipe.Contacts.Where(c=>c.Weight(time)>0).ToList();
-            double low=-body.PelvisLimit,high=body.PelvisLimit;
+            var ranges=new List<Tuple<double,double>>{Tuple.Create(-body.PelvisLimit,body.PelvisLimit)};
             foreach(var c in active.Where(c=>c.Chain.EndsWith("Leg")))
             {
-                var ids=profile.Chain(c.Chain).Bones;var goal=Goal(c,profile,world);var orientation=c.RestOrientation?rest[ids[2]].R:world[ids[2]].R;var ankle=goal-orientation.Apply(body.Landmark(c.Chain).Local);double reach=(rest[ids[1]].P-rest[ids[0]].P).Length+(rest[ids[2]].P-rest[ids[1]].P).Length;
+                var ids=profile.Chain(c.Chain).Bones;var goal=Goal(c,profile,world);var orientation=c.RestOrientation?rest[ids[2]].R:world[ids[2]].R;var ankle=goal-orientation.Apply(body.Landmark(c.Chain).Local);double first=(rest[ids[1]].P-rest[ids[0]].P).Length,second=(rest[ids[2]].P-rest[ids[1]].P).Length,reach=first+second,inner=Math.Abs(first-second);
                 var d=world[ids[0]].P-ankle;double horizontal=d.X*d.X+d.Z*d.Z;
-                if(horizontal>=reach*reach){result.Diagnostics.Add(c.Chain+": unreachable horizontal contact; no stretch");continue;}
-                double height=Math.Sqrt(Math.Max(0,reach*reach-horizontal));low=Math.Max(low,ankle.Y-height-world[ids[0]].P.Y);high=Math.Min(high,ankle.Y+height-world[ids[0]].P.Y);
+                if(horizontal>reach*reach){result.Diagnostics.Add(c.Chain+": unreachable horizontal contact; no stretch");continue;}
+                double center=ankle.Y-world[ids[0]].P.Y,height=Math.Sqrt(Math.Max(0,reach*reach-horizontal));
+                // A two-bone limb occupies a shell, not a ball. Unequal segment
+                // lengths leave an unreachable inner region with two possible Y intervals.
+                double gap=Math.Sqrt(Math.Max(0,inner*inner-horizontal));
+                var allowed=gap>0?new[]{Tuple.Create(center-height,center-gap),Tuple.Create(center+gap,center+height)}:new[]{Tuple.Create(center-height,center+height)};
+                ranges=(from prior in ranges from next in allowed let lo=Math.Max(prior.Item1,next.Item1) let hi=Math.Min(prior.Item2,next.Item2) where lo<=hi select Tuple.Create(lo,hi)).ToList();
             }
-            double shift=low<=high?Math.Max(low,Math.Min(high,recipe.PelvisBias)):Math.Max(-body.PelvisLimit,Math.Min(body.PelvisLimit,(low+high)/2));
+            double shift=ranges.Select(r=>Math.Max(r.Item1,Math.Min(r.Item2,recipe.PelvisBias))).OrderBy(v=>Math.Abs(v-recipe.PelvisBias)).ThenBy(v=>v).DefaultIfEmpty(Math.Max(-body.PelvisLimit,Math.Min(body.PelvisLimit,recipe.PelvisBias))).First();
             // Fade coupled pelvis participation with the same explicit contact interval.
             // A full-weight threshold would cause a discontinuous pelvis jump at margins.
             double participation=active.Where(c=>c.Chain.EndsWith("Leg")).Select(c=>c.Weight(time)).DefaultIfEmpty(0).Max();shift=recipe.PelvisBias+(shift-recipe.PelvisBias)*participation;
-            if(low>high)result.Diagnostics.Add("Coupled pelvis reach intervals conflict; bounded best effort, inspect residuals.");
-            int pelvis=profile.Chain("Pelvis").Bones[0],parent=target.Bones[pelvis].Parent;result.Local[pelvis].P+=parent<0?new HVec(0,shift,0):world[parent].R.Inverse().Apply(new HVec(0,shift,0));result.PelvisOffset=shift;
+            if(ranges.Count==0)result.Diagnostics.Add("Coupled pelvis lower/upper reach intervals conflict; no feasible bounded pelvis Y. Correct the explicit stance/goals.");
+            result.Local[pelvis].P+=parent<0?new HVec(0,shift,0):world[parent].R.Inverse().Apply(new HVec(0,shift,0));result.PelvisOffset=shift;
             foreach(var contact in active)
             {
                 world=target.World(result.Local);var ids=profile.Chain(contact.Chain).Bones;var landmark=body.Landmark(contact.Chain);double weight=contact.Weight(time);var old=world[ids[2]];var wanted=Goal(contact,profile,world);var rotation=contact.RestOrientation?rest[ids[2]].R:old.R;

@@ -1,5 +1,21 @@
 # Capability matrix — verified restart checkpoint
 
+2026-10-17 H3 standing extension (supersedes the reverse-failure status of historical rows):
+
+| Operation | New evidence | Boundary |
+|---|---|---|
+| Clip-specific stance calibration | Explicit separate source/target native phases and bounded common pelvis offset; real previewer controls, grouped undo, exact project reload | Binds, meshes and Idle/Fall unchanged; no automatic commercial characterization approval |
+| Inner/outer reach | Independent unequal-segment analytic goal requires +.25 pelvis Y; opposing inner shells diagnose conflict | Bounded Y participation; arbitrary pole/reach transition continuity remains next |
+| Mario -> Snake standing diagnostic | 201 fresh quarter samples: contact 4.83656435 -> .00531707; native .00515032 position / .06031383 degrees / .00679391 mesh, zero unreachable | Explicit source phase 10.25 -> native target phase 0; unreviewed opt-in local pair, not all clips or a game result |
+| Snake -> Mario standing diagnostic | 341 samples: contact 2.18319475 -> .0000156114; native .000241707 position / .00944755 degrees / .000461379 mesh, zero unreachable | Independent forward test; no reverse inference or approval |
+| Separate native output | New target PAC and loose CHR0, decoded motion/timing checks, actual native export/reopen/playback | BrawlLib reader/writer, not independent external-tool or game validation |
+| Character-only Brawl preview | Picker and ordinary archive preview require indexed character choice for multiple models; only one render/animation target; full hierarchy retained | No shadow/article deletion or claim that opaque/unsupported entire packages round-trip |
+
+Native limits remain .02 / .15 degrees / .03 mesh and contact .005 * target leg length.
+Recipe calibration is project metadata; its supported bone corrections are baked, not
+metadata magically encoded into PAC/CHR0. Complete temporal/clearance/channel coverage remains queued.
+
+
 Inherited implementation is source-inspected, not automatically verified support.
 No previous FighterPort counts or capabilities transfer to this codebase.
 

@@ -1,5 +1,22 @@
 # Model Previewer authoring acceptance
 
+H3 standing workflow (2026-10-17): Brawl multi-model archive Preview and Open Character
+catalogue indexed MDL0 choices; choose the actual character. Only that model is attached to
+native rendering/playback. Shadows/articles remain in the native hierarchy for preservation.
+Adding a separate motion with Open models off does not load its article models.
+
+In the existing Rig / FK humanoid controls, choose the explicit source clip, target and
+native destination. Preview the intended target. Set `StanceSourcePhase`, then **Align source
+phase to native target at playhead**. The saved status shows both phases and world pelvis
+offset; it evaluates the immutable native target reference, not unsaved target edits. Keep
+binds, Idle/Fall and this clip-specific calibration distinct. Clear calibration is deliberate
+and undoable. Existing contact goals/intervals and Fit/FK/corrected/export controls are reused.
+The independently tested Mario -> Snake standing diagnostic uses source 10.25, target 0;
+this is an explicit local diagnostic recipe, not an automatically reviewed mapping/template.
+Use a new output destination and reopen its animation on the selected native target model.
+Unreachable goals still report losses/reject assignment; broad pole/whole-body solving remains next.
+
+
 Ordinary animation path (2026-10-17, after bee76e5): File > Animation workspace opens
 the same native viewer, or use a model's native Preview. The visible, resizable Animations
 browser stays above the viewport even when native side panels/workspace are hidden.

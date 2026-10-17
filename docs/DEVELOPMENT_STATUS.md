@@ -12,10 +12,87 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [Ordinary animation browser and playback](#ordinary-animation-browser-and-playback--2026-10-17).
-Continued actual HEAD bee76e53e5e19cc719bbd9ef21a2d2e7741d3b9f, preserving the complete
+Current checkpoint: [H3 standing contact and character-only preview](#h3-standing-contact-and-character-only-preview--2026-10-17).
+Continued actual HEAD 04ef3d90bdac60b3522a617a880d5ae608009431, preserving the complete
 BrawlCrate application and passing discovery/library/slots/anchor work. Historical receipts
 below retain their original scope. docs/plans/current.md is the only next executable task.
+
+## H3 standing contact and character-only preview — 2026-10-17
+
+Continued actual HEAD 04ef3d90bdac60b3522a617a880d5ae608009431; preserved all newer work
+and the four untracked user briefs. The exact reverse failure was reproduced privately in
+h3-reverse-before-01: 108 unreachable samples, .368991651 position / 7.881017096 degrees /
+.417223322 mesh decode error. First-frame-only calibration also remained inadequate.
+The cause includes an incompatible transferred pelvis stance relative to independently
+chosen target foot goals, plus inaccurate native endpoint tangent estimation. No source
+file, limb length, mesh scale, acceptance tolerance or commercial approval was changed.
+
+The previewer now saves explicit native source/target calibration phases and a constant
+common-space pelvis offset as an optional recipe record. Calibration is distinct from
+bind/rest, body measurements and Idle/Fall, and remains undoable/reloadable. The reverse
+diagnostic deliberately aligns source 10.25 to target 0 (offset about 1.1731, -3.1215,
+-1.9995 native units); interval pelvis correction has its own unchanged bound. The core
+intersects inner and outer two-bone reach shells and diagnoses opposing constraints.
+Native baking fits Hermite tangents at thirds while retaining integer keys/duration;
+fresh quarter-frame native bone/mesh checks use the unchanged .02/.15/.03 limits.
+
+Observed local receipts h3-local-reverse-final-01 and h3-local-forward-final-01:
+
+| Directed standing test | Samples | FK -> corrected contact | Native position / degrees / mesh | Unreachable |
+|---|---:|---|---|---:|
+| Mario -> Snake, explicit stance | 201 | 4.83656435 -> .00531707 | .00515032 / .06031383 / .00679391 | 0 |
+| Snake -> Mario, independent original recipe | 341 | 2.18319475 -> .0000156114 | .000241707 / .00944755 / .000461379 | 0 |
+
+Both directed FK-only routes pass independently. Both local runs actually previewed own
+rigs, FK and corrected geometry, advanced native Play, exported new PAC and loose CHR0,
+compared standalone decoded channels, reloaded exact project recipes and regenerated
+identical corrected hashes. Real previewer Export/Save controls wrote another PAC, reopened
+it in the main native browser, selected the animation through the visible browser and
+played it on the exact target. Inspected OpenGL captures show textured character geometry
+and changed poses. The reverse corrected stance visibly differs from its airborne FK
+baseline and matches the freshly reopened output. Captures/derivatives remain private.
+The local GUI exception guards observed no exception in these two runs; the historical
+intermittent P0 GDI button-paint cause remains unclassified, not declared fixed.
+
+Brawl archive/picker entrypoints now catalogue multiple indexed MDL0 choices without
+attaching all models. Selection/switching leaves exactly one native animation/render target;
+project comparisons also assert exactly one. Shadows/articles remain native package data,
+not scene geometry. Motion-only attachments do not nominate character models. Initial
+preview sources derive from explicitly supplied models, not Program.RootNode/window order.
+
+Passing focused receipts: humanoid-native-20261017-184149-679,
+humanoid-gui-20261017-184229-104, browser-native-20261017-185508-252 and
+browser-gui-20261017-185517-334.
+The original tests retain planted/aerial/hand/loop/full-turn/random-scrub and independent
+analytic skin/sole checks, adding unequal-segment inner reach, conflicting shells, real
+calibration controls/undo/reload and both native archive/picker character-selection paths.
+All retained native and GUI suites passed again (h3-native, companions, dump, container,
+library, retarget, shared, workspace and humanoid evidence directories). The latest full
+humanoid GUI receipt is h3-humanoid-gui-20261017-185323-097. Normal executable restart
+passes twice each for the calibrated local project and both independent workspace projects
+(h3-local-product-restart-02.log, h3-project-one-restart.log, h3-project-two-restart.log).
+These six normal launches preserve exact project state and native instance bytes; the
+local instance is own-rig because commercial diagnostics cannot become approved assignments.
+Retargeted saved-output rendering/reopen evidence is the separate local GUI check above.
+The restart helper now takes PAC/BRRES from the exact target record instead of assuming
+BRRES. Its first PAC check failed that test-only assumption; no application failure or
+successful restart was invented for that attempt.
+
+Final scripts/build.ps1: Release/x86/net472, zero warnings/errors; executable
+application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe, SHA256
+b1fd4f2d08d625f51d40d728e933b41817709eab8805e45a5cad3228be1a33ce.
+doctor passes; verify-upstream reports 6,237 baseline entries and no missing files.
+Final hashes retain all 41 local inputs, original workspace sources and the untouched
+second project. Upstream pin and external recovery remain intact. Source review/publication
+receipts are local in h3-source-review / h3-publication evidence, not asset uploads.
+
+Limits: these are unreviewed opt-in local standing diagnostics, not automatic rig approval,
+arbitrary clip coverage, external native-tool, Modkit or game results. Shared-source and
+approved-assignment guards remain. General continuous pole/singularity handling, broader
+temporal reach coverage, reusable calibration profiles, clearance/spine/clavicle/twist/
+scale/props and genuine non-Brawl output remain queued. plans/current.md now continues
+H3 with independent analytic reach/pole transition and native temporal acceptance.
+
 
 ## Ordinary animation browser and playback — 2026-10-17
 

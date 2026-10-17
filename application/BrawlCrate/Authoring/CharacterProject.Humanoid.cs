@@ -77,6 +77,17 @@ namespace BrawlCrate.Authoring
             if(_state.Instances.Any(i=>i.HumanoidRecipeId==recipe.Id) && Hash(Serialize(_state.HumanoidRecipes.Single(r=>r.Id==recipe.Id)))!=Hash(Serialize(recipe)))throw new IOException("An assigned correction recipe is immutable. Create a new recipe ID for a new output; prior instance dependencies were preserved.");
             Commit(s=>{s.Version=3;int i=s.HumanoidRecipes.FindIndex(r=>r.Id==recipe.Id);if(i<0)s.HumanoidRecipes.Add(recipe);else s.HumanoidRecipes[i]=recipe;});
         }
+        public HumanoidRecipe CalibrateHumanoidStance(HumanoidRecipe proposed,double sourceTime,double targetTime)
+        {
+            CheckSources();var recipe=Deserialize<HumanoidRecipe>(Serialize(proposed),MaxMetadataBytes);ValidateHumanoidRecipe(_state,recipe,false);
+            var a=Animation(recipe.AnimationId);var b=Animation(recipe.TargetAnimationId);
+            if(!HVec.Finite(sourceTime)||!HVec.Finite(targetTime)||sourceTime<0||sourceTime>a.Frames-1||targetTime<0||targetTime>b.Frames-1)throw new IOException("Choose valid source and target reference phases.");
+            var sc=Character(a.SourceCharacterId);var tc=Character(b.SourceCharacterId);
+            CheckHumanoidScratch(2,Data(a.NativeHash??sc.NativeHash).Length+Data(b.NativeHash??tc.NativeHash).Length);
+            string sf=Materialize(a.NativeHash??sc.NativeHash,sc.Extension),tf=null;
+            try{tf=Materialize(b.NativeHash??tc.NativeHash,tc.Extension);recipe.Stance=BrawlProjectAdapter.CalibrateHumanoidStance(sf,sc,a,tf,tc,b,HumanoidSetupFor(sc.Id),HumanoidSetupFor(tc.Id),sourceTime,targetTime);CheckSources();ValidateHumanoidRecipe(_state,recipe,false);return recipe;}
+            finally{File.Delete(sf);if(tf!=null)File.Delete(tf);}
+        }
         public HumanoidTrial PreviewHumanoid(HumanoidRecipe recipe,CancellationToken token=default(CancellationToken))
         {
             CheckSources();ValidateHumanoidRecipe(_state,recipe,false);token.ThrowIfCancellationRequested();var a=Animation(recipe.AnimationId);var native=Animation(recipe.TargetAnimationId);var source=Character(a.SourceCharacterId);var target=Character(native.SourceCharacterId);
@@ -132,6 +143,7 @@ namespace BrawlCrate.Authoring
             sp.Validate(BrawlProjectAdapter.CommonRig(source),review);tp.Validate(BrawlProjectAdapter.CommonRig(target),review);sb.Validate(BrawlProjectAdapter.CommonRig(source),review);tb.Validate(BrawlProjectAdapter.CommonRig(target),review);
             if(sb.ModelHash!=source.ModelExportHash || tb.ModelHash!=target.ModelExportHash)throw new IOException("Body profile belongs to another mesh/weights/rest revision.");CheckReviewDigest(sp);CheckReviewDigest(tp);CheckReviewDigest(sb);CheckReviewDigest(tb);r.Validate(a.Frames);
             if(Math.Abs(r.PelvisBias)>tb.PelvisLimit)throw new IOException("Recipe pelvis bias exceeds the reviewed target body's adjustment limit.");
+            if(r.Stance!=null && (!HVec.Finite(r.Stance.SourceTime)||!HVec.Finite(r.Stance.TargetTime)||r.Stance.SourceTime<0||r.Stance.SourceTime>a.Frames-1||r.Stance.TargetTime<0||r.Stance.TargetTime>t.Frames-1||!r.Stance.PelvisOffset.IsFinite||r.Stance.PelvisOffset.Length>tb.LegLength||string.IsNullOrWhiteSpace(r.Stance.Evidence)||r.Stance.Evidence.Length>2048))throw new IOException("Invalid clip-specific stance calibration; references/offset must remain bounded and explicit.");
         }
         private void ValidateHumanoids(CharacterProjectState s)
         {

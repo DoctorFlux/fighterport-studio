@@ -1,5 +1,10 @@
 # Third-party notices and distribution audit
 
+The 2026-10-17 H3 stance/reach/bake/character-selection increment adds original
+repository-licensed source and tests, with no new dependency or distributed native asset.
+Inherited notices and the unresolved component/binary-distribution audit below still apply.
+
+
 This is an independently hosted derivative, not a claim of original authorship or upstream
 endorsement. Preserve all notices in application/ and the root LICENSE. This inventory is
 source evidence and an unresolved distribution checklist, not legal clearance.

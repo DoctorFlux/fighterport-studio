@@ -42,7 +42,7 @@ namespace BrawlCrate.UI
             _scope=new ComboBox{Name="animationScope",DropDownStyle=ComboBoxStyle.DropDownList,Width=150};
             _scope.Items.AddRange(new object[]{"Opened sources","Selected character","Project","Shared library","Assignments"});_scope.SelectedIndex=0;
             _models=new ComboBox{Name="animationModel",DropDownStyle=ComboBoxStyle.DropDownList,Width=150,DisplayMember="Label",AccessibleName="Choose explicit native model"};
-            _models.SelectedIndexChanged+=(s,e)=>{if(_refreshing)return;Try(()=>{var choice=_models.SelectedItem as ModelChoice;if(choice==null)return;if(_host.Document!=null && !ReferenceEquals(choice.Model,_host.Document.Model))throw new IOException("Use the project's explicit target handoff to change a bound model.");_host.Editor.StopAnim();_host.Editor.TargetModel=choice.Model;_host.Editor.EditingAll=false;_host.FrameNativeModel();ShowDetails();});};
+            _models.SelectedIndexChanged+=(s,e)=>{if(_refreshing)return;Try(()=>{var choice=_models.SelectedItem as ModelChoice;if(choice==null)return;_host.SelectNativeCharacter(choice.Model);ShowDetails();});};
             _search=new TextBox{Name="animationSearch",Width=140,AccessibleName="Search animations"};
             bar.Controls.Add(new Label{Text="Animations",AutoSize=true});bar.Controls.Add(_scope);bar.Controls.Add(_search);
             bar.Controls.Add(_models);
@@ -93,7 +93,7 @@ namespace BrawlCrate.UI
             try
             {
                 string key=(_clips.SelectedItem as Row)?.Key,search=_search.Text;_clips.BeginUpdate();_clips.Items.Clear();_next.Enabled=false;
-                _models.Items.Clear();foreach(var model in _host.Editor._targetModels){var native=model as ResourceNode;_models.Items.Add(new ModelChoice{Model=model,Label=native==null?model.ToString():native.Name+" ["+BrawlProjectAdapter.PathOf(native.RootNode,native)+"]"});}
+                _models.Items.Clear();foreach(var model in _host.CharacterChoices()){var native=model as ResourceNode;_models.Items.Add(new ModelChoice{Model=model,Label=native==null?model.ToString():native.Name+" ["+BrawlProjectAdapter.PathOf(native.RootNode,native)+"]"});}
                 _models.SelectedItem=_models.Items.Cast<ModelChoice>().FirstOrDefault(m=>ReferenceEquals(m.Model,_host.Editor.TargetModel));_models.Visible=_models.Items.Count>1;_models.Enabled=_host.Document==null;
                 var project=_host.Workspace.Session?.Project;string scope=(string)_scope.SelectedItem;
                 if(scope=="Shared library")
@@ -127,6 +127,15 @@ namespace BrawlCrate.UI
             finally{_clips.EndUpdate();_refreshing=false;ShowDetails();}
         }
         private void AddRow(Row row,string search){if(row.Label.IndexOf(search,StringComparison.OrdinalIgnoreCase)>=0)_clips.Items.Add(row);}
+        internal static System.Collections.Generic.IEnumerable<BrawlLib.Modeling.IModel> NativeModels(ResourceNode root)
+        {int visited=0;return ModelNodes(root,0,()=>++visited).ToArray();}
+        private static System.Collections.Generic.IEnumerable<BrawlLib.Modeling.IModel> ModelNodes(ResourceNode node,int depth,Func<int> visit)
+        {
+            if(depth>16 || visit()>4096)throw new IOException("Model catalogue exceeds 4096 entries / 16 levels; select a smaller container.");
+            if(node is BrawlLib.Modeling.IModel model){yield return model;yield break;}
+            if(node is ARCNode || node is BRRESNode || node is BRESGroupNode)
+                foreach(var child in node.Children)foreach(var item in ModelNodes(child,depth+1,visit))yield return item;
+        }
         private static System.Collections.Generic.IEnumerable<NW4RAnimationNode> Animations(ResourceNode root,int depth,Func<int> visit)
         {
             if(depth>16 || visit()>4096)throw new IOException("Animation browser exceeds 4096 entries / 16 levels; select a smaller native container.");

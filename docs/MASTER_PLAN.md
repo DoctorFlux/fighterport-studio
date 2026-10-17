@@ -1,5 +1,24 @@
 # FighterPort Studio master plan — clean restart
 
+## Standing-contact continuation — 2026-10-17
+
+Continued 04ef3d9 without restarting. The bounded H3 standing checkpoint now supports an
+explicit persisted native source-phase -> target-phase pelvis calibration, inner/outer
+reach-shell diagnostics and improved native Hermite baking. Configured local Mario -> Snake
+standing output passes the unchanged native/contact limits after deliberate phase alignment;
+the independent Snake -> Mario standing route remains passing. Commercial proposals remain
+unreviewed. Character-only native preview excludes other MDL0 render/animation targets while
+preserving complete package data. Later historical failure receipts below remain historical.
+
+The sole next acceptance in plans/current.md continues H3 with continuous reach/pole
+transitions, temporal native output and broader contact coverage. This checkpoint does not
+complete arbitrary-pole stability, reusable calibration-profile revisions, clearance,
+spine/clavicle/prop/twist solving or automatic contact recognition. H4 genuine non-Brawl
+native output, all requested games/channels, native adapters, miscellaneous fill, actual
+Modkit inspection and vetted app-local tools stay queued. Mirroring is no prerequisite;
+gameplay compilation remains deferred. No source thresholds or approval guards were removed.
+
+
 ## Ordinary animation workflow amendment — 2026-10-17
 
 [FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md](FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md)

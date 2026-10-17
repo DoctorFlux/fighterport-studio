@@ -20,6 +20,21 @@ namespace BrawlCrate.UI
         private readonly System.Collections.Generic.List<BrawlCrate.Sources.StagedSource> _previewSources=new System.Collections.Generic.List<BrawlCrate.Sources.StagedSource>();
         internal void CheckSourceBudget(long size){if(_previewSources.Count>=16 || size<16 || size>64L*1024*1024 || _previewSources.Sum(s=>s.Length)+size>128L*1024*1024)throw new System.IO.IOException("This viewer's selected sources exceed 16 files / 128 MiB or 64 MiB per file. Open a separate viewer; existing source limits remain.");}
         internal void RecordSource(BrawlCrate.Sources.StagedSource source)=>_previewSources.Add(source);
+        private readonly System.Collections.Generic.List<ResourceNode> _characterSources=new System.Collections.Generic.List<ResourceNode>();
+        internal void RecordCharacterSource(ResourceNode root){if(!_characterSources.Contains(root))_characterSources.Add(root);}
+        internal System.Collections.Generic.IEnumerable<IModel> CharacterChoices()=>(Document==null?_characterSources.Where(Editor._openedFiles.Contains).SelectMany(PreviewAnimationBrowser.NativeModels):Enumerable.Empty<IModel>()).Concat(Editor._targetModels).Distinct().ToArray();
+        internal void SelectNativeCharacter(IModel model)
+        {
+            if(Document!=null && !ReferenceEquals(model,Document.Model))throw new System.IO.IOException("Use the project's explicit target handoff to change a bound model.");
+            Editor.StopAnim();
+            if(!ReferenceEquals(model,Editor.TargetModel)){Editor._undoSaves.Clear();Editor._redoSaves.Clear();Editor._currentUndo=null;Editor._saveIndex=0;Editor.UpdateUndoButtons();}
+            // Keep complete native roots for saving/preservation, but attach only the
+            // explicitly chosen character to the renderer and animation editor.
+            foreach(var previous in Editor._targetModels.ToArray())Editor.ModelPanel.RemoveTarget(previous);
+            Editor._targetModels.Clear();Editor._resetCamera=false;Editor.TargetModel=null;
+            if(model!=null){Editor.AppendTarget(model);Editor.TargetModel=model;}
+            Editor.EditingAll=false;Editor.ModelPanel.RefreshReferences();FrameNativeModel();
+        }
         internal string NativeSourceLabel(ResourceNode root)
         {
             if(root==Document?.Root)return "project "+Document.Session.Project.State.Id.Substring(0,8)+" / "+Document.Mode;

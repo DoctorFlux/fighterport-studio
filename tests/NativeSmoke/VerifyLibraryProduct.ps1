@@ -10,6 +10,9 @@ Copy-Item -LiteralPath $Project -Destination $savedProject
 [xml]$expected=Get-Content -LiteralPath $savedProject -Raw
 $instance=@($expected.CharacterProjectFile.State.Instances.MoveInstance)[$InstanceIndex]
 if (!$instance) {throw 'Requested target instance is missing'}
+$target=@($expected.CharacterProjectFile.State.Characters.SourceCharacterProfile | Where-Object {$_.Id -eq $instance.TargetCharacterId})
+if($target.Count -ne 1 -or $target[0].Extension -notin @('.brres','.pac')) {throw 'Expected one supported explicit native target extension'}
+$nativeExtension=[string]$target[0].Extension
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
 using System;
@@ -87,11 +90,11 @@ try {
   Capture-Library $window "project-$attempt.png"
   Click-Library $window 'Open instance in native editor'
   Wait-Product {[LibraryWindows]::Find($process.Id,'Advanced Model Editor') -ne [IntPtr]::Zero} 'Actual native model editor did not open'
-  $native=@(Get-ChildItem -LiteralPath (Join-Path $env:FIGHTERPORT_DATA_ROOT 'CharacterSessions') -Recurse -File -Filter '*.brres')
+  $native=@(Get-ChildItem -LiteralPath (Join-Path $env:FIGHTERPORT_DATA_ROOT 'CharacterSessions') -Recurse -File -Filter "*$nativeExtension")
   $native=@($native | Where-Object {(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -eq $instance.WorkingHash})
   if ($native.Count -ne 1) {throw 'Product did not restore exact edited native data'}
   Capture-Library ([LibraryWindows]::Find($process.Id,'Advanced Model Editor')) "native-$attempt.png"
-  $output=Join-Path $evidence "product-output-$attempt.brres"
+  $output=Join-Path $evidence "product-output-$attempt$nativeExtension"
   $preview=[LibraryWindows]::Find($process.Id,'Advanced Model Editor')
   if($PreviewWorkspace) {
    $tabs=@([LibraryWindows]::Children($preview) | Where-Object {[LibraryWindows]::Class($_) -like '*SysTabControl32*' -and [LibraryWindows]::SendMessage($_,0x1304,[IntPtr]::Zero,[IntPtr]::Zero).ToInt32() -eq 6})
