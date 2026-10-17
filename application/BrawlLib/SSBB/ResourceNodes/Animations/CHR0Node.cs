@@ -1031,9 +1031,11 @@ namespace BrawlLib.SSBB.ResourceNodes
             return Keyframes.Equals(obj.Keyframes);
         }
 
+        // FighterPort 2026-10-17: generated humanoid motion may require exact I12 tangents.
+        [Browsable(false)] public bool PreserveInterpolation { get; set; }
         public override int OnCalculateSize(bool force)
         {
-            _dataLen = AnimationConverter.CalculateCHR0Size(Keyframes, out _entryLen, out _code);
+            _dataLen = AnimationConverter.CalculateCHR0Size(Keyframes, out _entryLen, out _code, PreserveInterpolation);
             return _dataLen + _entryLen;
         }
 

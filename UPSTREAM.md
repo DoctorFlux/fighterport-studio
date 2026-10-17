@@ -78,3 +78,21 @@ preserve camera/timeline, gate read-only comparisons and retain dirty edits on f
 capture. Native codecs, source baseline, renderer and component licenses are unchanged.
 The supplied Model Previewer workspace amendment is preserved verbatim in docs/. New
 original fixtures/GUI/entrypoint regressions remain local, not redistributed game assets.
+
+2026-10-17 humanoid continuation after 7458be7: new original common-transform/contact
+services, shared rig/body records, selected BRRES/palette companion intake and previewer
+controls extend the existing application. This checkpoint intentionally changes three
+inherited native files, separately from the pristine baseline and earlier receipts:
+
+- BrawlLib/Internal/BigEndianTypes.cs: bfloat stores reversed bytes as uint, preventing
+  x86 FPU signaling-NaN quieting of disguised finite native values. Four-byte layout stays
+  unchanged. Independent finite IEEE byte vectors and native output regressions verify it.
+- BrawlLib/Wii/Animations/AnimationConverter.cs and SSBB/ResourceNodes/Animations/CHR0Node.cs:
+  opt-in PreserveInterpolation selects the existing I12 Hermite encoding for generated
+  humanoid bakes. The ordinary editor/default codec policy is retained.
+
+These are newly justified, tested modifications, not silently carried old codec patches.
+Existing upstream headers/licenses/authorship and the pinned baseline manifest remain.
+No dependency, architecture/runtime, renderer, external editor, signing key or bundled game
+input was added. Original procedural humanoid/palette fixtures and all generated outputs
+remain local. Commercial inspection, trial derivatives and captures are excluded from Git.

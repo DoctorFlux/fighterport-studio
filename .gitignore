@@ -6,6 +6,7 @@ artifacts/
 assets-local/
 # User-supplied commercial reference data: never stage any file from these roots.
 /Brawl mario/
+/Brawl Snake/
 /Smash Ultimate mario/
 **/bin/
 **/obj/

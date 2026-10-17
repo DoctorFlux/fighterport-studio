@@ -28,11 +28,13 @@ namespace BrawlCrate.Sources
         public string SourcePath { get; internal set; }
         public string StagedPath { get; internal set; }
         public string Sha256 { get; internal set; }
+        public string StagedHash { get; internal set; }
+        public string SelectedContainer { get; internal set; }
         public long Length { get; internal set; }
     }
 
     /// <summary>Bounded loose-folder source slice. No archive extraction, decryption, script execution or guessed companions.</summary>
-    public sealed class SourceFolderSession
+    public sealed partial class SourceFolderSession
     {
         public const long MaxFileBytes = 64L * 1024 * 1024;
         public const int MaxDirectoryEntries = 512;

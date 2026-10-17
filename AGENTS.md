@@ -21,6 +21,11 @@ identify the editable target from window order, names or Program.RootNode alone.
 editable authoring document with safe pending-edit handoffs and read-only comparisons.
 Preserve the inherited viewport, camera, timeline, native editors and contextual Undo.
 
+Read docs/FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md. The user replaced mirror
+priority with proportion-aware/contact-preserving humanoid retargeting; mirroring is not
+a prerequisite. Profiles require exact rig/mesh identity and honest review. Local commercial
+inputs/derivatives/captures/private paths remain excluded; never mount the repository root.
+
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.
 - Local, standalone, non-AI core; no mandatory DCC/cloud. All requested games, channels,

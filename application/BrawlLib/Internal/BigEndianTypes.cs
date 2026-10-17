@@ -107,21 +107,25 @@ namespace BrawlLib.Internal
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct bfloat
     {
-        public float _data;
+        // FighterPort modification, 2026-10-17: endian storage is integer bits.
+        // A reversed finite IEEE value can look like a signaling NaN. Passing that
+        // disguised float through the x86 FPU quiets it and changes the native bytes.
+        // The four-byte layout is unchanged; never perform float operations on storage.
+        public uint _data;
 
         public static implicit operator float(bfloat val)
         {
-            return val._data.Reverse();
+            uint bits=val._data.Reverse();return *(float*)&bits;
         }
 
         public static implicit operator bfloat(float val)
         {
-            return new bfloat {_data = val.Reverse()};
+            return new bfloat {_data = (*(uint*)&val).Reverse()};
         }
 
         public static implicit operator bfloat(byte[] val)
         {
-            return new bfloat {_data = BitConverter.ToSingle(val, 0)};
+            return new bfloat {_data = BitConverter.ToUInt32(val, 0)};
         }
 
         public VoidPtr Address

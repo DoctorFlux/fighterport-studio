@@ -83,9 +83,9 @@ namespace BrawlCrate.Authoring
             try { node.Export(file); return CharacterProject.Hash(CharacterProject.ReadBounded(file)); }
             finally { if (File.Exists(file)) File.Delete(file); }
         }
-        internal static string PayloadHash(string file, string nativePath)
+        internal static string PayloadHash(string file, string nativePath,string selectedContainer=null)
         {
-            var record = BrawlContainerAudit.Inspect(file).Records.Single(r => r.Path == nativePath);
+            var record = (selectedContainer==null?BrawlContainerAudit.Inspect(file):BrawlContainerAudit.InspectSelected(file,selectedContainer)).Records.Single(r => r.Path == nativePath);
             using (var stream = File.OpenRead(file))
             {
                 stream.Position = record.Offset;
@@ -103,7 +103,7 @@ namespace BrawlCrate.Authoring
             {
                 if ((root is ARCNode ? ".pac" : root is BRRESNode ? ".brres" : "") != profile.Extension) throw new IOException("Native root type changed.");
                 var model = At(root, profile.ModelPath) as MDL0Node;
-                if (model == null || model.Version != 11 || Fingerprint(Skeleton(model)) != profile.RigFingerprint || ExportHash(model, scratch) != profile.ModelExportHash)
+                if (model == null || model.Version != profile.ModelVersion || (model.Version!=9 && model.Version!=11) || Fingerprint(Skeleton(model)) != profile.RigFingerprint || ExportHash(model, scratch) != profile.ModelExportHash)
                     throw new IOException("Model/rig identity changed; saved assumptions are invalid. Register a new source revision.");
                 var motion = Motion(root, profile, animation);
                 if (original && (ExportHash(motion, scratch) != animation.NativeExportHash || motion.FrameCount != animation.Frames || motion.Loop != animation.Loop))

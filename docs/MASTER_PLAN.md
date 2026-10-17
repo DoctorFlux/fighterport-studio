@@ -3,15 +3,46 @@
 Current phase decision (2026-10-17): [shared animation/library amendment](FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md)
 supersedes gameplay priority in the earlier briefs. Focus on models and every declared
 animation family, shared disk-backed library/multiple clips per source, reviewed FK/IK,
-animation slots/parts, references/templates, mirror then transition fitting, native assets
+animation slots/parts, references/templates, proportion/contact correction and transition fitting, native assets
 and supported Modkit asset import. Gameplay scripts, damage/hitboxes, ACMD/PSA/Lua,
 cancel/combo execution and playable moveset compilation are deferred, not erased.
 Existing manual drafts remain lossless compatibility data, never animation prerequisites.
 An attack slot in this phase is an animation assignment, not executable behavior.
 Reviewed original FK and shared-library/multi-clip migration checkpoints now pass within
 the subsets in FORMAT_SUPPORT.md. The new Model Previewer workspace and typed slots/anchors
-now pass the declared original Brawl acceptance; next are reviewed mirror, fitting/IK,
-template fill and non-Brawl asset routes. Only plans/current.md defines the next executable acceptance criterion.
+now pass the declared original Brawl acceptance. H1/H2 adds bounded humanoid profiles,
+proportion-aware FK and explicit contact-native output below; broader contact/temporal
+coverage, template fill and non-Brawl asset routes remain. Only plans/current.md defines
+the next executable acceptance criterion.
+
+## Proportion-aware humanoid amendment — 2026-10-17
+
+The user now prioritizes proportion-aware, contact-preserving humanoid retargeting in
+the existing Model Previewer. See [FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md](FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md).
+Mirroring is not a prerequisite for fitting or later work. Preserve compatible data and
+useful inherited operations; coordinate-basis conversion is distinct from animation mirroring.
+The historical proposals below are superseded wherever they impose mirror priority.
+Only docs/plans/current.md defines the next executable acceptance; native/source/contact
+quality and game evidence remain separate. Gameplay compilation remains deferred.
+
+H1/H2 now implements narrow selected-BRRES/palette admission for the configured local
+Brawl pair, actual own-rig preview/playback, reusable exact rig and mesh-bound body
+profiles, native FK comparisons, explicit interval limb/pelvis correction and independent
+native save/decode inside the existing previewer. Original full humanoids prove different
+axes/parents/proportions/spine/finger/helper counts, body volumes, planted/aerial/hand goals,
+loop/winding, undo/native edits, shared independence and deterministic scrubbing. Local
+Snake -> Mario standing diagnostic improves decoded contact; both local FK directions
+pass. Commercial mappings remain unreviewed proposals. Mario -> Snake standing correction
+is rejected for reach/native-error failures; it is not a completed reverse contact route.
+
+H3 retains reviewed calibration/stance goals, lower/upper reach and stable pole/temporal
+coverage, pelvis/spine/clavicle coupling, source-style/important poses, editable body
+clearance proxies, twist/helpers, explicit scale and root policies, hand/prop relationships,
+fractional/event timing and reviewed profile revision/batch workflows. No arbitrary-rig
+promise or default aerial floor lock. H4 proves a genuine non-Brawl native adapter through
+the common core, with reverse/loss evidence independently; MDL0/CHR0 is not universal.
+Melee, Ultimate, Rivals II, FighterZ, Sparking! ZERO, Xenoverse 1/2 and all wider source,
+channel/native-output/interchange/optional DCC/tool-provider requirements remain queued.
 
 Authority: [complete clean-restart brief](CODEX_CLEAN_BRAWLCRATE_RESTART.md), preserved verbatim.
 It supersedes earlier WPF/bridge/migration and auto-push strategies. Retained product requirements
@@ -76,10 +107,11 @@ independent slot assignments and actual native edit/project save/reopen/undo. It
 original v1 subset remains loadable. Version 2 now uses shared immutable disk-backed
 source/clip records across separate projects and supports several CHR0 v4 clips per source.
 Explicit reviewed original rig A -> B and independent reverse FK routes pass sampled
-fresh-native pose/skinning checks. IK, mirror, fitting and other native channels remain
-queued. Version 3 now adds typed expandable parts/variants, verified asset destinations or explicit
-unbound state, and target reference phases in the actual previewer. Next are reviewed
-mirror, fitting/IK and template fill; native gameplay/attack translation remains deferred under the current scope.
+fresh-native pose/skinning checks. H1/H2 above adds bounded humanoid/interval IK; broader
+fitting, mirror and channel coverage remain queued, without a mirror prerequisite.
+Version 3 adds typed expandable parts/variants, verified asset destinations or explicit
+unbound state and target reference phases in the actual previewer. H3 broader humanoid
+coverage and template fill continue; native gameplay/attack translation remains deferred.
 Develop managed provisioning alongside the first external adapter: original harmless
 package installation/rejection/rollback tests plus one genuinely integrated pinned tool.
 
@@ -105,7 +137,8 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
    passes its original-fixture acceptance (see status/testing). Shared disk-backed clips,
    explicit fingerprint-bound role review and a measured original FK subset now pass.
    Version 3 slots/anchors and their shared-session Model Previewer controls now pass.
-   Next: reviewed native mirror, fitting/IK and dependency-aware template fill. Preserve native originals,
+   H1/H2 humanoid/contact native output above now passes its bounded subset; H3 broader
+   reach/temporal coverage and dependency-aware template fill remain. Preserve native originals,
    immutable/revisioned source profiles/animations/moves, non-destructive target instances, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,

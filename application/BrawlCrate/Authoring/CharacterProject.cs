@@ -44,6 +44,7 @@ namespace BrawlCrate.Authoring
         public bool CanRedo => _redo.Count != 0;
         public bool Dirty { get; private set; }
         public string FilePath { get; private set; }
+        public string StorageRoot=>Path.GetDirectoryName(Path.GetDirectoryName(_scratch));
 
         public CharacterProject(string storageRoot = null)
         {
@@ -67,7 +68,7 @@ namespace BrawlCrate.Authoring
             var profile = new SourceCharacterProfile { Id = Id(), Name = displayName, NativeHash = AddBlob(nativeData), ResolutionHash = AddBlob(resolution),
                 Extension = Path.GetExtension(native), ModelPath = workspace.Model.TreePath, ModelIdentity = workspace.Model.Identity,
                 ContainerPath = workspace.Model.ContainerPath, ContainerIdentity = workspace.Model.ContainerIdentity, ModelVersion = workspace.Model.Version,
-                ModelPayloadHash = BrawlProjectAdapter.PayloadHash(workspace.Model.SourcePath, workspace.Model.TreePath) };
+                ModelPayloadHash = BrawlProjectAdapter.PayloadHash(workspace.Model.SourcePath, workspace.Model.TreePath,workspace.Model.SourceContainer) };
             foreach (XmlElement e in provenance.DocumentElement.SelectNodes("source"))
             {
                 token.ThrowIfCancellationRequested(); byte[] data = ReadBounded(e.GetAttribute("path"));
@@ -83,7 +84,7 @@ namespace BrawlCrate.Authoring
                 var motion = ((BRRESNode)BrawlProjectAdapter.At(root, profile.ContainerPath)).Children.SelectMany(g => g.Children).OfType<CHR0Node>().Single(n => n.Name == workspace.Motion.Name);
                 animation = new AnimationAsset { Id = Id(), SourceCharacterId = profile.Id, SourceRigFingerprint = profile.RigFingerprint,
                     Name = motion.Name, NativeHash=profile.NativeHash, NativePath = BrawlProjectAdapter.PathOf(root, motion), NativeIdentity = workspace.Motion.Identity,
-                    OriginalPayloadHash = BrawlProjectAdapter.PayloadHash(workspace.Motion.SourcePath, workspace.Motion.TreePath),
+                    OriginalPayloadHash = BrawlProjectAdapter.PayloadHash(workspace.Motion.SourcePath, workspace.Motion.TreePath,workspace.Motion.SourceContainer),
                     NativeExportHash = BrawlProjectAdapter.ExportHash(motion, _scratch), Version = motion.Version, Frames = motion.FrameCount, Loop = motion.Loop };
                 BrawlProjectAdapter.Motion(root, profile, animation);
             }
@@ -174,7 +175,7 @@ namespace BrawlCrate.Authoring
                 finally { File.Delete(baseline); }
                 string hash = AddBlob(ReadBounded(edited));
                 Commit(s => { var i = s.Instances.Single(n => n.Id == instance.Id); i.WorkingHash = hash; i.Revision++;
-                    if(i.MappingId!=null && !i.BakeEvidence.StartsWith("Native edits captured;"))i.BakeEvidence="Native edits captured; prior transfer measurement is historical, not a measurement of these edits. "+i.BakeEvidence; });
+                    if((i.MappingId!=null || i.HumanoidRecipeId!=null) && !i.BakeEvidence.StartsWith("Native edits captured;"))i.BakeEvidence="Native edits captured; prior transfer measurement is historical, not a measurement of these edits. "+i.BakeEvidence; });
                 // Continue editing this same explicitly bound native document. Each
                 // capture is a new transaction with the just-committed baseline.
                 lease.BaselineHash = hash;
@@ -315,7 +316,7 @@ namespace BrawlCrate.Authoring
             var original = source.Originals.SingleOrDefault(o => o.Path == choice.GetAttribute("source"));
             if (original == null) throw new IOException("Native choice has no original source evidence.");
             string path = Materialize(original.Hash, ".native");
-            try { if (BrawlProjectAdapter.PayloadHash(path, choice.GetAttribute("tree")) != expected) throw new IOException("Exact original native payload hash changed."); }
+            try { if (BrawlProjectAdapter.PayloadHash(path, choice.GetAttribute("tree"),choice.HasAttribute("selectedContainer")?choice.GetAttribute("selectedContainer"):null) != expected) throw new IOException("Exact original native payload hash changed."); }
             finally { File.Delete(path); }
         }
 
@@ -329,7 +330,7 @@ namespace BrawlCrate.Authoring
             foreach (var c in s.Characters)
             {
                 CheckText(c.Name,120);
-                if (c.Adapter != "brawl-native-v1" || c.Revision != 1 || c.ModelVersion != 11 || (c.Extension != ".pac" && c.Extension != ".brres") ||
+                if (c.Adapter != "brawl-native-v1" || c.Revision != 1 || (c.ModelVersion != 9 && c.ModelVersion!=11) || (c.Extension != ".pac" && c.Extension != ".brres") ||
                     c.Bones == null || c.Bones.Count < 1 || c.Bones.Count > 512 || c.Originals == null || c.Originals.Count < 1 || c.Originals.Count > 16 ||
                     s.Animations.Count(a => a.SourceCharacterId == c.Id) < 1 || c.ModelPath == null || c.ContainerPath == null)
                     throw new IOException("Unsupported source profile.");
@@ -347,7 +348,9 @@ namespace BrawlCrate.Authoring
                 bool direct=a!=null && c!=null && a.SourceCharacterId==c.Id && a.SourceRigFingerprint==c.RigFingerprint;
                 var map=s.RigMaps.SingleOrDefault(m=>m.Id==i.MappingId);
                 if(map!=null && a!=null && c!=null) RigTransfer.Validate(map,s.Characters.Single(n=>n.Id==a.SourceCharacterId),c);
-                if (a == null || c == null || native==null || native.SourceCharacterId!=c.Id || (!direct && (map==null || map.Revision!=i.MappingRevision || string.IsNullOrEmpty(i.BakeEvidence))) || i.TargetRigFingerprint != c.RigFingerprint || i.AnimationRevision != a.Revision || i.Revision < 1 ||
+                var humanoid=s.HumanoidRecipes?.SingleOrDefault(r=>r.Id==i.HumanoidRecipeId);bool fitted=false;
+                if(humanoid!=null){ValidateHumanoidRecipe(s,humanoid,true);fitted=humanoid.AnimationId==i.AnimationId && humanoid.TargetAnimationId==i.NativeAnimationId && humanoid.TargetCharacterId==i.TargetCharacterId && !string.IsNullOrEmpty(i.BakeEvidence);}
+                if (a == null || c == null || native==null || native.SourceCharacterId!=c.Id || (!direct && !fitted && (map==null || map.Revision!=i.MappingRevision || string.IsNullOrEmpty(i.BakeEvidence))) || (i.HumanoidRecipeId!=null && !fitted) || i.TargetRigFingerprint != c.RigFingerprint || i.AnimationRevision != a.Revision || i.Revision < 1 ||
                     (i.MoveId != null && !s.Moves.Any(m => m.Id == i.MoveId && m.AnimationId == a.Id))) throw new IOException("Unsupported/stale instance binding. Different-rig transfer requires review and baking.");
             }
             foreach(var map in s.RigMaps) RigTransfer.Validate(map,s.Characters.Single(c=>c.Id==map.SourceCharacterId),s.Characters.Single(c=>c.Id==map.TargetCharacterId));
@@ -364,6 +367,7 @@ namespace BrawlCrate.Authoring
             }
             if (UsedHashes(s).Any(h => h == null || !HasData(h))) throw new IOException("Missing immutable native/project blob.");
             ValidateAnimationSets(s);
+            ValidateHumanoids(s);
         }
         private static IEnumerable<string> UsedHashes(CharacterProjectState s) => s.Characters.SelectMany(c => new[] { c.NativeHash, c.ResolutionHash }.Concat(c.Originals.Select(o => o.Hash)))
             .Concat(s.Animations.Where(a=>a.NativeHash!=null).SelectMany(a=>new[]{a.NativeHash}.Concat(a.AdditionalOriginals.Select(o=>o.Hash)))).Concat(s.Instances.Select(i => i.WorkingHash)).Distinct();

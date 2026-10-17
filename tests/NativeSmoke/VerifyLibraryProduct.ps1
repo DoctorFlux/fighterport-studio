@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 public static class LibraryWindows {
+ // Cross-bitness control messages may zero-extend -1; preserve the signed low DWORD.
+ public static int SignedResult(IntPtr result) { return unchecked((int)result.ToInt64()); }
  public delegate bool EnumProc(IntPtr hwnd,IntPtr data);
  [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left,Top,Right,Bottom; }
  [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc callback,IntPtr data);
@@ -78,7 +80,7 @@ try {
   $list=@($children | Where-Object {[LibraryWindows]::Class($_) -like '*SysListView32*'})[0]
   $null=[LibraryWindows]::SendMessage($list,0x100,[IntPtr]0x24,[IntPtr]::Zero)
   for($index=0;$index -lt $InstanceIndex;$index++) {$null=[LibraryWindows]::SendMessage($list,0x100,[IntPtr]0x28,[IntPtr]::Zero)}
-  Wait-Product { [LibraryWindows]::SendMessage($list,0x100C,[IntPtr](-1),[IntPtr]2).ToInt32() -eq $InstanceIndex } 'Requested target instance was not selected'
+  Wait-Product { [LibraryWindows]::SignedResult([LibraryWindows]::SendMessage($list,0x100C,[IntPtr](-1),[IntPtr]2)) -eq $InstanceIndex } 'Requested target instance was not selected'
   $texts=@([LibraryWindows]::Children($window) | ForEach-Object {[LibraryWindows]::Text($_)})
   if (!($texts -match 'Sources verified') -or !($texts -match 'Source profile')) {throw 'Restored source data not visible'}
   Capture-Library $window "project-$attempt.png"

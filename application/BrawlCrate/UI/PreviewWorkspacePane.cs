@@ -22,6 +22,8 @@ namespace BrawlCrate.UI
         private readonly TextBox _projectPath,_resolution,_output,_search,_savePath,_referenceRole,_partLabel;
         private readonly NumericUpDown _count;
         private readonly Panel _rigHost;
+        private readonly Panel _humanoidHost;
+        private HumanoidWorkspacePanel _humanoid;
         private AnimationLibraryStore.LibraryCursor _cursor;
         private bool _updating;
         public string TargetId=>(_targets.SelectedItem as Choice)?.Id;
@@ -39,12 +41,14 @@ namespace BrawlCrate.UI
             Button(setup,"Attach project","workspaceAttach",()=>{string path=_projectPath.Text;if(string.IsNullOrWhiteSpace(path))using(var d=new OpenFileDialog{Filter="Character project|*.fpcharacter"}){if(d.ShowDialog(this)!=DialogResult.OK)return;path=d.FileName;}if(_host.Document!=null && !_host.Document.Session.ResolvePending(_host.Document))return;Attach(PreviewAuthoringSession.Open(path));});
             _resolution=Input(setup,"workspaceResolution","Saved source resolution (.fpcompanion)");
             Button(setup,"Create shared project from resolution","workspaceCreate",()=>{string path=_resolution.Text;if(string.IsNullOrWhiteSpace(path))using(var d=new OpenFileDialog{Filter="Source resolution|*.fpcompanion"}){if(d.ShowDialog(this)!=DialogResult.OK)return;path=d.FileName;}if(_host.Document!=null && !_host.Document.Session.ResolvePending(_host.Document))return;var p=new CharacterProject();p.MigrateToSharedLibrary();p.RegisterSource(path,"Source character");Attach(PreviewAuthoringSession.For(p));});
+            var sourceName=Input(setup,"workspaceSourceName","Character display name for registration (identity is native/hash-bound)");
+            Button(setup,"Add character from resolution to this project","workspaceRegisterCharacter",async()=>{try{Require();var session=Session;string path=_resolution.Text,name=sourceName.Text;await session.WorkAsync(token=>session.Project.RegisterSource(path,name,token));}catch(Exception error){Report("Stopped: "+error.Message);}});
             Button(setup,"Share / migrate legacy project","workspaceMigrate",()=>Command(()=>Session.Project.MigrateToSharedLibrary()));
             Label(setup,"Select the intended target explicitly; attaching a project does not infer an association for a plain model.");_targets=Combo(setup,"workspaceTarget");_targets.SelectedIndexChanged+=(s,e)=>{if(!_updating)RefreshViews();};
             Label(setup,"Current asset adapter: Brawl native v1. Semantic pack labels do not certify runtime/game bindings; other adapters remain queued.");
             _instances=Combo(setup,"workspaceInstances");Button(setup,"Inspect / activate target instance","workspaceActivate",()=>{Require();string id=ChoiceId(_instances);Session.ShowInstance(id,_host);});
             Button(setup,"Inspect selected target (new working instance)","workspaceInspect",()=>Command(()=>{var a=Session.Project.State.Animations.First(n=>n.SourceCharacterId==TargetId);string id=Session.Project.Assign(a.Id,TargetId,"Custom preview instance");Session.ShowInstance(id,_host);}));
-            Button(setup,"Source paths / companions...","workspaceSources",()=>new CompanionWorkspaceForm().Show(_host));
+            Button(setup,"Source paths / companions...","workspaceSources",()=>new CompanionWorkspaceForm(new BrawlCrate.Sources.CompanionWorkspace(Session?.Project.StorageRoot)).Show(_host));
             var library=Page("Library");_search=Input(library,"workspaceSearch","Shared library search");
             _catalogue=new ListBox {Name="workspaceCatalogue",Width=290,Height=130,DisplayMember="Label"};library.Controls.Add(_catalogue);
             Button(library,"Search / refresh shared clips","workspaceLibrarySearch",()=>Browse(true));Button(library,"Next metadata page","workspaceLibraryNext",()=>Browse(false));
@@ -52,6 +56,7 @@ namespace BrawlCrate.UI
             Label(library,"Project clips (source-bound):");_clips=Combo(library,"workspaceClip");_clips.SelectedIndexChanged+=(s,e)=>{if(!_updating)UpdateRigPanel();};
             Button(library,"Preview source (read-only)","workspaceSourcePreview",()=>{Require();Session.ShowSource(SelectedClipId,_host);});
             Button(library,"Add native clips to selected source...","workspaceAddClips",()=>Command(()=>{var a=Session.Project.State.Animations.Single(n=>n.Id==SelectedClipId);using(var d=new OpenFileDialog {Filter="Skeletal native clips|*.chr0",Multiselect=true})if(d.ShowDialog(this)==DialogResult.OK)foreach(string file in d.FileNames)Session.Project.AddAnimation(a.SourceCharacterId,file);}));
+            Button(library,"Add clips from a selected native container…","workspaceAddContainerClips",()=>{Require();string character=Session.Project.State.Animations.Single(n=>n.Id==SelectedClipId).SourceCharacterId;using(var dialog=new BrawlContainerImportForm(Session,character))dialog.ShowDialog(_host);});
             var set=Page("Animation Set");Button(set,"Install Brawl semantic pack (unbound)","workspaceInstallPack",()=>Command(()=>Session.Project.InstallAnimationPack(TargetId,AnimationPack.BrawlAuthoring())));
             _parts=new TreeView {Name="workspaceParts",Width=290,Height=180,HideSelection=false};set.Controls.Add(_parts);
             _parts.AfterSelect+=(s,e)=>{if(!_updating){var part=Set?.Parts.SingleOrDefault(n=>n.Id==SelectedPartId);if(part?.InstanceId!=null)Try(()=>Session.ShowInstance(part.InstanceId,_host));ShowPartStatus();}};
@@ -61,6 +66,7 @@ namespace BrawlCrate.UI
             _partLabel=Input(set,"workspacePartLabel","Selected part label");_partLabel.MaxLength=120;Button(set,"Rename part","workspaceRenamePart",()=>Command(()=>Session.Project.RenameAnimationPart(Set.Id,SelectedPartId,_partLabel.Text)));
             Button(set,"Move earlier in variant","workspacePartEarlier",()=>Command(()=>Session.Project.MoveAnimationPart(Set.Id,SelectedPartId,-1)));Button(set,"Move later in variant","workspacePartLater",()=>Command(()=>Session.Project.MoveAnimationPart(Set.Id,SelectedPartId,1)));
             Label(set,"Actual native asset destination (not a runtime action):");_destinations=Combo(set,"workspaceDestination");
+            _destinations.SelectedIndexChanged+=(s,e)=>{if(!_updating)_humanoid?.RefreshFromProject();};
             Button(set,"Verify / bind selected destination","workspaceBind",()=>Command(()=>Session.Project.BindAnimationPart(Set.Id,SelectedPartId,ChoiceId(_destinations))));
             Button(set,"Assign selected library clip","workspaceAssign",AssignSelected);
             Button(set,"Clear assignment (keep edited instance)","workspaceClearPart",()=>Command(()=>Session.Project.ClearAnimationPart(Set.Id,SelectedPartId,false)));
@@ -82,6 +88,7 @@ namespace BrawlCrate.UI
             Button(refs,"Preview named reference on target","workspacePreviewNamedReference",()=>{Require();Session.PreviewAnchor(TargetId,_referenceRole.Text,_host);});
             Button(refs,"Set named phase from native playhead","workspacePhaseNamedReference",()=>Command(()=>{var doc=_host.Document;if(doc?.InstanceId==null || doc.TargetId!=TargetId || doc.Editor.SelectedCHR0!=BrawlProjectAdapter.At(doc.Root,Session.Project.NativeAnimation(doc.InstanceId).NativePath))throw new IOException("Preview this target reference first.");Session.Project.SetAnchorPhase(TargetId,_referenceRole.Text,doc.InstanceId,doc.Editor.CurrentFrame-1);}));
             var rig=Page("Rig / FK");Label(rig,"Choose the source clip in Library and intended target in Setup. Explicit policies are required.");
+            _humanoidHost=new Panel{Name="workspaceHumanoidHost",Width=310,Height=650};rig.Controls.Add(_humanoidHost);
             _rigHost=new Panel {Name="workspaceRigHost",Width=310,Height=610};rig.Controls.Add(_rigHost);
             var output=Page("Project / Output");Button(output,"Apply native edits","workspaceApply",()=>{Require();Session.Apply(_host.Document);});
             _savePath=Input(output,"workspaceSavePath","New project path (new or migrated projects)");
@@ -101,7 +108,7 @@ namespace BrawlCrate.UI
                 flow.Width=width+8;
                 foreach(Control control in flow.Controls)
                 {
-                    if(control is TextBox || control is ComboBox || control is ListBox || control is TreeView || control==_rigHost)control.Width=width;
+                    if(control is TextBox || control is ComboBox || control is ListBox || control is TreeView || control==_rigHost || control==_humanoidHost)control.Width=width;
                     if(control is Label || control is Button)control.MaximumSize=new Size(width,0);
                 }
             }
@@ -184,7 +191,8 @@ namespace BrawlCrate.UI
         private void UpdateRigPanel()
         {
             if(Session==null || SelectedClipId==null || TargetId==null)return;var source=Session.Project.State.Animations.Single(n=>n.Id==SelectedClipId).SourceCharacterId;string key=Session.Project.State.Id+source+TargetId;
-            if(_rigKey==key)return;foreach(Control c in _rigHost.Controls)c.Dispose();_rigHost.Controls.Clear();_rigKey=key;
+            if(_rigKey==key){_humanoid?.RefreshFromProject();return;}foreach(Control c in _rigHost.Controls)c.Dispose();_rigHost.Controls.Clear();_rigKey=key;
+            _humanoid?.Dispose();_humanoidHost.Controls.Clear();_humanoid=new HumanoidWorkspacePanel(_host,Session,()=>new HumanoidWorkspaceContext{ClipId=SelectedClipId,TargetId=TargetId,NativeId=(_destinations.SelectedItem as Choice)?.Id,SetId=Set?.Id,PartId=SelectedPartId}){Dock=DockStyle.Fill};_humanoidHost.Controls.Add(_humanoid);
             var panel=new RigMapReviewPanel(Session.Project,source,TargetId){Dock=DockStyle.Fill,Execute=action=>Command(action)};_rigHost.Controls.Add(panel);
         }
         private void ShowPartStatus()

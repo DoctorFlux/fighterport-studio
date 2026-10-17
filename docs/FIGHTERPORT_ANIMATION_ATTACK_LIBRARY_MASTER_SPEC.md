@@ -1,5 +1,16 @@
 # FighterPort Studio — reusable animation and attack authoring master specification
 
+## Proportion-aware humanoid amendment — 2026-10-17
+
+The user now prioritizes proportion-aware, contact-preserving humanoid retargeting in
+the existing Model Previewer. See [FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md](FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md).
+Mirroring is not a prerequisite for fitting or later work. Preserve compatible data and
+useful inherited operations; coordinate-basis conversion is distinct from animation mirroring.
+The historical proposals below are superseded wherever they impose mirror priority.
+Only docs/plans/current.md defines the next executable acceptance; native/source/contact
+quality and game evidence remain separate. Gameplay compilation remains deferred.
+
+
 ## Model Previewer amendment — 2026-10-17
 
 [FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md](FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md)

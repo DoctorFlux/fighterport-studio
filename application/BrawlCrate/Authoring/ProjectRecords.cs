@@ -87,6 +87,7 @@ namespace BrawlCrate.Authoring
         public string MappingId { get; set; }
         public int MappingRevision { get; set; }
         public string BakeEvidence { get; set; }
+        public string HumanoidRecipeId {get;set;}
     }
     public sealed class CharacterProjectState
     {
@@ -103,6 +104,10 @@ namespace BrawlCrate.Authoring
         public List<LibraryPin> LibraryPins { get; set; } = new List<LibraryPin>();
         public List<CharacterAnimationSet> AnimationSets { get; set; } = new List<CharacterAnimationSet>();
         public List<ReferenceAnchor> Anchors { get; set; } = new List<ReferenceAnchor>();
+        public List<Humanoid.HumanoidProfile> Humanoids {get;set;}=new List<Humanoid.HumanoidProfile>();
+        public List<Humanoid.BodyProfile> Bodies {get;set;}=new List<Humanoid.BodyProfile>();
+        public List<Humanoid.HumanoidRecipe> HumanoidRecipes {get;set;}=new List<Humanoid.HumanoidRecipe>();
+        public List<LibraryPin> HumanoidPins {get;set;}=new List<LibraryPin>();
     }
     public sealed class NativeEditLease
     {

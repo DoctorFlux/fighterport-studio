@@ -5,7 +5,7 @@ Set-Location -LiteralPath $repoRoot
 if ((git remote get-url origin) -ne 'https://github.com/DoctorFlux/fighterport-studio.git') { throw 'Unexpected origin' }
 $paths=@(git diff --cached --name-only --diff-filter=ACMR)
 foreach ($path in $paths) {
-  if ($path -match '(^|/)(bin|obj|artifacts|assets-local|\.local|\.deps|\.tools|Brawl mario|Smash Ultimate mario)/|CredentialsHelper\.exe$|\.(snk|pem|pfx|key)$|(^|/)\.env') { throw "Excluded staged path: $path" }
+  if ($path -match '(^|/)(bin|obj|artifacts|assets-local|\.local|\.deps|\.tools|Brawl mario|Brawl Snake|Smash Ultimate mario)/|CredentialsHelper\.exe$|\.(snk|pem|pfx|key)$|(^|/)\.env') { throw "Excluded staged path: $path" }
   if ($path -match '\.(exe|dll)$' -and $path -notin @('application/BrawlLib/OpenTK.dll','application/BrawlCrate/discord-rpc.dll')) { throw "Unexpected staged binary: $path" }
 }
 git diff --cached --shortstat

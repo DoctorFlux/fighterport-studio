@@ -55,6 +55,7 @@ namespace BrawlCrate.UI
                     if (dialog.ShowDialog(this) == DialogResult.OK)
                         foreach (string path in dialog.FileNames) await AddSourceAsync(path);
             });
+            AddAction("Select companion BRRES…","companionSelectContainer",()=>{using(var dialog=new BrawlContainerImportForm(_workspace))dialog.ShowDialog(this);RefreshChoices();return Task.CompletedTask;});
             AddAction("Load resolution…", "companionLoad", async () =>
             {
                 using (var dialog = new OpenFileDialog { Filter = "FighterPort companion resolution|*.fpcompanion" })
@@ -85,8 +86,8 @@ namespace BrawlCrate.UI
             _candidates.SelectedIndexChanged += (sender, args) =>
             {
                 if (_refreshing || _bindings.SelectedItems.Count != 1 || !(_candidates.SelectedItem is CompanionResource texture)) return;
-                string name = _bindings.SelectedItems[0].Text;
-                TryAction(() => { _workspace.SelectTexture(name, texture); RefreshBindings(name); });
+                bool palette=(string)_bindings.SelectedItems[0].Tag=="palette";string name=palette?_bindings.SelectedItems[0].Text.Substring(9):_bindings.SelectedItems[0].Text;
+                TryAction(() => { if(palette)_workspace.SelectPalette(name,texture);else _workspace.SelectTexture(name, texture); RefreshBindings(palette?"Palette: "+name:name); });
             };
             layout.Controls.Add(_candidates);
             var motionRow = new TableLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, ColumnCount = 1 };
@@ -183,6 +184,7 @@ namespace BrawlCrate.UI
                 var item = new ListViewItem(name); item.SubItems.Add(_workspace.TextureStatus(name)); _bindings.Items.Add(item);
                 if (name == select) item.Selected = true;
             }
+            foreach(string name in _workspace.RequiredPalettes){var item=new ListViewItem("Palette: "+name){Tag="palette"};item.SubItems.Add(_workspace.PaletteStatus(name));_bindings.Items.Add(item);if(item.Text==select)item.Selected=true;}
             _refreshing = false;
             RefreshCandidates(); UpdateStatus();
         }
@@ -192,9 +194,9 @@ namespace BrawlCrate.UI
             _refreshing = true; _candidates.Items.Clear();
             if (_bindings.SelectedItems.Count == 1)
             {
-                string name = _bindings.SelectedItems[0].Text;
-                _candidates.Items.AddRange(_workspace.TextureCandidates(name).Cast<object>().ToArray());
-                if (_workspace.TextureSelections.TryGetValue(name, out CompanionResource selected)) _candidates.SelectedItem = selected;
+                bool palette=(string)_bindings.SelectedItems[0].Tag=="palette";string name=palette?_bindings.SelectedItems[0].Text.Substring(9):_bindings.SelectedItems[0].Text;
+                _candidates.Items.AddRange((palette?_workspace.PaletteCandidates(name):_workspace.TextureCandidates(name)).Cast<object>().ToArray());
+                if ((palette?_workspace.PaletteSelections:_workspace.TextureSelections).TryGetValue(name, out CompanionResource selected)) _candidates.SelectedItem = selected;
             }
             _refreshing = false;
         }

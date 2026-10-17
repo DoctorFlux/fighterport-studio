@@ -1,5 +1,16 @@
 # FighterPort Studio: shared animation library, character slots, transition templates, and mirroring
 
+## Proportion-aware humanoid amendment — 2026-10-17
+
+The user now prioritizes proportion-aware, contact-preserving humanoid retargeting in
+the existing Model Previewer. See [FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md](FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md).
+Mirroring is not a prerequisite for fitting or later work. Preserve compatible data and
+useful inherited operations; coordinate-basis conversion is distinct from animation mirroring.
+The historical proposals below are superseded wherever they impose mirror priority.
+Only docs/plans/current.md defines the next executable acceptance; native/source/contact
+quality and game evidence remain separate. Gameplay compilation remains deferred.
+
+
 ## Purpose and precedence
 
 This is a continuation specification, not a restart. It records the user's latest scope: model and animation authoring/conversion first; gameplay scripting is deferred. Keep the actual BrawlCrate-derived FighterPort application, its native editors, completed source/container/project work, source protections, original fixtures, and all wider game support requirements.

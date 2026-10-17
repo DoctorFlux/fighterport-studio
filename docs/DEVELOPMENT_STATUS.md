@@ -12,11 +12,129 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [Model Previewer slots and anchors](#model-previewer-slots-and-anchors--2026-10-17).
-The first authoring increment follows the completed container checkpoint, preserving HEAD
-9f9405fb925f50b4df33ec1ae41e17b1dd77b6dc and all newer passing work. Earlier receipts
-below describe their historical checkpoints. docs/plans/current.md remains the only
-authoritative next executable acceptance criterion.
+Current checkpoint: [Humanoid admission and native contacts](#humanoid-admission-and-native-contacts--2026-10-17).
+Continued actual HEAD 7458be7d9a11f95c4c4c1dd586819fd9dc40e831, preserving the complete
+BrawlCrate application and passing discovery/library/slots/anchor work. Historical receipts
+below retain their original scope. docs/plans/current.md is the only next executable task.
+
+## Humanoid admission and native contacts — 2026-10-17
+
+The supplied proportion-aware brief is persisted verbatim in
+FIGHTERPORT_PROPORTION_AWARE_HUMANOID_RETARGETING.md, SHA256
+0c7fe9d050945f2809142356e9fa41f963eb7aab91cef15af91fb92d71bb0d33.
+Dated amendments reconcile the prior specifications/master plan. Mirroring is no longer
+a prerequisite. H1/H2 is a bounded working checkpoint; the complete humanoid solver is
+not finished. Gameplay compilation stays deferred, with the full game/channel roadmap.
+
+Bounded local/config inspection found narrow character folders, not root-level PAC files.
+The explicit main Snake/Mario models are MDL0 v9, 70/63 bones and 7054/3913 vertices;
+Wait1 is CHR0 v4 with 86/51 frames, Fall 19/21. Motion packages include unknown/empty/
+redirect siblings, so strict whole-package admission still rejects them. A new explicit
+selected-BRRES route reads only the bounded ARC directory and chosen validated range;
+full source hashes/bytes and original indexed identities remain evidence. Model bases
+retain their full supported PAC. No repository/application-root source mount was used.
+Normal materials resolve CI8+PLT0 RGB565/RGB5A3, CMPR/RGB5A3 and other documented texture
+dependencies. Optional metal materials/resources remain retained; their external texture
+is absent and metal preview is not certified. No opaque fighter-package round trip is claimed.
+
+Own-rig native assembly, textured GL geometry, scrubbing, actual Play, separate PAC save/
+decode and project reload were observed for both local characters. Adding Fall reuses the
+registered source. Intake now checks original versus decoded motion keys/tangents/timing/
+flags, not only names/counts. All 41 original local files retain their pre-inspection hashes.
+Inputs, derivatives, settings, private paths and captures stay ignored, never in source Git.
+
+The actual Model Previewer Rig/FK tab shares the existing session and native timeline.
+It provides proposal/review, ordered semantic chains, mesh-bound sole/wrist/pole/ground
+profiles, explicit intervals/goals, Fit and native FK/corrected comparisons, independent
+Apply and export. Virtual contact/pole/pelvis handles commit recipe changes, not control
+bones. Original author review is used only for known generated rigs. Commercial proposals
+remain unreviewed; diagnostic export does not approve an assignment. Existing rigid FK,
+direct mismatch rejection, immutable library independence, slots/anchors, leases, contextual
+undo and single editable-document handoff remain intact. v1/v2/v3 project loading remains.
+
+Original full humanoids differ in proportions, body volumes, local axes, parents, spine/
+finger counts and helpers, with both rigid soles and blended skin. Independent authored
+planted goals improve maximum contact error from .80866599 to .0000723043 native units.
+Fresh native decode error is .000076724 position / .000958876 degrees / .000077095 mesh
+units. Reverse contact transfer passes separately. Native sole geometry, body-relative
+hand-to-head and two-wrist goals, unreachable rejection, margin/pelvis continuity, source
+basis re-expression, full turns, animated-finger loop seams, fractional/random scrubbing,
+shared reviewed reuse and different-mesh body identities are tested. Aerials have no
+default contacts. Unsupported scale/dynamic joint translation/fast winding/frame budgets
+reject without committing partial assignments. These are sampled, declared-subset results.
+
+Local unreviewed diagnostic results (native position / degrees / mesh errors):
+
+| Direction/operation | Fresh decode | Contact quality |
+|---|---|---|
+| Snake -> Mario FK, 341 samples | .0000541352 / .0249895 / .000420525 | No constraints |
+| Mario -> Snake FK, 201 samples | .0146614 / .110767 / .0160607 | No constraints |
+| Snake -> Mario standing correction, 341 samples | .00649909 / .124225 / .00960849 | 2.183194 -> .00309587 units; zero unreachable samples |
+
+Both own-rig sources and the forward FK/corrected native geometry/playback were actually
+observed in the existing previewer; no commercial mapping approval or game result is implied.
+The reverse standing correction is a real rejected boundary: 108 unreachable samples,
+1.145646 contact residual, native error .368992 / 7.881017 / .417223 after continuous pelvis
+margin handling. Worst position is the knee at 10.25; worst orientation the other knee at
+6.5. Limits remain .02 position / .15 degrees / .03 mesh units; no corrected assignment was
+committed. H3 in plans/current.md addresses deliberate reachable calibration/stance goals
+and continuous reach/pole/temporal handling, with independent analytic fixtures and fresh
+native proof. H4 non-Brawl output follows; no image-reader prerequisite or mirror rollback.
+
+Native writing exposed an x86 bfloat bug: some reversed finite IEEE values become signaling
+NaNs and float storage quiets them, changing keys by e.g. .25 degrees. Integer bit storage
+fixes the four-byte native representation; independent byte vectors test finite extremes,
+signed zero and subnormal boundaries. Generated bakes explicitly opt into existing I12
+Hermite encoding. Native rotation measurement validates scale/shear before normalizing
+float rotation frames. Original/default codec policy is retained. UPSTREAM.md records
+these intentional modifications; licenses, baseline pin and component audit remain intact.
+
+Actual GUI handler tests exercise selected-container/palette intake and add-clip dialogs,
+profile/landmark surfaces, Fit/FK/corrected rendering/Play, explicit contact save, a viewport
+pelvis drag, one-step undo/redo, independent Apply, native finger edit/Apply, project reload,
+small-window and panel hide/reopen. Retained workspace tests cover pending edits/two-viewer
+handoff, unsupported changes, cancellation and simulated scaling. The desktop was 96 DPI;
+physical high-DPI, manual clicking, external native-tool, Modkit and game tests are unobserved.
+
+Four successful fresh normal product launches (two per original shared project) restore
+exact profiles/recipes/native edits, export/save through the real previewer and exit normally.
+Edited native output SHA256: e784c65856453d373ced74de4d95caa7278c7c30a025e2961286c7755782b52f;
+other-project output: 57c5beb50d1129d945520e449c735f73d73fad0018a243ba06dde85a6a8dd66a.
+18 pinned shared records and all 21 content-addressed native blobs verify unchanged after
+restart, as does the untouched other project. Persistent undo history is not claimed.
+
+Release/x86/net472 builds and doctor pass without a new package, global install, runtime/
+renderer change or external editor. All eight retained families pass native and GUI modes;
+the new Humanoid suite passes native and GUI. A distinct 8.3 alias remains a reported skip,
+not a pass; hardlink/reparse tests pass. Upstream comparison reports no missing imported
+files. Recovery remains untouched at the previously verified external location below.
+Source-only commit/publication SHA is reported by Git and the ignored publication receipt;
+this status file does not predeclare a successful push.
+
+Actual executable: application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe;
+final build SHA256 c3704e946f6c4e33c809e19485d1ad110c442f1d165ce88c6aeac505ad9510ff.
+
+Local receipts (all ignored): humanoid-native-20261017-161119-867 and
+humanoid-gui-20261017-161215-596; original/regression family receipts at 160014..160302;
+final affected-native reruns at 161418..161516; h2-local-contact-forward-final-04;
+h2-local-contact-reverse-03 (rejected); library-product-20261017-161558-290 (edited) and
+library-product-20261017-161405-434 (other); h2-final-local-input-hashes.json and
+h2-final-shared-and-other.json. Subsequent final size-preflight checks retain separate
+receipts: humanoid-native-20261017-161853-097 and humanoid-gui-20261017-161939-076,
+plus final normal product receipts at 162201 and later. Earlier exploratory failures
+remain local and are not counted as passes. The product restart helper now handles
+zero-extended signed list-control results correctly across x86/64-bit automation.
+Final handle-identity review adds source clip/target/part/document/project-state checks:
+switching clips during a drag rejects without changing another recipe. Focused native
+162503-721 and GUI 162546-016 receipts pass that final source update.
+Finite-pose review additionally rejects NaN/infinity and hierarchy overflow before native
+quality comparisons; native 162955-827 and GUI 163037-659 pass those final guards.
+
+Remaining: reviewed calibration/revision UI, fuller anatomical/pelvis/spine/clavicle and
+temporal/pole/clearance/twist/scale/root/prop policies, batch workflows, broad Brawl versions/
+ancillary channel fidelity and native model/material capture, non-Brawl/native output and
+actual Modkit/game validation. Measurements are not a body collision solver. No perfect
+automatic retargeting, arbitrary package preservation or playable-fighter claim is made.
 
 ## Model Previewer slots and anchors — 2026-10-17
 

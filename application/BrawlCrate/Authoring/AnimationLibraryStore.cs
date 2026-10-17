@@ -20,6 +20,8 @@ namespace BrawlCrate.Authoring
     {
         public SourceCharacterProfile Character { get; set; }
         public AnimationAsset Animation { get; set; }
+        public Humanoid.HumanoidProfile Humanoid {get;set;}
+        public Humanoid.BodyProfile Body {get;set;}
     }
     public sealed class LibraryInfo
     {
@@ -87,8 +89,13 @@ namespace BrawlCrate.Authoring
         }
         public LibraryPin Publish(SourceCharacterProfile source) => PublishRecord(new LibraryRecord {Character=source},"characters",source.Id,source.Revision);
         public LibraryPin Publish(AnimationAsset animation) => PublishRecord(new LibraryRecord {Animation=animation},"animations",animation.Id,animation.Revision);
+        public LibraryPin Publish(Humanoid.HumanoidProfile profile)=>PublishRecord(new LibraryRecord{Humanoid=profile},"humanoids",profile.Id,profile.Revision);
+        public LibraryPin Publish(Humanoid.BodyProfile body)=>PublishRecord(new LibraryRecord{Body=body},"bodies",body.Id,body.Revision);
+        public LibraryRecord TryProfile(string kind,string id,int revision=1)
+        {if(kind!="humanoids" && kind!="bodies")throw new IOException("Select a profile record kind.");string path=RecordPath(kind,id,revision);SourceWriteGuard.EnsureNoReparsePoints(path);return File.Exists(path)?Read(Pin(kind,id,revision)):null;}
         private LibraryPin PublishRecord(LibraryRecord record,string kind,string id,int revision)
         {
+            if(kind=="humanoids" || kind=="bodies"){string folder=Path.Combine(Root,kind);SourceWriteGuard.ThrowIfProtected(folder);SourceWriteGuard.EnsureNoReparsePoints(folder);Directory.CreateDirectory(folder);}
             byte[] data=CharacterProject.Serialize(record);if(data.Length>(kind=="animations"?128*1024:1024*1024))throw new IOException("Library record exceeds its bounded metadata budget (animation 128 KiB / character 1 MiB).");string hash=CharacterProject.Hash(data),path=RecordPath(kind,id,revision);
             using(Lock())
             {
@@ -158,7 +165,7 @@ namespace BrawlCrate.Authoring
         }
         private string RecordPath(string kind,string id,int revision)
         {
-            if((kind!="characters" && kind!="animations") || !Guid.TryParseExact(id,"N",out _) || revision<1 || revision>999999)throw new IOException("Invalid library revision identity.");
+            if((kind!="characters" && kind!="animations" && kind!="humanoids" && kind!="bodies") || !Guid.TryParseExact(id,"N",out _) || revision<1 || revision>999999)throw new IOException("Invalid library revision identity.");
             return Path.Combine(Root,kind,id+"-"+revision.ToString("D6")+".fplibrecord");
         }
         private static void WriteImmutable(string path,byte[] data)

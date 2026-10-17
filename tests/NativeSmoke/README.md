@@ -167,3 +167,12 @@ UI_ACCEPTANCE.md for detailed GUI steps, native pose tolerances and honest DPI l
 Use VerifyLibraryProduct.ps1 -PreviewWorkspace on each independently saved fixture project
 for normal application restarts, restored anchor phases, previewer export/save and exits.
 No source assets, generated binaries, settings or captures belong in Git.
+
+Proportion/contact continuation (2026-10-17): run `scripts/test.ps1 -Humanoid -Gui`
+for original full humanoids, palette/mip/selected-container intake, exact shared rig/body
+review, native FK/corrected contact output and actual previewer controls/handles/undo.
+See docs/TESTING.md for the independent analytic expectations, numeric limits, opt-in
+private local pair configuration and separately launched normal-product restart checks.
+This is a bounded rigid/two-bone route, not a complete arbitrary humanoid/game solver.
+The local reverse standing recipe remains a recorded rejected boundary. Mirroring is
+not a prerequisite. Game inputs, derivatives, captures and configs remain ignored.

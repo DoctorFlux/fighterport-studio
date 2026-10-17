@@ -53,24 +53,31 @@ namespace BrawlCrate.Authoring
             });
         }
         public string AddAnimation(string characterId,string motionPath,CancellationToken token=default(CancellationToken))
+            =>AddBrawlAnimation(characterId,motionPath,null,null,token);
+        public string AddAnimationFromContainer(string characterId,string motionPath,string containerPath,string nativePath,CancellationToken token=default(CancellationToken))
+            =>AddBrawlAnimation(characterId,motionPath,containerPath,nativePath,token);
+        private string AddBrawlAnimation(string characterId,string motionPath,string containerPath,string nativePath,CancellationToken token)
         {
             CheckSources();token.ThrowIfCancellationRequested();var source=Character(characterId);
             var initial=Animation(source.InitialAnimationId??_state.Animations.First(a=>a.SourceCharacterId==characterId).Id);
             var session=new SourceFolderSession(Path.GetDirectoryName(SourceWriteGuard.NormalizePath(motionPath)),Path.GetDirectoryName(Path.GetDirectoryName(_scratch)));
-            var staged=session.Stage(motionPath,token);BrawlContainerAudit.Inspect(staged.StagedPath,token).RequirePreservable();
+            var staged=containerPath==null?session.Stage(motionPath,token):session.StageContainer(motionPath,containerPath,token);BrawlContainerAudit.Inspect(staged.StagedPath,token).RequirePreservable();
             string original=Materialize(source.NativeHash,source.Extension),output=Path.Combine(_scratch,Id()+source.Extension);
             try
             {
                 using(var root=NodeFactory.FromFile(null,original))
                 using(var imported=NodeFactory.FromFile(null,staged.StagedPath))
                 {
-                    var motion=imported as CHR0Node??throw new IOException("Add animation currently accepts loose CHR0 v4 only; other adapters remain queued.");
+                    string relative=nativePath;
+                    if(containerPath!=null && containerPath.Length!=0){if(nativePath==null || !nativePath.StartsWith(containerPath+"/",StringComparison.Ordinal))throw new IOException("Select a motion within its explicit native container.");relative=nativePath.Substring(containerPath.Length+1);}
+                    var motion=(containerPath==null?imported:BrawlProjectAdapter.At(imported,relative)) as CHR0Node??throw new IOException("Select a loose CHR0 v4 or an explicit CHR0 within the selected raw BRRES.");
                     if(motion.Version!=4)throw new IOException("This adapter requires CHR0 v4.");
                     var existing=(CHR0Node)BrawlProjectAdapter.At(root,initial.NativePath);var parent=existing.Parent;int index=existing.Index;
                     string copy=Path.Combine(_scratch,Id()+".chr0");try{motion.Export(copy);var node=(CHR0Node)NodeFactory.FromFile(null,copy);parent.InsertChild(node,index);existing.Remove();existing.Dispose();root.Export(output);}finally{if(File.Exists(copy))File.Delete(copy);}
+                    using(var decoded=NodeFactory.FromFile(null,output))CompanionWorkspace.RequireSameMotion(motion,(CHR0Node)BrawlProjectAdapter.At(decoded,initial.NativePath));
                     var animation=new AnimationAsset {Id=Id(),SourceCharacterId=source.Id,SourceRigFingerprint=source.RigFingerprint,Name=motion.Name,NativePath=initial.NativePath,NativeHash=AddBlob(ReadBounded(output)),
-                        NativeIdentity=staged.Sha256+":loose:CHR0:"+motion.Name,OriginalPayloadHash=BrawlProjectAdapter.PayloadHash(staged.StagedPath,""),NativeExportHash=BrawlProjectAdapter.ExportHash(motion,_scratch),Version=4,Frames=motion.FrameCount,Loop=motion.Loop};
-                    animation.AdditionalOriginals.Add(new NativeSourceEvidence {Path=staged.SourcePath,Hash=AddBlob(ReadBounded(staged.StagedPath))});
+                        NativeIdentity=staged.Sha256+":"+(containerPath==null?"loose":nativePath)+":CHR0:"+motion.Name,OriginalPayloadHash=BrawlProjectAdapter.PayloadHash(staged.StagedPath,containerPath==null?"":relative),NativeExportHash=BrawlProjectAdapter.ExportHash(motion,_scratch),Version=4,Frames=motion.FrameCount,Loop=motion.Loop};
+                    animation.AdditionalOriginals.Add(new NativeSourceEvidence {Path=staged.SourcePath,Hash=AddBlob(ReadBounded(staged.SourcePath))});
                     BrawlProjectAdapter.ValidateArchive(output,source,animation,_scratch,true);
                     BrawlProjectAdapter.ValidateEdit(original,output,source,animation,_scratch,true);
                     if(Hash(ReadBounded(staged.SourcePath))!=staged.Sha256)throw new IOException("Motion source changed during import.");token.ThrowIfCancellationRequested();

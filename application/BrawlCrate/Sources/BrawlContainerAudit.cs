@@ -42,6 +42,16 @@ namespace BrawlCrate.Sources
         public void RequirePreservable()
         { if (Issues.Count != 0) throw new IOException("Container cannot be assembled without loss: " + string.Join("; ", Issues.Take(8))); }
 
+        // Explicit read-only companion selection. Opaque siblings remain original evidence;
+        // this does not admit them for native parsing or enclosing-package rewriting.
+        public static BrawlContainerAudit InspectSelected(string path,string containerPath,CancellationToken token=default(CancellationToken))
+        {
+            var selected=BrawlContainerSelection.List(path,token).SingleOrDefault(c=>c.Path==containerPath)??throw new IOException("Selected BRRES identity is missing.");
+            var audit=new BrawlContainerAudit();using(var input=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))
+                audit.Read(input,selected.Offset,selected.Length,containerPath,"selected BRRES",0,token);
+            return audit;
+        }
+
         private void Read(FileStream input, long offset, long length, string path, string arcEntry, int depth, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

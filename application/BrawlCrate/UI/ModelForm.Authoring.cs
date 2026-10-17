@@ -70,7 +70,7 @@ namespace BrawlCrate.UI
         internal void MarkDocumentStale(){Editor.SetAuthoringReadOnly(true);_identity.Text="Stale target instance — select and reopen its current revision";}
         internal void UpdateAuthoringIdentity()
         {
-            _identity.Text=Document==null?(Editor.AuthoringReadOnly?"Native comparison (read-only) — not associated with a character project":"Native model — not associated with a character project"):Document.Mode+" | project "+Document.Session.Project.State.Id.Substring(0,8)+" | target "+Document.TargetId.Substring(0,8)+" / rig "+Document.TargetFingerprint.Substring(0,8)+" | "+(Document.InstanceId??"immutable source")+" r"+Document.InstanceRevision;
+            _identity.Text=Document==null?(Editor.AuthoringReadOnly?"Native comparison (read-only) — not associated with a character project":"Native model — not associated with a character project"):Document.Mode+" | project "+Document.Session.Project.State.Id.Substring(0,8)+" | target "+Document.TargetId.Substring(0,8)+" / rig "+Document.TargetFingerprint.Substring(0,8)+" | "+(Document.InstanceId??(Document.Mode.StartsWith("Source")?"immutable source":"unassigned native comparison"))+" r"+Document.InstanceRevision;
         }
         private void DetachDocument()
         {

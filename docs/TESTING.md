@@ -12,6 +12,7 @@ repository root:
 ./scripts/test.ps1 -Companions -Gui
 ./scripts/test.ps1 -DumpSources -Gui
 ./scripts/test.ps1 -Containers -Gui
+./scripts/test.ps1 -Humanoid -Gui
 ./scripts/run.ps1
 ```
 
@@ -26,7 +27,8 @@ The executable is `application/BrawlCrate/bin/x86/Release/net472/FighterPort.Stu
 `tests/NativeSmoke` executable, using a fresh ignored `artifacts/restart/native-*`
 directory. `-Gui` additionally opens real editor windows on the interactive desktop
 and writes `gui-*` captures. Allow those windows to finish; avoid interacting with
-them during the short check. A 90-second watchdog fails a hung check. Logs and native
+them during the check. Watchdogs are 90 seconds normally, 180 for workspace and 300 for
+humanoid modes. Logs and native
 outputs stay local. No previous FighterPort tests or worker are used.
 
 The original procedural fixture is a two-bone rigid paddle with four vertices, exact
@@ -72,6 +74,48 @@ completed, passing source update; no repeat permission request is needed. Preser
 with normal pushes to origin/main. CI dispatch, releases, tags, artifact uploads and binary
 distribution remain unauthorized. The source/component audit remains required before
 binary distribution.
+
+Humanoid/contact H1/H2 — 2026-10-17:
+
+`test.ps1 -Humanoid -Gui` generates original full humanoids (v9/v11, contrasting proportions,
+local axes/parents/spines/fingers/helpers and blended weights), original CI8/palettes with
+alpha/three mips, and raw ARC directories with opaque/empty siblings. It tests explicit
+selected-BRRES intake, whole-original versus staged hashes, stale/missing/bounds/cancel/
+reparse rejection, exact profile/body review, independent shared projects, native FK and
+contact outputs, reverse transfer, body-relative/two-wrist contacts, aerial/no-lock, full
+turn/finger loop, margins, basis re-expression and deterministic random scrubbing. Contact
+goals include independent fixture-author floor/sole expectations and native decoded mesh
+checks; solver self-comparison alone is insufficient. Native serialization limits are
+.02 position/.15 degrees/.03 mesh units at quarter frames, separate from target contact
+quality. Unreachable/unsupported/fast-winding cases reject rather than changing limits.
+
+GUI mode exercises the actual previewer Fit/comparison/Apply/edit/save/undo surfaces and
+virtual contact/pole/pelvis handles (handler automation, native GL/timeline). It verifies
+rendered geometry, immutable source/other-project revisions and small-window/hide-reopen
+behavior. Normal product restart is separate: run
+`tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <original humanoid.fpcharacter> -PreviewWorkspace`
+and repeat for the independently saved other project. The helper launches the real exe
+twice, restores exact native hashes/project records, exports/saves from the previewer and
+requires normal exit. No persistent undo-history, manual-click, physical high-DPI, external
+native-tool, Modkit or game result follows from those tests.
+
+Opt-in local checks (never CI/default fixtures): `NativeSmoke.exe --probe-brawl <selected
+local file> <new private evidence directory>` lists bounded BRRES ranges/native metadata.
+`--local-humanoid <private XML config> <new private evidence directory>` accepts exactly
+two `<character>` elements under `<localHumanoid>` with explicit id/model/modelPath/motion/
+motionContainer/clip/extraClip selections. `trial="true"`, `contacts="true"`, optional
+`contactSource="A"`/`"B"` and `gui="true"` enable diagnostic trials and native GUI checks.
+Store actual absolute inputs/config/receipts only in ignored local storage. No commercial
+paths, hashes, captures or derivatives enter commits. Characterization remains unreviewed;
+only explicitly authored original fixtures receive author review in the regression suite.
+The current reverse local contact recipe is an intentionally recorded failing boundary,
+not a default passing regression. Preserve that receipt and follow plans/current.md.
+
+The bfloat fix has independent finite IEEE byte vectors whose reversed bits look like
+signaling NaNs, including signed zero, subnormal/normal boundaries and large finite values.
+Generated CHR0 bakes explicitly opt into existing I12 Hermite encoding. All eight retained
+suite families must still pass in native and GUI modes after native codec changes; run
+GUI tests sequentially and finish active harnesses before rebuilding their locked exe.
 
 No broad fidelity, arbitrary skeleton retargeting, separate native tool, Modkit build,
 console or game result follows from these checks. Keep each format/version/operation,

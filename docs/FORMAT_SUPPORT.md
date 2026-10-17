@@ -3,6 +3,26 @@
 Inherited implementation is source-inspected, not automatically verified support.
 No previous FighterPort counts or capabilities transfer to this codebase.
 
+2026-10-17 H1/H2 addition after 7458be7 (historical rows below retain their original scope):
+
+| Resource/operation | New evidence | Limits |
+|---|---|---|
+| Original MDL0 v9/v11 humanoids / CHR0 v4 | Full authored humanoids with contrasting proportions, local axes, parents, 2/3 spine and finger joints, explicit helpers, blended skin and distinct body volumes; separate native FK/corrected save/decode, reverse, persistent edits/review/undo | Unit-scale rigid Brawl adapter, no mesh rebinding or arbitrary channel fidelity claim |
+| Selected raw ARC/PAC companion BRRES | Bounded directory selection with opaque/empty siblings; original paths/full hashes, cancellation/missing/changed/bounds/reparse checks; native/project reload | Only chosen BRRES decoded; whole opaque source retained as evidence, not rewritten/flattened or certified as a package round trip; model base stays complete |
+| Original TEX0 v1 CI8 + PLT0 v1 RGB565/RGB5A3 | Explicit material palette resolution, original alpha and three mip levels independently decoded, payload preservation and native/project reopen | Same-name palette/material binding subset; other indexed formats/versions remain queued |
+| Local Brawl Snake/Mario own-rig playback | Exact selected main MDL0 v9 models (70/63 bones) and CHR0 v4 Wait1/Fall; CI8+palettes, CMPR/RGB5A3 dependencies, normal-material textured native preview/playback and separate PAC reopen | Opt-in local inputs only, not published. External metal texture absent; optional metal resources retained. Not a universal retail package/channel claim |
+| Local Snake -> Mario and independent Mario -> Snake FK | Fresh quarter-frame native bone/mesh/orientation checks pass both directions | Unreviewed semantic proposals; no approved commercial assignment, arbitrary clip or game claim |
+| First interval contact correction | Original planted contact error 0.808666 -> 0.0000723043 native units; independent reverse, body-relative hand and two-wrist goals; aerial no-lock, winding, finger loop, random scrubbing and basis re-expression tests | Explicit goals, analytic two-bone limbs and bounded pelvis Y; no whole-body clearance, automatic contact recognition, scale/twist/prop solver or perfect retargeting |
+| Local Snake -> Mario standing diagnostic | 341 decoded samples: contact 2.183194 -> 0.00309587; native error .00649909 units/.124225 degrees/.00960849 mesh units; actual FK/corrected geometry/playback and separate PAC | Labeled unreviewed diagnostic only. Reverse standing correction rejects: reach failures and native error exceed limits; FK alone passes |
+| Native float / baked CHR0 encoding | Independent finite IEEE byte vectors preserve exact bits through uint-backed endian storage; generated I12 Hermite values/tangents survive native decode; retained regressions rerun | Native-file checks use BrawlLib, not an external validator or in-game test; ordinary codec policy unchanged |
+| Existing Model Previewer humanoid controls | Shared exact profiles/body landmarks, explicit interval goals, virtual goal/pole/pelvis handles, Fit/FK/corrected comparison, independent Apply, native edit, save/reload and undo | Read-only source/trial ownership and one editable target; no approval from names. Reviewed revision fork UI and full solver remain queued |
+
+Native bake sample limits are .02 position / .15 degrees / .03 mesh native units, separate
+from explicit target contact error. Unsupported scale/compensation/dynamic non-root motion
+and fast winding reject. Contact records are project metadata; supported corrections bake
+to native bones. Gameplay, runtime slots, Modkit and playable compilation remain unverified.
+Mirroring is no longer a prerequisite; the full Brawl/channel and multi-game queue remains.
+
 | Game/resource | Read/edit/write | Preview/GUI | Package/game |
 |---|---|---|---|
 | Original Brawl BRRES / MDL0 v11 / CHR0 v4 / TEX0 v1 RGBA8/material | Original fixture encode/decode, exact geometry/identity binds, key edit, Save-new/reopen and unchanged source hashes passed | Actual native tree, texture/material controls, textured OpenGL poses, playback and key edit observed | No separate native tool or game check |

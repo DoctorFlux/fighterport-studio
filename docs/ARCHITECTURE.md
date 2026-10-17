@@ -282,8 +282,8 @@ Native edits retain the original bake report explicitly as historical measuremen
 
 The current UI hides legacy gameplay fields behind Legacy drafts. Assigning animations
 requires no gameplay record. Legacy free-text slots have no verified runtime binding.
-The v3 workspace below adds typed slots/anchors. Reviewed mirror precedes later final-target
-fitting, interval IK and atomic template fill with saved dependencies. Keep native originals, independent targets
+The v3 workspace below adds typed slots/anchors. The 2026-10-17 humanoid amendment removes
+mirror as a prerequisite for final-target fitting, interval IK and template fill. Keep native originals, independent targets
 and modular adapters; non-Brawl sources must not pass through MDL0/CHR0.
 
 
@@ -351,7 +351,69 @@ it cannot replace another selected view after handoff. Cancellation rolls back p
 batches; unreferenced immutable blobs may remain within store quotas. This is not a general
 thread-safe public CharacterProject API. Library indexing remains metadata-only and paged.
 
-All later mirror/fitting/IK/contact/template/channel/non-Brawl/Modkit/tool features must
+Additional fitting/IK/contact/template/channel/non-Brawl/Modkit/tool/mirror features must
 extend this workspace and these explicit bindings. Native animation, mesh rebinding and
 gameplay remain separate, with gameplay deferred in this phase. No dependency/runtime/
 renderer/CPU migration or new third-party package was introduced.
+
+Proportion/contact checkpoint H1/H2 — 2026-10-17, continued from 7458be7:
+
+The existing Rig/FK tab now embeds HumanoidWorkspacePanel in the same session. Detection,
+explicit review, chain/body landmark edits, contact intervals, FK/corrected comparisons,
+Fit, independent Apply and native trial export all use explicit clip/target/destination
+bindings. Virtual contact/pole/pelvis handles draw in ModelPanel and commit one recipe
+transaction on release; they are never native bones. Native playback remains the clock.
+Drag release rejects a changed document, selected clip/target/part or project snapshot;
+handles are drawn only for the exact bound native destination.
+Comparisons own separate decoded roots and remain read-only. Unreviewed proposals may
+produce labeled diagnostic trials, but cannot become approved target assignments.
+
+HumanoidRetargeting.cs contains common proper rigid transforms and the deterministic
+stateless solver, without BrawlLib, native-format or UI dependencies. Adapter-side native
+evaluation supplies local transforms after interpreting flags. World rest-rotation deltas
+transfer through semantic chains; target locals reconstruct through the animated target
+hierarchy. Spine/finger chain lengths can differ. This first route requires reviewed
+three-joint limbs, unit rigid scales and InPlace actor motion. Pelvis displacement scales
+by measured leg lengths, not assumed physical units; target bone lengths/mesh are retained.
+Optional target channels retain normalized target-reference motion, with explicit loss
+reporting for untransferred source channels. Old rigid FK and direct cross-rig guards remain.
+
+Humanoid profiles bind exact rig/interpretation/calibration and reviewed digests. Body
+profiles additionally bind model/bind/weight evidence and store sole/wrist landmarks,
+poles, ground, pelvis limit, widths and torso/head measurements. Reviewed revisions publish
+as immutable bounded shared records and can be reused across independent projects. Draft
+chain/landmark edits are transactional; reviewed-revision editing/fork UI remains queued.
+Bind/rest, calibration and Idle/Fall phases are distinct. Version 3 adds optional records;
+old v1/v2/v3 files remain loadable. Limits: 8 rig profiles, 8 bodies, 64 recipes, 16 pins.
+
+Explicit World/Head/Spine contact intervals drive analytic two-bone limbs, poles, end
+orientation and bounded shared pelvis Y. Pelvis participation fades with interval margins;
+there are no inferred floor locks on aerials. Unreachable reach/interval conflicts report
+residuals without stretching. This is not a full anatomical/temporal/clearance/twist/prop
+solver. Pure source-local basis re-expression, analytic planted soles, body-relative hand
+and two-wrist goals provide independent expectations. Native serialization checks remain
+separate from contact quality and from human/game acceptance.
+
+BrawlHumanoidBake evaluates native curves and writes independent FK/corrected archives,
+keeping target skeleton/binds/weights and unrelated native resources. I12 is an explicit
+opt-in for baked Hermite values/tangents; inherited default encoding remains. The bfloat
+storage fix keeps reversed IEEE bits in uint rather than a disguised float, avoiding x86
+signaling-NaN quieting corruption. Four-byte layout is unchanged. Native orientation
+measurement validates scale/shear before orthonormalizing float rotation frames; raw
+position/mesh measurements remain unchanged. Limits are .02 position / .15 degrees / .03
+mesh units at quarter frames, not an arbitrary continuous error certificate. Integer
+bakes reject >120 degrees/frame travel/tangents, animated scale/compensation and unsupported
+dynamic non-root translations. Source constant authored offsets are evaluated natively,
+never copied as target limb lengths. Bake budgets: 2..1024 frames, one million scalar
+keys, eight million decoded vertex samples. Working copies reserve 256 files / 128 MiB;
+trial disposal releases only the exact newly created temporary comparisons.
+
+Selected companion admission is separate from dump discovery. BrawlContainerSelection
+reads bounded raw ARC directories, without decompression/magic scanning/opaque parsers,
+and stages one explicitly chosen BRRES through existing strict validation. Empty/redirect
+and unknown siblings stay outside decoding. The complete original hash/bytes/provenance
+and original indexed path remain pinned; this is not a round trip of an opaque package.
+Model bases still require the full supported archive. Companion v4 adds selected-range
+and explicit palette identities while v1/v2/v3 load. MDL0 v9/v11, CHR0 v4 and the documented
+normal-material TEX0/PLT0 subset are admitted; no repository-root source mount or limit
+removal is involved. Target model PAC hierarchy is retained through native output.

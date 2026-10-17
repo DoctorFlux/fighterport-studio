@@ -420,7 +420,9 @@ namespace BrawlLib.Wii.Animations
 
         #region Size Calculation
 
-        public static int CalculateCHR0Size(KeyframeCollection kf, out int entrySize, out AnimationCode code)
+        // FighterPort 2026-10-17: opt-in lossless Hermite storage for validated humanoid bakes.
+        // Default native editing/legacy encoding selection is unchanged.
+        public static int CalculateCHR0Size(KeyframeCollection kf, out int entrySize, out AnimationCode code, bool preserveInterpolation = false)
         {
             int dataSize = 0;
             entrySize = 8;
@@ -429,7 +431,7 @@ namespace BrawlLib.Wii.Animations
 
             for (int i = 0; i < 3; i++)
             {
-                dataSize += EvaluateCHR0Group(ref code, kf, i, ref entrySize);
+                dataSize += EvaluateCHR0Group(ref code, kf, i, ref entrySize, preserveInterpolation);
             }
 
             if (!code.HasRotation && !code.HasTranslation)
@@ -465,7 +467,7 @@ namespace BrawlLib.Wii.Animations
         private const float tanError = 0.001f;
 
         private static int EvaluateCHR0Group(ref AnimationCode code, KeyframeCollection kf, int group,
-                                             ref int entrySize)
+                                             ref int entrySize, bool preserveInterpolation)
         {
             int index = group * 3;
             int numFrames = kf.FrameLimit;
@@ -716,6 +718,7 @@ namespace BrawlLib.Wii.Animations
                     }
                 }
 
+                if(preserveInterpolation && (!isFixed[0] || !isFixed[1] || !isFixed[2]))format=AnimDataFormat.I12;
                 //calculate size
                 for (int i = 0; i < evalCount; i++)
                 {

@@ -36,6 +36,8 @@ internal static partial class NativeSmoke
         if (args.Length == 2 && args[0] == "--verify-companions") return VerifyCompanionRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-dump") return VerifyDumpRestart(args[1]);
         if (args.Length == 3 && args[0] == "--inspect-brawl") return InspectConfiguredBrawl(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--probe-brawl") return ProbeBrawl(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--local-humanoid") return LocalHumanoid(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--verify-container") return VerifyContainerRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-workspace") return VerifyWorkspaceRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-shared") return VerifySharedRestart(args[1]);
@@ -81,7 +83,7 @@ internal static partial class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui", "--library-native", "--library-gui", "--retarget-native", "--retarget-gui", "--shared-native", "--shared-gui", "--workspace-native", "--workspace-gui" }.Contains(args[0]))
+        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui", "--library-native", "--library-gui", "--retarget-native", "--retarget-gui", "--shared-native", "--shared-gui", "--workspace-native", "--workspace-gui", "--humanoid-native", "--humanoid-gui" }.Contains(args[0]))
         {
             Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
@@ -90,7 +92,8 @@ internal static partial class NativeSmoke
         if (Directory.Exists(_output) && Directory.EnumerateFileSystemEntries(_output).Any())
             throw new IOException("Use a new/empty evidence directory; previous evidence is never overwritten.");
         Directory.CreateDirectory(_output);
-        var watchdog = new Thread(() => { Thread.Sleep(args[0].StartsWith("--workspace")?180000:90000); File.AppendAllText(Path.Combine(_output, "result.txt"), "FAIL: 90 second timeout\r\n"); Environment.Exit(3); }) { IsBackground = true };
+        int timeout=args[0].StartsWith("--humanoid")?300000:args[0].StartsWith("--workspace")?180000:90000;
+        var watchdog = new Thread(() => { Thread.Sleep(timeout); File.AppendAllText(Path.Combine(_output, "result.txt"), "FAIL: "+timeout/1000+" second timeout\r\n"); Environment.Exit(3); }) { IsBackground = true };
         watchdog.Start();
         try
         {
@@ -101,6 +104,7 @@ internal static partial class NativeSmoke
             // pumping can create WinForms handles on this STA thread.
             if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if(args[0].StartsWith("--humanoid",StringComparison.Ordinal)){ExerciseHumanoid(args[0].EndsWith("gui",StringComparison.Ordinal));Log("PASS: original full-humanoid native/contact checkpoint; declared subset only, no commercial approval/clearance/Modkit/game claim.");return 0;}
             if (args[0].StartsWith("--workspace",StringComparison.Ordinal)) {ExerciseWorkspace(args[0].EndsWith("gui",StringComparison.Ordinal));Log("PASS: previewer workspace/native slots/anchors; no fitting/Modkit/game claim");return 0;}
             if (args[0].StartsWith("--shared", StringComparison.Ordinal))
             { ExerciseShared(args[0].EndsWith("gui", StringComparison.Ordinal)); Log("PASS: shared immutable revisions across separate projects; no mirroring/transition/Modkit claim"); return 0; }

@@ -132,6 +132,13 @@ namespace BrawlCrate.UI
             var anchor=Project.State.Anchors.Single(a=>a.TargetId==targetId && a.Role==role);var problem=Project.AnchorProblem(anchor);if(problem!=null)throw new IOException(problem);
             return ShowInstance(anchor.InstanceId,owner,"Reference "+role+" (read-only)",anchor.Frame);
         }
+        internal PreviewDocument ShowHumanoidTrial(HumanoidTrial trial,bool corrected,ModelForm owner)
+        {
+            if(Busy)throw new IOException("Finish or cancel the current operation before selecting its native comparison.");
+            string mode=(trial.Report.ProfilesReviewed?"Reviewed":"Unreviewed diagnostic")+(corrected?" corrected humanoid":" FK-only humanoid")+" comparison (read-only)";
+            PrepareSwitch(owner,mode,false);string path=Project.MaterializeHumanoidTrial(trial,corrected);var target=Project.State.Characters.Single(c=>c.Id==trial.TargetId);
+            return Show(owner,target,trial.TargetAnimationId,null,path,null,mode,0,false);
+        }
         private PreviewDocument Show(ModelForm owner,SourceCharacterProfile profile,string animation,string instance,string path,NativeEditLease lease,string mode,double frame,bool discard)
         {
             try

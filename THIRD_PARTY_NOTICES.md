@@ -51,3 +51,9 @@ items above still apply before any binary distribution.
 The Model Previewer workspace continuation adds original repository-licensed source and
 uses existing framework/native editor dependencies. It adds no third-party package or
 binary. Existing upstream/component notices and unresolved distribution obligations remain.
+
+The 2026-10-17 humanoid/input continuation adds original repository-licensed services,
+controls and procedural test generators. The inherited bfloat and opt-in CHR0 encoding
+changes are recorded in UPSTREAM.md and source modification notices. It adds no package,
+binary or redistributed game fixture. The component audit and corresponding-source /
+replacement/relink obligations above remain prerequisites for binary distribution.
