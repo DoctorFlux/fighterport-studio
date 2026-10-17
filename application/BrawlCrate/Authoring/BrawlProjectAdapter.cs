@@ -13,7 +13,7 @@ using System.Text;
 namespace BrawlCrate.Authoring
 {
     // This native adapter does not define an intermediate for other games.
-    internal static class BrawlProjectAdapter
+    internal static partial class BrawlProjectAdapter
     {
         internal const string Interpretation = "brawl-native-v1; native XYZ local basis; Euler degrees; native units (physical scale unknown); no semantic roles approved";
         internal static ResourceNode At(ResourceNode root, string path)
@@ -47,7 +47,7 @@ namespace BrawlCrate.Authoring
             int keys = 0;
             foreach (CHR0EntryNode entry in motion.Children)
             {
-                if (!names.Contains(entry.Name)) throw new IOException("Motion contains an unbound bone. Retargeting is not implemented.");
+                if (!names.Contains(entry.Name)) throw new IOException("Motion contains an unbound bone; explicitly bind it to a supported source rig before transfer.");
                 foreach (var array in entry.KeyArrays)
                     foreach (var k in array.Entries)
                         if (++keys > 1000000 || k._index < 0 || k._index > motion.FrameCount || float.IsNaN(k._value) || float.IsInfinity(k._value) || float.IsNaN(k._tangent) || float.IsInfinity(k._tangent))
@@ -109,7 +109,7 @@ namespace BrawlCrate.Authoring
                     throw new IOException("Immutable library animation changed.");
             }
         }
-        internal static void ValidateEdit(string baseline, string edited, SourceCharacterProfile profile, AnimationAsset animation, string scratch)
+        internal static void ValidateEdit(string baseline, string edited, SourceCharacterProfile profile, AnimationAsset animation, string scratch, bool importingClip=false)
         {
             ValidateArchive(edited, profile, animation, scratch, false);
             BrawlContainerAudit.VerifyPreserved(baseline, edited, profile.ContainerPath);
@@ -121,7 +121,7 @@ namespace BrawlCrate.Authoring
                 var b = ((BRRESNode)At(after, profile.ContainerPath)).Children.SelectMany(g => g.Children).ToList();
                 if (a.Count != b.Count) throw new IOException("Adding/removing native resources is not supported by this project increment.");
                 for (int i = 0; i < a.Count; i++)
-                    if (a[i].GetType() != b[i].GetType() || a[i].Name != b[i].Name ||
+                    if (a[i].GetType() != b[i].GetType() || (a[i].Name != b[i].Name && !(importingClip && PathOf(before,a[i])==animation.NativePath)) ||
                         (PathOf(before, a[i]) != animation.NativePath && ExportHash(a[i], scratch) != ExportHash(b[i], scratch)))
                         throw new IOException("Only the bound CHR0 may change in this project increment. Save other native edits separately.");
             }

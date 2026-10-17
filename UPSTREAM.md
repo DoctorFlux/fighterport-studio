@@ -59,3 +59,13 @@ The baseline manifest remains unchanged as a comparison anchor. Git diffs and lo
 each modification. `scripts/verify-upstream.py` reports divergence and validates baseline entries.
 No blanket authorship/license replacement is intended. See THIRD_PARTY_NOTICES.md before any
 binary distribution. Corresponding-source/component audit remains incomplete.
+
+
+2026-10-17 continuation after b45fcc3: original FighterPort Authoring services add an
+immutable disk-backed animation library, multi-clip source binding/v1 migration, exact
+reviewed rig maps, format-neutral rigid FK math and a Brawl-native sampled bake/validation
+adapter. Native editor controls are reused for review/preview/capture/export. Original
+fixtures test independent projects and both FK directions. No inherited native codec,
+third-party dependency, source baseline manifest or license/header was replaced. The new
+shared-library/slots/transitions brief is preserved verbatim in its canonical docs path;
+the prior library specification retains its body under an explicit scope amendment.

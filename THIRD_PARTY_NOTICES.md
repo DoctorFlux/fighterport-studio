@@ -42,3 +42,8 @@ design/output permission is stated in the new test generator; generated game-for
 local and ignored. Commercial input folders and their derivatives remain outside all commits.
 The source-bound library/project increment adds original repository-licensed source and
 original procedural rig fixtures; it introduces no new third-party package or binary.
+
+The shared-library/FK continuation adds original repository-licensed source and procedural
+fixtures only, without new dependencies, distributed native fixtures, installers or game
+assets. Existing component/source-distribution obligations remain unchanged and unresolved
+items above still apply before any binary distribution.

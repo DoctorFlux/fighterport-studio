@@ -12,7 +12,7 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [source-bound library and projects](#source-bound-library-and-projects--2026-10-17).
+Current checkpoint: [shared library and reviewed FK](#shared-library-and-reviewed-fk--2026-10-17).
 The first authoring increment follows the completed container checkpoint, preserving HEAD
 9f9405fb925f50b4df33ec1ae41e17b1dd77b6dc and all newer passing work. Earlier receipts
 below describe their historical checkpoints. docs/plans/current.md remains the only
@@ -375,6 +375,8 @@ review and normal history-preserving push; publication success is verified separ
 
 ## Source-bound library and projects — 2026-10-17
 
+Historical receipt at b45fcc3; the shared/FK checkpoint below extends its declared limits. Current acceptance is in plans/current.md.
+
 The first R3 authoring acceptance is implemented inside the existing application.
 File > Character Library and .fpcharacter file opening provide source model groups,
 source-bound clips, native previews, explicit manual drafts and independent slot instances.
@@ -463,3 +465,119 @@ The master spec remains byte-identical (SHA256
 Publication uses the standing reviewed-source authorization; the exact source commit and
 remote verification are recorded in Git and the local publication receipt after pushing.
 No assets, binaries, releases, public PRs or CI dispatch are part of this source update.
+
+
+## Shared library and reviewed FK — 2026-10-17
+
+Continued actual HEAD b45fcc34a4b437438cb94155f801c7be2feb5a73 without resetting or
+replacing the BrawlCrate-derived application. The supplied shared-library/slots/transitions
+brief is persisted verbatim as FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md,
+SHA256 c706891b56834b088880d1882fb563d5a942d76c87001b7eaacc778e69db8667.
+The previous library spec retains its supplied body under an explicit scope amendment;
+its older byte-identical hash above describes that historical checkpoint only.
+Models/animations are the active phase; gameplay scripting/damage/hitboxes/ACMD/PSA/Lua,
+cancel/combo execution and playable compilation are deferred. Editable legacy draft fields
+are behind Legacy drafts and animation assignments need no MoveAsset.
+
+Checkpoint A: real explicit rig-review grid, exact source/target fingerprints and native
+interpretations, semantic role/index pairs, helper policies, unit ratio and root policy,
+with undo/redo and persisted review invalidation digest. Direct cross-rig Assign still
+rejects. A separate reviewed FK route transfers original rig A (2 bones) to genuinely
+different rig B (4 bones, changed rest axes/parents/proportions and blended skinning),
+then independently proves B -> A. Native target model/binds/weights, unrelated resources
+and enclosing archive remain intact; this is animation transfer, not mesh rebinding.
+
+Fresh native CHR0 decode checks world bone positions/orientations and weighted mesh at
+quarter frames, including fractional native Hermite loop-boundary phases and wrapped
+start (129 samples for the 31-frame original). Independent analytic expectations test
+both directions at declared fractional data/seam times. A 360-degree Euler key survives.
+Forward maxima: position 4.44e-15 native units, orientation 2.565e-14 degrees, mesh
+2.142e-6 native units; acceptance limits .002 / .05 / .005 respectively. These are
+sampled bounds; general nonlinear/multi-axis winding and other loop conventions remain
+unverified. The source's inherited loop return is preserved, not automatically improved.
+
+Native GUI observations: empty mapping approval rejects, explicit test-authored mapping
+is accepted, actual inherited model editor displays the textured blended target and Play
+advances. The inspected OpenGL framebuffer shows deformation; native editor/library captures
+are local. OriginalFixture author mappings are not commercial-rig review approval.
+Native edits mark prior FK measurements historical so later manual changes are not passed
+off as measured target constraints.
+
+Checkpoint B: immutable disk-backed shared records/payloads and a bounded metadata cursor,
+multiple clips on one source registration, explicit v1 migration preserving stable IDs,
+actual native edits/provenance and legacy drafts, plus separate .fpcharacter projects.
+New GUI projects use the app-wide store; v1 migration leaves its original file untouched
+and requires a new save path. Project XML contains selected metadata/hash pins, no global
+library or native blob inventory. Two projects pin the same immutable source clip revision;
+editing target one to 25 degrees leaves target two at 180 and shared data unchanged.
+A fresh process edits/undoes again with the same independence. Session undo/redo persists
+actual current edits on save; undo history intentionally clears on restart.
+
+Observed four fresh normal FighterPort.Studio.exe launches (two per separate project):
+restored exact project records and working hashes, opened the inherited native editor,
+exported through the real output path/button, saved and exited normally. Outputs match
+previous native decode: project one 6a5b491f69877db387cc18d3192d1e5f62cd0ad0cdd2f5f705375ce5925e7a5a;
+project two 0c7fa14b0e44b0c9284205f02c9814c6a458e4231084b8c4d5962d4447c343b9.
+Product PrintWindow images prove UI restoration; focused OpenGL captures prove visible
+geometry. File pickers are bypassed; no manual-click/external-native-tool claim.
+
+Focused rejection checks: stale/unreviewed/tampered policies, incomplete helpers, non-unit
+rest scales, animated ignored helpers/non-root translations, cancelled/fast-winding bake,
+immutable metadata conflict, changed pinned records, concurrent writers, cancelled index/
+import, page budget, cursor generation invalidation and missing pinned-library rejection.
+Existing changed/missing original, reparse/hardlink, transaction/source guards and container
+regressions remain passing. Post-product receipt rechecks seven original hashes across the
+new focused fixtures, shared metadata/native revisions and the untouched second project.
+
+Failures caught and resolved during development: native BRES sole-child replacement could
+remove its group (insert-before-remove fixes it); inherited dense rotation encoding changed
+fractional tangents (exact linear curves remain sparse; strict decode rejects other losses);
+concurrent lock-file preflight needed bounded retry; the GUI playback test needed its own
+bounded stop timer. Final passing tests below supersede the failed exploratory receipts.
+
+Current limits: Brawl adapter MDL0 v11 / CHR0 v4 with existing RGBA8/canonical-container
+admission. Additional clips currently import loose CHR0 v4. Shared records are immutable
+revision 1; revision-management UI, portable bundles, cleanup/tombstones and shared map/
+template records are queued. Maps currently reuse across clips within one project. Store:
+4 GiB / 100,000 records; native blob <=32 MiB; metadata page <=256 visited / 64 results;
+animation record <=128 KiB / character <=1 MiB. Projects: 8 profiles / 128 clips / 64
+instances, drafts and maps / 1 MiB metadata; original session/undo budgets still apply.
+FK: <=128 bones, 2..2048 frames, <=1 million scalar keys / 8 million vertex samples;
+unit scales only, no compensation/billboards, static ignored helpers, no animated
+non-root translation. Euler singularities, ambiguous fast winding and decoded errors
+reject. Calibrated root translation is service-tested; native fixtures use in-place.
+No automatic semantic recognition, IK/contacts, mirror, fitting, typed native-slot packs,
+Idle/Fall anchors, template fill or non-Brawl adapter is implemented yet. No current
+commercial fighter, external native-tool, Modkit import or game test was observed.
+All Brawl fidelity/version/channel and wider source/target requirements remain queued.
+
+Final primary build: Release/x86/net472, zero warnings/errors, no new dependency.
+Executable: D:/Users/ChatGPT/ROA2TOOL/application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe.
+SHA256: 812147291853a632fe07599298bdada76d9fc48fda8fd199c9c6fda8f9d1fccf.
+Recovery remains untouched at D:/Users/ChatGPT/FighterPort-Recovery-20261017-01/workspace;
+upstream pin remains d56cbac89dc2cd0e5c3f923e1d03041b16902add. Licenses/notices retained;
+binary distribution audit remains open. Assets/settings/binaries/evidence stay ignored.
+
+Local receipts:
+
+- artifacts/restart/retarget-native-20261017-122507-964/result.txt
+- artifacts/restart/retarget-gui-20261017-122350-296/result.txt and inspected map/viewport captures
+- artifacts/restart/shared-native-20261017-122435-716/result.txt
+- artifacts/restart/shared-gui-20261017-122451-150/result.txt and inspected catalogue
+- artifacts/restart/library-product-20261017-122519-339/result.json (two project-one launches)
+- artifacts/restart/library-product-20261017-122530-076/result.json (two project-two launches)
+- artifacts/restart/shared-fk-final-source-hashes.json (post-product hashes/independence)
+- artifacts/restart/library-native-20261017-121954-034/result.txt and library-gui-20261017-122008-530/result.txt
+- artifacts/restart/container-native-20261017-122032-318/result.txt and container-gui-20261017-122036-138/result.txt
+- artifacts/restart/dump-native-20261017-122050-597/result.txt and dump-gui-20261017-122055-187/result.txt
+- artifacts/restart/companions-native-20261017-122109-989/result.txt and companions-gui-20261017-122113-581/result.txt
+- artifacts/restart/native-20261017-122126-803/result.txt and gui-20261017-122128-403/result.txt
+- artifacts/restart/build-Release.log; doctor passed with net472 targeting pack/MSBuild, Cargo absent (independent hooks do not require it)
+
+The single next acceptance in plans/current.md is typed expandable animation slots and
+persistent character references/anchors, with verified bindings or honest unbound status,
+separate projects, undo/redo/restart/native-output checks. Mirror precedes later fitting;
+IK, atomic template fill and non-Brawl/actual Modkit asset routes follow. Gameplay remains
+a later independent milestone. Publication follows standing reviewed source authorization;
+commit/remote SHA verification lives in Git and the ignored publication receipt. No release,
+assets, binaries, tags, PR or CI dispatch is authorized by this checkpoint.

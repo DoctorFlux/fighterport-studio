@@ -9,6 +9,11 @@ plan. It continues this codebase; plans/current.md is the only next executable t
 Read docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md for the source-character-
 bound library, semantic rigs/IK/FK, native attacks/templates and vetted app-local tool
 provisioning requirements. These extend the product; they do not restart the app.
+Read docs/FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md for the current
+animation-first scope. Gameplay scripting/compilation is deferred; retain old manual
+drafts as compatibility data. Animation assignment never requires a gameplay draft.
+Shared source/clip revisions belong to a bounded disk-backed library across separate
+projects. Preserve native edits, v1 migration, explicit reviews and independent instances.
 
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.
@@ -27,8 +32,10 @@ provisioning requirements. These extend the product; they do not restart the app
   explicit hash-pinned choices across scans; root configuration is not a character project.
 - .fpcharacter v1 stores actual native motion edits; .fpcompanion stores source choices.
   Preserve immutable source/library identities and independent instances. Native edit capture
-  requires an explicit current instance lease; semantic roles remain unapproved and different-
-  rig assignment rejects until reviewed mapping/baking exists. Undo history is session-only.
+  requires an explicit current instance lease. Roles start unapproved; direct different-rig
+  assignments reject. Use the fingerprint-bound reviewed, measured FK path for its declared
+  subset only. Shared immutable sources and other projects must stay unchanged. Undo history
+  is session-only; typed animation slots/anchors are the next task.
 - Standing user authorization, 2026-10-17: push each completed, passing source update
   to the existing public origin/main after committing and reviewing it. This supersedes
   the earlier one-upload/local-only restriction. No repeat permission request is needed

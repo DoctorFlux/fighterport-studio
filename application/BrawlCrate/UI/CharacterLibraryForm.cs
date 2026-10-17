@@ -36,11 +36,12 @@ namespace BrawlCrate.UI
         public CharacterLibraryForm(CharacterProject project = null)
         {
             _project = project ?? new CharacterProject();
+            if(project==null)_project.MigrateToSharedLibrary(); // New authoring uses the app-wide store; v1 opening stays deliberate.
             Text = "FighterPort Studio - Character Library"; Name = "CharacterLibraryForm";
             ClientSize = new Size(1160, 740); MinimumSize = new Size(970, 680); StartPosition = FormStartPosition.CenterParent;
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(10), ColumnCount = 1, RowCount = 8 };
             for (int i = 0; i < 8; i++) layout.RowStyles.Add(new RowStyle(i == 2 || i == 5 ? SizeType.Percent : SizeType.AutoSize, i == 2 || i == 5 ? 50 : 0));
-            layout.Controls.Add(new Label { AutoSize = true, Text = "Source-bound native library. Semantic roles unapproved; different-rig transfer requires reviewed retargeting. Draft slots are not playable mods." });
+            layout.Controls.Add(new Label { AutoSize = true, Text = "Shared source-bound animations. Review exact rig roles before FK transfer. Animation slots organize clips; gameplay is deferred." });
             var files = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
             _name = new TextBox { Name = "libraryName", Width = 150, Text = "Source character" }; files.Controls.Add(_name);
             Button(files,"Register resolution...","libraryRegister",() => {
@@ -60,6 +61,14 @@ namespace BrawlCrate.UI
             _undo = Button(files,"Undo project","libraryUndo",() => { EnsureCaptured(); _project.Undo(); RestoreNativeView(); });
             _redo = Button(files,"Redo project","libraryRedo",() => { EnsureCaptured(); _project.Redo(); RestoreNativeView(); });
             layout.Controls.Add(files);
+            Button(files,"Shared library...","librarySharedBrowse",()=> {EnsureCaptured();using(var browser=new SharedAnimationLibraryForm(_project))browser.ShowDialog(this);RestoreNativeView();});
+            Button(files,"Share / migrate project","libraryMigrate",()=> {EnsureCaptured();_project.MigrateToSharedLibrary();RestoreNativeView();});
+            Button(files,"Add clips to source...","libraryAddClips",()=> {
+                EnsureCaptured();var source=_project.State.Animations.Single(a=>a.Id==RequireAnimation()).SourceCharacterId;
+                using(var dialog=new OpenFileDialog {Filter="Native skeletal clips|*.chr0",Multiselect=true})
+                    if(dialog.ShowDialog(this)==DialogResult.OK)foreach(string file in dialog.FileNames)_project.AddAnimation(source,file);
+                RestoreNativeView();
+            });
             var split = new SplitContainer { Size = new Size(1140,260), Dock = DockStyle.Fill, SplitterDistance = 450 };
             _library = new TreeView { Name = "characterLibrary", Dock = DockStyle.Fill, HideSelection = false };
             _details = new TextBox { Name = "libraryDetails", Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, BackColor = SystemColors.Control, BorderStyle = BorderStyle.None };
@@ -83,11 +92,26 @@ namespace BrawlCrate.UI
             _notes = new TextBox { Name = "libraryDraftNotes", Width = 165, Text = "Manually authored draft" }; draftPanel.Controls.Add(_notes);
             _startup = Number(draftPanel,"libraryStartup",100000); _active = Number(draftPanel,"libraryActive",100000); _recovery = Number(draftPanel,"libraryRecovery",100000); _damage = Number(draftPanel,"libraryDamage",10000); _damage.DecimalPlaces = 2;
             Button(draftPanel,"Create draft","libraryDraft",() => { EnsureCaptured(); _project.CreateDraft(RequireAnimation(),_notes.Text,(int)_startup.Value,(int)_active.Value,(int)_recovery.Value,(float)_damage.Value); RestoreNativeView(); });
-            layout.Controls.Add(draftPanel);
+            // Legacy draft fields remain available for compatibility, outside the animation path.
+            var legacy=new GroupBox {Text="Legacy gameplay drafts (deferred)",AutoSize=true,Dock=DockStyle.Fill,Visible=false};legacy.Controls.Add(draftPanel);
+            layout.Controls.Add(legacy);
+            var legacyToggle=Button(files,"Legacy drafts","libraryLegacyDrafts",()=>legacy.Visible=!legacy.Visible);
+            Button(assign,"Review rig map...","libraryReviewRig",()=> {
+                EnsureCaptured();var source=_project.State.Animations.Single(a=>a.Id==RequireAnimation()).SourceCharacterId;
+                using(var review=new RigMapReviewForm(_project,source,((TargetItem)_targets.SelectedItem).Id))review.ShowDialog(this);
+                RestoreNativeView();
+            });
+            Button(assign,"Transfer reviewed FK","libraryTransfer",()=> {
+                EnsureCaptured();var animation=_project.State.Animations.Single(a=>a.Id==RequireAnimation());string target=((TargetItem)_targets.SelectedItem).Id;
+                var map=_project.State.RigMaps.LastOrDefault(m=>m.SourceCharacterId==animation.SourceCharacterId && m.TargetCharacterId==target)??throw new IOException("Review the exact source/target rig map first.");
+                var targetClip=_project.State.Animations.First(a=>a.SourceCharacterId==target);
+                _project.AssignRetargeted(animation.Id,targetClip.Id,map.Id,_slot.Text);RestoreNativeView();
+            });
             _instances = new ListView { Name = "libraryInstances", Dock = DockStyle.Fill, View = View.Details, FullRowSelect = true, MultiSelect = false, HideSelection = false };
             _instances.Columns.Add("Target / stable ID",250); _instances.Columns.Add("Slot",150); _instances.Columns.Add("Source-bound clip / status",340); _instances.Columns.Add("Native revision",160); layout.Controls.Add(_instances);
+            _instances.SelectedIndexChanged+=(s,e)=>ShowDetails();
             var edit = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
-            Button(edit,"Open instance in native editor","libraryEdit",() => { var lease = _project.OpenInstance(RequireInstance()); OpenNative(lease.Path,_project.State.Instances.Single(i=>i.Id==lease.InstanceId).AnimationId); _lease = lease; _nativeInstanceId = lease.InstanceId; });
+            Button(edit,"Open instance in native editor","libraryEdit",() => { var lease = _project.OpenInstance(RequireInstance()); OpenNative(lease.Path,_project.NativeAnimation(lease.InstanceId).Id); _lease = lease; _nativeInstanceId = lease.InstanceId; });
             Button(edit,"Capture native edits","libraryCapture",() => {
                 _project.CaptureNativeEdits(_lease, Program.RootNode, Program.RootPath); Program.RootNode.IsDirty = false;
             });
@@ -111,7 +135,7 @@ namespace BrawlCrate.UI
         {
             _lease = null;
             if (_nativeInstanceId == null || !_project.State.Instances.Any(i => i.Id == _nativeInstanceId)) return;
-            var lease = _project.OpenInstance(_nativeInstanceId); OpenNative(lease.Path,_project.State.Instances.Single(i=>i.Id==lease.InstanceId).AnimationId); _lease = lease;
+            var lease = _project.OpenInstance(_nativeInstanceId); OpenNative(lease.Path,_project.NativeAnimation(lease.InstanceId).Id); _lease = lease;
         }
         private void OpenNative(string path, string animationId)
         {
@@ -164,7 +188,7 @@ namespace BrawlCrate.UI
                 var group = _library.Nodes.Add(source.Name + " [" + source.Id.Substring(0,8) + "] - " + source.Bones.Count + " bones");
                 foreach (var a in state.Animations.Where(a => a.SourceCharacterId == source.Id))
                 {
-                    var node = group.Nodes.Add(a.Name + (state.Moves.Any(m => m.AnimationId == a.Id) ? " - manual draft available" : " - animation only")); node.Tag = a.Id;
+                    var node = group.Nodes.Add(a.Name+" ["+a.Id.Substring(0,8)+"] r"+a.Revision + (state.Moves.Any(m => m.AnimationId == a.Id) ? " - legacy draft retained" : " - animation only")); node.Tag = a.Id;
                     if (clip == a.Id) _library.SelectedNode = node;
                 }
                 var item = new TargetItem { Id = source.Id, Name = source.Name }; _targets.Items.Add(item); if (target == item.Id) _targets.SelectedItem = item;
@@ -181,7 +205,7 @@ namespace BrawlCrate.UI
             _undo.Enabled = _project.CanUndo; _redo.Enabled = _project.CanRedo;
             var problems = _project.SourceProblems();
             _status.Text = (problems.Count == 0 ? "Sources verified. " : string.Join("; ",problems) + " Preview retained; assignments/capture/export blocked. ") +
-                (_project.Dirty ? "Unsaved project. " : "Saved state. ") + "Capture native edits before saving. Native output: enter a new absolute path or leave empty to browse. Undo is session-only (32 commands); load clears history. No gameplay compiler or retargeting yet.";
+                (_project.Dirty ? "Unsaved project. " : "Saved state. ") + "Capture native edits before saving. Native output: enter a new absolute path or leave empty to browse. Undo is session-only (32 commands); load clears history. FK requires review; IK, mirror and fitting remain queued.";
             ShowDetails();
         }
         private void ShowDetails()
@@ -192,6 +216,8 @@ namespace BrawlCrate.UI
             _details.Text = c.Name + "\r\nSource profile " + c.Id + " / revision " + c.Revision + "\r\nModel " + c.ModelIdentity + "\r\nContainer " + c.ContainerIdentity +
                 "\r\nRig " + c.RigFingerprint + "\r\n" + c.Interpretation + "\r\n\r\n" + a.Name + " / CHR0 v" + a.Version + " / " + a.Frames + " frames / loop=" + a.Loop +
                 "\r\nAnimation " + a.Id + " / revision " + a.Revision + "\r\n" + (draft == null ? "Animation-only input: no imported attack behavior." : "Manual draft: " + draft.Notes + "\r\nStartup/active/recovery: " + draft.Startup + "/" + draft.Active + "/" + draft.Recovery + "; damage " + draft.Damage + ". No native attack evidence or output.");
+            var instance=state.Instances.SingleOrDefault(i=>i.Id==SelectedInstanceId);
+            if(instance!=null)_details.Text+="\r\n\r\nSelected target instance: "+instance.Id+"\r\nNative target clip: "+(instance.NativeAnimationId??instance.AnimationId)+"\r\n"+(instance.BakeEvidence??"Same-source assignment; no cross-rig transfer.");
         }
     }
 }

@@ -144,3 +144,16 @@ bounds/depth, stale identities, source protection and unchanged original hashes.
 Use VerifyDumpProduct.ps1 -NativeExtension pac for the normal product entrypoint check.
 The --inspect-brawl mode is explicit read-only local metadata inspection only; its TSV
 and hashes stay ignored. It is not retail native editing or game validation.
+
+
+Reviewed FK and shared storage: run `scripts/test.ps1 -Retarget -Gui` and
+`-SharedLibrary -Gui` separately. RetargetChecks uses original 2/4-bone changed-axis,
+changed-parent/proportion blended fixtures, reviewed roles/helpers and independent forward/
+reverse analytic/native validation, quarter-frame decode and full-turn/native-loop-boundary
+checks. SharedLibraryChecks uses immutable disk-backed source/multi-clip records, legacy
+v1 native-edit migration, separate project files, fresh-process edits/undo, cancellation,
+concurrent writers, cursor/record invalidation and unchanged source hashes. The actual
+shared catalogue and mapping grid/native preview/Play are exercised. See TESTING.md for
+numeric limits, budgets and unsupported cases; no mirror/fitting/Modkit/game claim.
+`VerifyLibraryProduct.ps1 -InstanceIndex 1` selects the shared project's second (retargeted)
+instance; default 0 still verifies older projects. It requires no gameplay draft.

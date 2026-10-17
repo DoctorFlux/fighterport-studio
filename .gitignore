@@ -68,3 +68,6 @@ __pycache__/
 *.fpcompanion
 *.fpcharacter
 *.fpcharacter.previous
+*.fpblob
+*.fplibrecord
+*.fplibrary

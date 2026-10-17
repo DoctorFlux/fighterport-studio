@@ -1,5 +1,17 @@
 # FighterPort Studio master plan — clean restart
 
+Current phase decision (2026-10-17): [shared animation/library amendment](FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md)
+supersedes gameplay priority in the earlier briefs. Focus on models and every declared
+animation family, shared disk-backed library/multiple clips per source, reviewed FK/IK,
+animation slots/parts, references/templates, mirror then transition fitting, native assets
+and supported Modkit asset import. Gameplay scripts, damage/hitboxes, ACMD/PSA/Lua,
+cancel/combo execution and playable moveset compilation are deferred, not erased.
+Existing manual drafts remain lossless compatibility data, never animation prerequisites.
+An attack slot in this phase is an animation assignment, not executable behavior.
+Reviewed original FK and shared-library/multi-clip migration checkpoints now pass within
+the subsets in FORMAT_SUPPORT.md. Next are typed expandable slots/anchors, mirror/fitting,
+template fill and non-Brawl asset routes. Only plans/current.md defines the next executable acceptance criterion.
+
 Authority: [complete clean-restart brief](CODEX_CLEAN_BRAWLCRATE_RESTART.md), preserved verbatim.
 It supersedes earlier WPF/bridge/migration and auto-push strategies. Retained product requirements
 in CODEX_START_FROM_ZERO.md remain applicable except where the clean brief supersedes architecture,
@@ -16,8 +28,8 @@ continue this application. They do not create a second current-task queue.
 Product definition: a source-character-bound animation/attack library, character/moveset
 editor, semantic rigging/IK/FK retargeting tool and native target-game builder inside this
 application. The [animation/attack library specification](FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md)
-is preserved as supplied; its proposed APIs/features are requirements, not implementation
-evidence. The user's requested canonical filename takes precedence over the alternative
+retains its supplied body with an explicit scope amendment; proposed APIs/features are
+requirements, not implementation evidence. The user's requested canonical filename takes precedence over the alternative
 filename suggested inside the supplied document. Actual HEAD at continuation was 19ae7b2.
 
 | Requirement | Permanent scope |
@@ -60,10 +72,12 @@ wider game/native-output/channel/interchange/optional DCC row above remains perm
 The first useful library/project increment now implements two original source-character
 profiles, correctly associated clips, native previews, honest manual-draft status,
 independent slot assignments and actual native edit/project save/reopen/undo. Its
-declared v1 subset is one selected CHR0 per immutable source profile and motion-only
-instance edits; semantic review and cross-rig application remain unimplemented.
-Next come reviewed characterization/FK, IK/contact-aware baking,
-parsed attack transfer and primary target templates to prove the defined E2E routes.
+original v1 subset remains loadable. Version 2 now uses shared immutable disk-backed
+source/clip records across separate projects and supports several CHR0 v4 clips per source.
+Explicit reviewed original rig A -> B and independent reverse FK routes pass sampled
+fresh-native pose/skinning checks. IK, mirror, fitting and other native channels remain
+queued. Next are typed expandable animation slots/anchors, then mirror/fitting and template
+fill; native gameplay/attack translation remains deferred under the current scope.
 Develop managed provisioning alongside the first external adapter: original harmless
 package installation/rejection/rollback tests plus one genuinely integrated pinned tool.
 
@@ -86,8 +100,10 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
    fixtures. Read/preview/edit/preserve/write/package evidence stays separate. No flattening
    a fighter package into BRRES and calling it a package round trip.
 4. R3: the first visible source-character-bound library and real edit-project increment
-   passes its original-fixture acceptance (see status/testing). Next: semantic
-   characterization and measured retargeting. Preserve native originals,
+   passes its original-fixture acceptance (see status/testing). Shared disk-backed clips,
+   explicit fingerprint-bound role review and a measured original FK subset now pass.
+   Next: typed expandable animation slots/anchors, then reviewed mirror, fitting/IK
+   and dependency-aware template fill. Preserve native originals,
    immutable/revisioned source profiles/animations/moves, non-destructive target instances, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,
@@ -106,7 +122,8 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
    alone are not rig equivalence. Do not defer this work behind every game's source provider.
 5. R4: inspect actual installed Rivals Modkit version/schemas/interfaces; assemble configured Goku
    sources; transfer selected clips to the chosen target rig; correct contacts; bake/export; import
-   using the real supported Modkit path; minimal state/attack; build/playtest when available.
+   using the real supported Modkit asset path. Runtime state/attack/build/playtest remains
+   a separate deferred gameplay milestone, not a prerequisite for animation authoring.
    Verify actual installed tools/templates/import/build interfaces, imported skeletal mesh,
    skeleton and baked animation assets. Keep movement states, one attack and target gameplay
    build/playtest distinct from the animation export; no playable claim from interchange alone.

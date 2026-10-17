@@ -1,5 +1,5 @@
 # FighterPort original-fixture entrypoint/restart check, 2026-10-17. No game data.
-param([Parameter(Mandatory=$true)][string]$Project)
+param([Parameter(Mandatory=$true)][string]$Project,[ValidateRange(0,63)][int]$InstanceIndex=0)
 $ErrorActionPreference='Stop'
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $exe=Join-Path $repoRoot 'application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe'
@@ -8,7 +8,8 @@ New-Item -ItemType Directory -Path $evidence | Out-Null
 $savedProject=Join-Path $evidence 'restart.fpcharacter'
 Copy-Item -LiteralPath $Project -Destination $savedProject
 [xml]$expected=Get-Content -LiteralPath $savedProject -Raw
-$instance=@($expected.CharacterProjectFile.State.Instances.MoveInstance)[0]
+$instance=@($expected.CharacterProjectFile.State.Instances.MoveInstance)[$InstanceIndex]
+if (!$instance) {throw 'Requested target instance is missing'}
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
 using System;
@@ -67,14 +68,16 @@ try {
   $null=[LibraryWindows]::SendMessage($tree,0x110B,[IntPtr]9,$clip)
   $list=@($children | Where-Object {[LibraryWindows]::Class($_) -like '*SysListView32*'})[0]
   $null=[LibraryWindows]::SendMessage($list,0x100,[IntPtr]0x24,[IntPtr]::Zero)
-  Wait-Product { [LibraryWindows]::SendMessage($list,0x100C,[IntPtr](-1),[IntPtr]2).ToInt32() -eq 0 } 'First target instance was not selected'
+  for($index=0;$index -lt $InstanceIndex;$index++) {$null=[LibraryWindows]::SendMessage($list,0x100,[IntPtr]0x28,[IntPtr]::Zero)}
+  Wait-Product { [LibraryWindows]::SendMessage($list,0x100C,[IntPtr](-1),[IntPtr]2).ToInt32() -eq $InstanceIndex } 'Requested target instance was not selected'
   $texts=@([LibraryWindows]::Children($window) | ForEach-Object {[LibraryWindows]::Text($_)})
-  if (!($texts -match 'Sources verified') -or !($texts -match 'Source profile') -or !($texts -match 'Manual draft:')) {throw 'Restored source/draft data not visible'}
+  if (!($texts -match 'Sources verified') -or !($texts -match 'Source profile')) {throw 'Restored source data not visible'}
   Capture-Library $window "project-$attempt.png"
   Click-Library $window 'Open instance in native editor'
   Wait-Product {[LibraryWindows]::Find($process.Id,'Advanced Model Editor') -ne [IntPtr]::Zero} 'Actual native model editor did not open'
   $native=@(Get-ChildItem -LiteralPath (Join-Path $env:FIGHTERPORT_DATA_ROOT 'CharacterSessions') -Recurse -File -Filter '*.brres')
-  if ($native.Count -ne 1 -or (Get-FileHash -LiteralPath $native[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant() -ne $instance.WorkingHash) {throw 'Product did not restore exact edited native data'}
+  $native=@($native | Where-Object {(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -eq $instance.WorkingHash})
+  if ($native.Count -ne 1) {throw 'Product did not restore exact edited native data'}
   Capture-Library ([LibraryWindows]::Find($process.Id,'Advanced Model Editor')) "native-$attempt.png"
   $output=Join-Path $evidence "product-output-$attempt.brres"
   $edit=@([LibraryWindows]::Children($window) | Where-Object {[LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})

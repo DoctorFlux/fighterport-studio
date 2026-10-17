@@ -1,5 +1,19 @@
 # FighterPort Studio — reusable animation and attack authoring master specification
 
+## Scope amendment — 2026-10-17
+
+The [shared animation/library amendment](FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md)
+sets the current phase: model/animation authoring and native asset import/export first.
+The historical specification below retains long-term requirements. Gameplay scripting,
+damage/hitboxes, ACMD/PSA/Lua, cancel/combo execution and playable moveset compilation
+are deferred. Preserve existing manual drafts without exposing them as animation prerequisites.
+The library must be shared across separately saved projects, with many clips per source,
+immutable pinned revisions and lazy bounded disk storage. Animation slots have expandable
+parts/variants and verified native bindings; arbitrary authoring parts remain explicitly
+unbound. Reviewed rig transfer precedes mirror and target-reference fitting. Idle/Fall
+anchors do not synthesize all motions. Mirror/transition/template/IK and non-Brawl routes
+need their own native decoded evidence. No desktop-only blend proves a baked transition.
+
 Prepared: 2026-10-17.
 Reviewed repository snapshot: `DoctorFlux/fighterport-studio` at `19ae7b2aa14c24d9cd6e6e8ef0bbe6769e9cbda4`.
 

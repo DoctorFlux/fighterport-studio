@@ -232,3 +232,70 @@ persists, history clears on load. Missing/changed originals leave recovery previ
 available but block assignments/capture/export. Capture accepts selected CHR0 edits only.
 Different source/rig assignments reject. No inferred attacks, compiled gameplay slots,
 retargeting, material/mesh/outfit authoring or game result follows from this increment.
+
+
+Shared library and reviewed FK acceptance (current extension):
+
+```powershell
+./scripts/doctor.ps1
+./scripts/build.ps1
+./scripts/test.ps1 -Retarget -Gui
+./scripts/test.ps1 -SharedLibrary -Gui
+./tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <absolute-project-one.fpcharacter> -InstanceIndex 1
+./tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <absolute-project-two.fpcharacter>
+```
+
+Run the retained Library, Containers, DumpSources, Companions and default -Gui suites
+separately as above. No old WPF counts are evidence. Each run creates new ignored evidence.
+
+RetargetChecks creates original A (2 bones) and B (4 bones) with changed parents, a 90-degree
+rest-axis bridge, different proportions, root offset and blended skinning. Explicit
+test-authored semantic root/effector pairs are reviewed against exact fingerprints; no
+matching-name approval or commercial rig certification. A 31-frame full-turn linear motion
+is transferred in both directions independently. Native exports/reopened projects are
+measured at quarter frames (129 times including the native loop boundary), and a separate analytic expectation checks world
+orientation and weighted positions at fractional times. Limits: .002 native bone-position
+units, .05 orientation degrees and .005 native mesh units. Original source hashes, loop
+flag/duplicate endpoint and 360-degree native key survive; another instance is unchanged.
+Check unreviewed/stale/tampered maps, missing helper policies, animated ignored helpers,
+non-unit scales, non-root translation, calibrated/in-place root policy, cancelled bake and
+ambiguous fast winding rejection with no partial assignment. Root translation's numeric
+service check is distinct from the in-place native fixture. General curves, arbitrary Euler
+winding/loop conventions and continuous error bounds remain unverified.
+
+GUI mode fills the real mapping grid and helper policies, rejects an empty approval,
+approves the explicit original mapping, opens the retargeted instance through inherited
+model editors and runs native Play with a bounded stop timer. Inspect fk-reviewed-map.png
+and fk-native-preview.png: the latter is the OpenGL framebuffer, not PrintWindow. No
+native-codec changes or test-side camera correction are supplied.
+
+SharedLibraryChecks reproduces the original b45fcc3 XML schema with an actual 77-degree
+native edit and a legacy manual draft, deliberately migrates it without rewriting that
+file, and imports two loose original CHR0 clips onto one registered source. A bounded cursor
+reads only metadata; cancel/page budgets, generation changes, simultaneous writers,
+immutable-record conflicts, altered pinned metadata and missing pinned-library rejection
+are exercised. Separate projects pin the identical source clip revision; native edit 25
+in project one leaves project two at 180 and shared metadata/native hashes unchanged.
+Project XML has no embedded blobs. Save/reload and a fresh child process decode both outputs;
+the child edits/undoes again to prove independent revisions after restart. GUI mode exercises
+the actual shared catalogue and Use button. All four original source hashes remain unchanged.
+No mirror/fitting claims follow from independent native edits.
+
+VerifyLibraryProduct accepts InstanceIndex (default 0), copies only the selected fixture
+project into evidence and launches the normal executable twice with isolated profiles.
+For shared project one choose index 1 (index 0 retains the migrated legacy edit); project
+two uses index 0. It restores exact working native hashes, opens the real editor, exports
+through the real path/button, saves/compares project records and observes normal exits.
+PrintWindow product captures prove UI restoration only; use the focused framebuffer capture
+for geometry. Compare original and library/other-project hashes after these product launches.
+OS file pickers are bypassed; no manual-click, external native-tool, Modkit or game check.
+
+Everyday current path: File > Character Library creates a shared project; register a saved
+companion resolution once, or Shared library > Use an existing immutable clip. Add clips to
+source imports loose CHR0 v4 without registering another model. Select source/target, review
+exact roles/helpers/root policy, Transfer reviewed FK, then open the independent native
+instance, edit/capture, save project and export a new enclosing native archive. V1 opening
+stays embedded until Share / migrate; save the migrated project to a new file. Keep the
+library directory with the projects; moving it currently requires restoring its pinned
+absolute location. Typed native slots/anchors, drag/drop, mirror/fitting and IK are next
+work, not implemented controls. Legacy drafts are available via their explicit toggle.

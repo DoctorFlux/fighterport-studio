@@ -14,14 +14,17 @@ No previous FighterPort counts or capabilities transfer to this codebase.
 | Original MDL0 v11 blended fixture | Two bones with nonidentity child bind/inverse bind, 25/75 and 75/25 vertex blends, exact expected geometry/material/all RGBA8 pixels, timing/loop/key checked through native PAC output | Native weighted poses compared with analytic LBS at declared key frames; GUI visible deformation/play/edit observed | Two-bone subset only; no arbitrary rest/scale/helper/retarget or continuous-error bound claim |
 | Base SRT0 v4 preservation | Original empty-entry fixture name, 17-frame timing and loop flag retained through assembly/native edit/save/reopen | No SRT0 authoring/preview claim added | Does not prove arbitrary channel/opaque-field preservation |
 | Source-bound library / .fpcharacter v1 | Two different original native rigs, stable source/clip IDs, full native evidence, actual motion edits, independent instances, manual drafts, atomic project save/load and session undo/redo tested; missing/changed/stale/tampered inputs reject or diagnose | Actual library selectors/assignment and inherited model preview/playback/key edit/capture/undo/redo/native export/reopen tested; fresh executable restarts checked separately | One CHR0 per profile, same-source assignments only; no semantic approval, cross-rig transfer, native attack compiler or playable mod |
+| Shared library / .fpcharacter v2 | Shared immutable source/clip records, several CHR0 v4 clips per registered model, bounded metadata cursor, explicit v1 migration preserving native edits/drafts, separate saved projects and native edit/export/restart tests pass | Actual shared catalogue/Use control and two projects opened/exported through four fresh product launches | Disk-backed Brawl subset; selected graph <=128 clips/project, no whole-library XML; revision-management/portable bundles/shared map records queued |
+| Reviewed original rig A -> B and independent B -> A FK | Exact fingerprint/interpretation review, explicit roles/helpers/root policies, rest/axis/parent/proportion differences, genuine native CHR0 bake, fresh quarter-frame bone/LBS comparisons, full turn/loop endpoint, transaction/undo/reopen and unchanged originals pass | Actual review form, native textured deformed target pose and playback observed | MDL0 v11/CHR0 v4, unit-scale rigid pose subset. Sampled .002 position/.05 degree/.005 mesh limits. No IK, mirror, fitting, mesh rebinding, commercial compatibility or game claim |
 | Other inherited Brawl editors/resources | Source retained; operation-specific tests pending | Inherited controls retained, unverified | No universal fidelity claim |
 | Smash 64, Melee, Wii U, 3DS, Ultimate | Planned per game/version | Planned | Planned native output/gameplay/game checks |
 | Rivals II installed sources / Modkit projects | Planned separately from cooked extraction | Planned actual Modkit validation | Planned import/build/playtest |
 | FighterZ, Sparking! ZERO, Xenoverse, Xenoverse 2 | Planned source and native-output adapters | Planned | Native/playable-mod goals retained |
 | Additional games / interchange / DCC bridges | Planned modular adapters and explicit subsets | No mandatory DCC | No implied compatibility |
 
-Retargeting, contacts, baking, complete character authoring and gameplay conversion
-are future milestones. Same-format editing is not cross-rig retargeting.
+The reviewed original FK subset above is now tested independently from same-format editing.
+Broader retargeting, contacts/IK, mirror, fitting, typed slots/references, template fill and
+complete character authoring remain queued. Gameplay conversion is deferred this phase.
 
 Source admission recognizes raw BRRES/ARC and MDL0 v8–11, CHR0 v3–5, TEX0 v1–3,
 PLT0 v1/3, SRT0 v4/5, PAT0 v3/4, CLR0/VIS0/SHP0 v3/4 and SCN0 v4/5. These are
@@ -57,5 +60,26 @@ bounded read-only metadata inspection with unchanged source hashes, not native d
 preview/edit/export or game verification. MDL0 v9 is still outside companion assembly.
 No Goku source is configured. Full Brawl/Project M/Project+ scope and all channel/format
 fidelity rows remain required. The first library/project subset above now exists; wider
-project authoring, semantic rigs/IK/FK, attack translators, native templates and managed
+project authoring, broader semantic rigs/IK/FK, native animation templates and managed
 tool provisioning remain traceable requirements in the new master spec/plan.
+
+
+Current FK limitations: one parent-first root, <=128 bones, unit scale/no compensation or
+billboards, no animated non-root translation, static ignored source helpers, reviewed
+rest-only target helpers. Euler singularities, ambiguous combined native Euler travel
+>=179 degrees/baked frame and decoded errors outside the limits reject atomically.
+Tested source winding is a 360-degree Z turn over 31 frames. The inherited FrameCount+1
+loop boundary is checked through its fractional Hermite return and wrapped phase; general
+nonlinear multi-axis winding, other loop conventions and continuous between-sample bounds
+are not certified. Calibrated root translation policy has a service-level numeric test; native
+output fixtures currently test in-place. Fractional tangents from inherited dense codecs
+can fail validation; exact linear channels use sparse native endpoints. Other channels
+are preserved in the target, not retargeted. No negative model scaling/mirror is added.
+
+Current shared library stores immutable revision-1 characters/clips; conflicting records,
+changed pinned metadata/payloads, missing libraries and cursor invalidation reject. Source
+registration and extra-motion imports preserve read-only external identities. Project-native
+edits are independent immutable payload references, not library clip rewrites. Full per-game
+model/animation types, verified animation-slot packs, Idle/Fall anchors, motion templates,
+previewable missing-slot fill and actual supported Rivals Modkit import remain unverified.
+Legacy gameplay drafts persist but are optional and hidden from primary animation controls.

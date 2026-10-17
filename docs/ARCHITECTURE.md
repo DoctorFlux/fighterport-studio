@@ -163,8 +163,9 @@ AnimationAsset binds the selected native CHR0 to that profile/fingerprint, indep
 of the viewport, display names or source order. Registration creates no MoveAsset.
 Explicitly authored manual drafts persist notes/startup/active/recovery/damage and have
 no parsed native attack commands. MoveInstance pins animation revision, draft ID,
-target profile/fingerprint, slot, revision and its own native blob. Assignments currently
-require the same source profile; different rigs/profiles reject pending reviewed transfer.
+target profile/fingerprint, slot, revision and its own native blob. Direct assignments require the same source profile. A separate reviewed FK path now
+handles an explicitly supported different-rig subset, described below; direct mismatches
+still reject.
 Slot names are project assignments, not compiled native gameplay slots. Multiple independent
 instances keep source/library revision 1 unchanged.
 
@@ -192,7 +193,7 @@ resolution bindings, rig interpretation/fingerprints and native instance revisio
 or changed external inputs leave the saved state recoverable and previewable, with visible
 diagnostics; assignment/capture/export block until original identities are valid again.
 
-Budgets: 8 profiles with one selected CHR0 each, 64 drafts/instances, 512 blobs / 32 MiB
+Original embedded-v1 budgets (still loadable): 8 profiles with one selected CHR0 each, 64 drafts/instances, 512 blobs / 32 MiB
 combined native/session-revision data, 1 MiB metadata and 48 MiB serialized document;
 DTD/entities are prohibited. Native files retain existing admission/staging/audit gates.
 Working copies are capped at 256 files / 128 MiB per project session, with 256 sessions /
@@ -200,8 +201,9 @@ Working copies are capped at 256 files / 128 MiB per project session, with 256 s
 requires a new file and the original enclosing .brres/.pac extension, then checks output hash.
 The shared service is local and adds no dependencies; only its Brawl adapter exists today.
 
-Reviewed semantics, game-neutral editable curves/constraints, outfits/material/mesh edits,
-correction layers, versioned source revisions and more clips per profile remain queued.
+Broader game-neutral editable curves/constraints, outfits/material/mesh edits, correction
+layers and source-revision management remain queued. Current shared storage and explicit
+FK characterization extend this original project implementation as follows.
 Animation-only input never invents attack behavior.
 The shared rigging core must separate fingerprint/template/heuristic recognition and
 review from FK transfer, editor-only IK controls, interval contacts and measured target
@@ -217,3 +219,69 @@ correction layers, source and target branches, companion ambiguity and explicit 
 Same-rig conversion, cross-rig retargeting, mesh rebinding and gameplay translation are distinct.
 Local non-AI operation and no required DCC remain invariants. Legacy FPPROJ/FPWORK compatibility
 is not a restart prerequisite; old implementation is only in recovery/history.
+
+
+Shared animation storage and reviewed FK — 2026-10-17:
+
+AnimationLibraryStore owns a stable library ID, immutable per-character/per-animation XML
+records and SHA256-addressed native/original/edited payload files. The app-wide default is
+UserData/AnimationLibrary (or explicit FIGHTERPORT_LIBRARY_ROOT). New GUI projects use it;
+old embedded v1 projects require the deliberate Share / migrate action. Migration copies
+native state and session-history payloads, preserves stable IDs/legacy drafts/actual edits,
+and clears the save path so the original v1 file is not silently overwritten. Source and
+clip revisions are immutable; this increment creates revision 1 and rejects conflicting
+rewrites. Revision-management UI, portable bundles, tombstones and cleanup are queued.
+
+Version 2 .fpcharacter pins library ID/root and exact record hashes, caching only its
+selected graph (8 profiles / 128 clips / 64 instances, drafts and reviewed maps / 1 MiB
+metadata). Native payloads stay on disk, including independent target edit revisions;
+projects do not embed or enumerate the entire library. One registered source accepts
+multiple loose CHR0 v4 imports, explicitly bound to its unchanged native model. Each clip
+retains separate native archive/payload/export hashes, timing and original evidence.
+Import changes only the selected motion, preserving native container/model/unrelated
+resources. No non-Brawl intermediate is defined by this adapter.
+
+Metadata browsing uses a resumable directory cursor: at most 256 visited metadata records
+and 64 results per request, no native decode/blob reads; generation changes require refresh.
+Animation metadata is at most 128 KiB; character records at most 1 MiB. Cancellation is
+supported by indexing/import/bake APIs; the small synchronous metadata GUI pages do not
+claim background whole-library search. The store reserves at most 4 GiB / 100,000 records,
+with 32 MiB per native blob. A file lock serializes writers and metadata pages with a bounded
+5-second busy failure. Reservation precedes writing; crashes can conservatively overcount
+space. Atomic immutable files, read-only attributes and verified hashes protect revisions;
+missing/wrong pinned libraries stop rather than create replacements. No automatic deletion.
+Working-copy/session and undo budgets above still apply. Project undo restores references,
+not destructive rewrites/deletion of library records. History clears on load.
+
+RigTransfer is a format-neutral rigid pose/mapping service. ReviewedRigMap pins both exact
+fingerprints and interpretations, explicit semantic role/index pairs, static ignored source
+helpers/rest-only target helpers, native-unit ratio and root policy. A digest invalidates
+accidental policy changes after review (not an authentication signature). The real review
+form starts without name-based approvals and displays parents/rest transforms; every bone
+needs an explicit policy. Maps currently live in the project and can be reused across its
+source clips. Shared reviewed-map/template records across projects are still queued.
+
+world-rest-delta-fk-v1 computes source world rest-relative rotation, applies it to the target
+rest orientation and resolves target local rotations through animated parents. Target local
+offsets/proportions remain intact; root is explicitly in-place or uses reviewed calibrated
+native translation. No physical unit inference. Single parent-first roots, <=128 bones,
+unit scales, no compensation/billboards, static ignored helpers and no animated non-root
+translations are required. Euler singularities and ambiguous combined source Euler travel
+>=179 degrees per baked frame reject. No IK, mesh rebinding, contacts or automatic semantic
+recognition is claimed. More general winding/curve/constraint support remains queued.
+
+The Brawl adapter samples inherited native evaluation, bakes CHR0 v4 into the existing target
+archive and checks fresh native decoding before committing an instance. Source clip, target
+native motion identity, map/review revision and measurement report are persisted separately.
+Budgets: 2..2048 frames, <=1 million scalar keys, <=8 million decoded vertex samples.
+Globally linear channels use exact sparse endpoints; inherited dense codecs can alter
+fractional tangents, so other cases may reject. Quarter-frame decoded world bone position,
+orientation and native weighted mesh errors must be <=.002 native units / .05 degrees /
+.005 native units. This is a sampled bound, not continuous arbitrary-curve certification.
+Native edits retain the original bake report explicitly as historical measurement.
+
+The current UI hides legacy gameplay fields behind Legacy drafts. Assigning animations
+requires no gameplay record. Free-text slots have no verified runtime binding yet. Typed
+expandable slots/anchors are next, then mirror before final-target fitting, interval IK and
+atomic template fill with saved dependencies. Keep native originals, independent targets
+and modular adapters; non-Brawl sources must not pass through MDL0/CHR0.

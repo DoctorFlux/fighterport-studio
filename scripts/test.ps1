@@ -1,5 +1,5 @@
-param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions, [switch]$DumpSources, [switch]$Containers, [switch]$Library)
-if (@($Companions,$DumpSources,$Containers,$Library | Where-Object {$_}).Count -gt 1) { throw 'Select one focused suite at a time; existing suites remain available separately.' }
+param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions, [switch]$DumpSources, [switch]$Containers, [switch]$Library, [switch]$Retarget, [switch]$SharedLibrary)
+if (@($Companions,$DumpSources,$Containers,$Library,$Retarget,$SharedLibrary | Where-Object {$_}).Count -gt 1) { throw 'Select one focused suite at a time; existing suites remain available separately.' }
 . $PSScriptRoot/environment.ps1
 $project = Join-Path $repoRoot 'tests/NativeSmoke/NativeSmoke.csproj'
 $logDir = Join-Path $repoRoot 'artifacts/restart'
@@ -25,6 +25,14 @@ if ($Containers) {
 if ($Library) {
     $modes = @('library-native')
     if ($Gui) { $modes += 'library-gui' }
+}
+if ($Retarget) {
+    $modes = @('retarget-native')
+    if ($Gui) { $modes += 'retarget-gui' }
+}
+if ($SharedLibrary) {
+    $modes = @('shared-native')
+    if ($Gui) { $modes += 'shared-gui' }
 }
 foreach ($mode in $modes) {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'

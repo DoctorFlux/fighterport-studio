@@ -36,6 +36,7 @@ namespace BrawlCrate.Authoring
         public string ContainerPath { get; set; }
         public string ContainerIdentity { get; set; }
         public int ModelVersion { get; set; }
+        public string InitialAnimationId { get; set; }
         public string RigFingerprint { get; set; }
         public string Interpretation { get; set; } = BrawlProjectAdapter.Interpretation;
         public List<BoneSnapshot> Bones { get; set; } = new List<BoneSnapshot>();
@@ -56,6 +57,8 @@ namespace BrawlCrate.Authoring
         public int Version { get; set; }
         public int Frames { get; set; }
         public bool Loop { get; set; }
+        public string NativeHash { get; set; }
+        public List<NativeSourceEvidence> AdditionalOriginals { get; set; } = new List<NativeSourceEvidence>();
     }
     public sealed class MoveAsset
     {
@@ -80,6 +83,10 @@ namespace BrawlCrate.Authoring
         public string Slot { get; set; }
         public string WorkingHash { get; set; }
         public int Revision { get; set; } = 1;
+        public string NativeAnimationId { get; set; }
+        public string MappingId { get; set; }
+        public int MappingRevision { get; set; }
+        public string BakeEvidence { get; set; }
     }
     public sealed class CharacterProjectState
     {
@@ -90,6 +97,10 @@ namespace BrawlCrate.Authoring
         public List<AnimationAsset> Animations { get; set; } = new List<AnimationAsset>();
         public List<MoveAsset> Moves { get; set; } = new List<MoveAsset>();
         public List<MoveInstance> Instances { get; set; } = new List<MoveInstance>();
+        public List<ReviewedRigMap> RigMaps { get; set; } = new List<ReviewedRigMap>();
+        public string LibraryRoot { get; set; }
+        public string LibraryId { get; set; }
+        public List<LibraryPin> LibraryPins { get; set; } = new List<LibraryPin>();
     }
     public sealed class NativeEditLease
     {
