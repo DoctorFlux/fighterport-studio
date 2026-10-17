@@ -82,6 +82,7 @@ namespace BrawlCrate.UI
         public void Apply(PreviewDocument doc)
         {
             if(doc==null || !doc.Editable || doc.Session!=this || doc.Editor.TargetModel!=doc.Model || doc.Root!=doc.Model.RootNode || Project.State.Characters.Single(n=>n.Id==doc.TargetId).RigFingerprint!=doc.TargetFingerprint)throw new IOException("No active explicit editable target/document binding. Activate the intended target first.");
+            if(doc.Editor.TargetAnimation!=BrawlProjectAdapter.At(doc.Root,Project.NativeAnimation(doc.InstanceId).NativePath))throw new IOException("The selected native animation is not this target instance's bound motion. Activate the intended instance before applying edits.");
             _applying=doc;
             try{Project.CaptureNativeEdits(doc.Lease,doc.Root,doc.Path);doc.Root.IsDirty=false;Project.RefreshNativeLease(doc.Lease);doc.InstanceRevision=Project.State.Instances.Single(n=>n.Id==doc.InstanceId).Revision;}
             finally{_applying=null;}

@@ -28,6 +28,9 @@ namespace BrawlCrate.UI
         private bool _updating;
         public string TargetId=>(_targets.SelectedItem as Choice)?.Id;
         public string SelectedClipId=>(_clips.SelectedItem as Choice)?.Id;
+        internal void SelectClip(string id){_clips.SelectedItem=_clips.Items.Cast<Choice>().Single(n=>n.Id==id);}
+        internal void ApplySelectedAnimation()=>AssignSelected();
+        internal void ShowOutput()=>_tabs.SelectedIndex=5;
         public string SelectedPartId=>_parts.SelectedNode?.Tag as string;
         private CharacterAnimationSet Set=>Session?.Project.State.AnimationSets.SingleOrDefault(n=>n.TargetId==TargetId);
         internal PreviewWorkspacePane(ModelForm host)
@@ -92,7 +95,7 @@ namespace BrawlCrate.UI
             _rigHost=new Panel {Name="workspaceRigHost",Width=310,Height=610};rig.Controls.Add(_rigHost);
             var output=Page("Project / Output");Button(output,"Apply native edits","workspaceApply",()=>{Require();Session.Apply(_host.Document);});
             _savePath=Input(output,"workspaceSavePath","New project path (new or migrated projects)");
-            _output=Input(output,"workspaceOutputPath","New native output path");Button(output,"Export native copy","workspaceExport",()=>Command(()=>{var doc=_host.Document;if(doc?.InstanceId==null || doc.Session!=Session || doc.TargetId!=TargetId)throw new IOException("Preview the intended target instance before exporting.");string path=_output.Text;if(string.IsNullOrWhiteSpace(path))using(var d=new SaveFileDialog{Filter="Native container|*.brres;*.pac"}){if(d.ShowDialog(this)!=DialogResult.OK)return;path=d.FileName;}Session.Project.ExportInstance(doc.InstanceId,path);Report("Native output reopened/validated by the adapter. Slot/anchor metadata remains in the project; runtime behavior unverified.");}));
+            _output=Input(output,"workspaceOutputPath","New native output path");Button(output,"Export native copy","workspaceExport",()=>Command(()=>{var doc=ExportDocument();string path=_output.Text;if(string.IsNullOrWhiteSpace(path))using(var d=new SaveFileDialog{Filter="Native container|*.brres;*.pac"}){if(d.ShowDialog(this)!=DialogResult.OK)return;path=d.FileName;}Session.Project.ExportInstance(doc.InstanceId,path);Report("Native output reopened/validated by the adapter. Slot/anchor metadata remains in the project; runtime behavior unverified.");}));
             Button(output,"Save unsupported native edits separately...","workspaceNativeDraft",()=>{var doc=_host.Document;if(doc==null || !doc.Editable)throw new IOException("Activate a target document first.");using(var d=new SaveFileDialog {Filter="Native archive|*.brres;*.pac"})if(d.ShowDialog(this)==DialogResult.OK){if(File.Exists(d.FileName))throw new IOException("Choose a new file.");bool pending=doc.Root.IsDirty;try{doc.Root.Export(d.FileName);}finally{doc.Root.IsDirty=pending;}Report("Separate native draft saved; unsupported edits were not captured into the project.");}});
             Button(output,"Save project","workspaceSave",()=>SaveProject());Button(output,"Undo project structure","workspaceUndo",()=>ProjectUndo(false));Button(output,"Redo project structure","workspaceRedo",()=>ProjectUndo(true));
             Button(output,"Check source / reference diagnostics","workspaceDiagnostics",CheckDiagnostics);
@@ -121,18 +124,24 @@ namespace BrawlCrate.UI
         private static TextBox Input(Control parent,string name,string hint){Label(parent,hint);var box=new TextBox{Name=name,AccessibleName=name,Width=290};parent.Controls.Add(box);return box;}
         private static ComboBox Combo(Control parent,string name){var box=new ComboBox {Name=name,AccessibleName=name,Width=290,DropDownStyle=ComboBoxStyle.DropDownList,DisplayMember="Label"};parent.Controls.Add(box);return box;}
         private void Button(Control parent,string text,string name,Action action){var b=new Button {Text=text,Name=name,AutoSize=true,MaximumSize=new Size(310,0)};b.Click+=(s,e)=>Try(action);parent.Controls.Add(b);}
-        private void Try(Action action){try{action();}catch(Exception error){Report("Stopped: "+error.Message);}}
+        private void Try(Action action){try{if(_status.Text.StartsWith("Stopped:"))Report("");action();}catch(Exception error){Report("Stopped: "+error.Message);}}
         public void Report(string message)=>_status.Text=message;
         private void Require(){if(Session==null || TargetId==null)throw new IOException("Attach a project and explicitly select its target in Setup.");}
+        private PreviewDocument ExportDocument()
+        {
+            var doc=_host.Document;
+            if(doc?.InstanceId==null || doc.Session!=Session || doc.TargetId!=TargetId || doc.Editor.TargetAnimation!=BrawlProjectAdapter.At(doc.Root,Session.Project.NativeAnimation(doc.InstanceId).NativePath))throw new IOException("Preview the intended target instance and its bound skeletal motion before exporting; a source/channel audition is not that instance output.");
+            return doc;
+        }
         private void Command(Action action){Require();Session.Execute(action);}
         private async void AssignSelected()
         {
             try
             {
-                Require();var session=Session;string target=TargetId,set=Set.Id,part=SelectedPartId,clip=SelectedClipId;var previous=_host.Document;
+                Require();var session=Session;string target=TargetId,set=Set.Id,part=SelectedPartId,clip=SelectedClipId;var previous=_host.Document;string request=previous?.RequestId;
                 var source=session.Project.State.Animations.Single(n=>n.Id==clip);var map=session.Project.State.RigMaps.LastOrDefault(n=>n.SourceCharacterId==source.SourceCharacterId && n.TargetCharacterId==target);
                 string id=await session.WorkAsync(token=>session.Project.AssignAnimationPart(set,part,clip,map?.Id,token));
-                if(!IsDisposed && Session==session && TargetId==target && SelectedPartId==part && _host.Document==previous && (PreviewAuthoringSession.Active==previous || PreviewAuthoringSession.Active==null))session.ShowInstance(id,_host);
+                if(!IsDisposed && Session==session && TargetId==target && SelectedPartId==part && _host.Document==previous && previous?.RequestId==request && (PreviewAuthoringSession.Active==previous || PreviewAuthoringSession.Active==null))session.ShowInstance(id,_host);
                 else if(!IsDisposed)Report("Assignment completed in its original project/part; select it to preview. The current view was not replaced.");
             }
             catch(OperationCanceledException){if(!IsDisposed)Report("Cancelled; no partial assignment was committed.");}

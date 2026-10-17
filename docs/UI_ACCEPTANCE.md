@@ -1,5 +1,31 @@
 # Model Previewer authoring acceptance
 
+Ordinary animation path (2026-10-17, after bee76e5): File > Animation workspace opens
+the same native viewer, or use a model's native Preview. The visible, resizable Animations
+browser stays above the viewport even when native side panels/workspace are hidden.
+Open Character > browse/inspect/select/Open stages a model; Add Source attaches a separate
+motion file (Open models defaults off once a model exists). For a motion PAC with opaque
+siblings, choose the intended raw BRRES path explicitly. No .fpcompanion/project is needed
+to audition opened motion. Model-first and motion-first are supported, with no inferred
+rig compatibility or target project association.
+
+Choose Opened sources / Selected character / Project / Shared library / Assignments,
+search names, select a row and Preview. Types/native paths disambiguate same-name channels.
+Read-only retains this navigation, native timeline/Play and camera; mutation stays gated.
+Previewing source A must retain a different selected target B. Shared selection does not
+assign a slot; Apply Animation uses the existing registered/reviewed project route. Native
+unregistered auditions cannot silently become assignments. Advanced Setup/Library selectors
+remain views over the same session. Save/Export opens project output, or exports a separate
+matching native skeletal-motion document with a fresh key/tangent/timing/flag decode check.
+Opaque/ancillary fidelity and merged fighter packages are not certified by this export.
+
+Animations hides/reopens the browser; Frame model reframes current geometry after resize.
+Compact and restored old layouts keep playback visible. Actual 850x620 controls and native
+framebuffer motion are tested; real 96-DPI product launches restore the ordinary path.
+No automatic character catalogue/model-only project registration, miscellaneous recipe
+fill or Godot integration is claimed. Those require working backends; no placeholder fill
+button was added. H3 Mario-to-Snake contact correction remains immediately next.
+
 The standing contract is FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md. This guide records
 the current surface and repeatable acceptance, not a second executable task queue.
 

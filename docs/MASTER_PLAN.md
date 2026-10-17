@@ -1,5 +1,50 @@
 # FighterPort Studio master plan — clean restart
 
+## Ordinary animation workflow amendment — 2026-10-17
+
+[FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md](FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md)
+is preserved verbatim as the latest supplementary scope amendment. Continue actual HEAD
+bee76e5; no restart, shell replacement or reimplementation of completed providers/slots.
+First repair ordinary model + separate motion-PAC visibility/playback with clean and
+saved settings in the actual product. Preserve H3 Mario-to-Snake reach/contact/native
+quality rejection immediately afterward. Mirroring remains optional and is no prerequisite.
+Only plans/current.md supplies the executable acceptance; the following are retained scope.
+
+The shared UI path must expose Add Source, Open Character, Apply Animation, Fill Missing
+Miscellaneous and Save/Export in the browser and previewer as their backends work. Browse,
+select, scrub, orbit, Play and comparison stay usable read-only. Explicit target identity
+survives source auditions. Source mounts, character dependency catalogue, shared immutable
+clips and independent project assignments are distinct. Registration/manifests belong
+behind contextual actions; model-only registration must not need a dummy motion. Exact
+reviewed profiles can reuse automatically; family rules require tested hierarchy/rest/axis/
+body checks and unresolved review. Existing commercial diagnostic proposals remain unreviewed.
+
+P0 now has a visible bounded searchable native/project/shared/assignment browser and
+protected selected-file/BRRES picker, without a manual manifest for ordinary auditions.
+P1 automatic source/target project setup and model-only registration remain incomplete.
+The same services/session, independent shared revisions, native edit leases and all
+v1/v2/v3 regressions remain mandatory. Do not equate a folder picker with a dependency catalogue.
+
+Retain P2/H3 target-aware stance goals, lower/upper reach, stable poles and coupled pelvis,
+separate serialization/contact measurements and deterministic scrub/export. Study selected
+Godot 4.6 reference algorithms against pinned commit 89cea143987d564363e15d207438530651d943ac
+before any reuse, preserving MIT notices; godot-cpp is not an IK SDK or an engine-migration
+decision. No Godot code/dependency is imported by the P0 UI checkpoint.
+
+P3 fixed-duration Fill Missing Miscellaneous needs category selection/change preview,
+protected custom assignments, atomic Apply/Undo, saved dependencies and per-clip diagnostics.
+Ledge/hurt/get-up/item/recovery recipes have distinct reference/contact/prop rules. Fit
+within existing duration/timing, with no appended blends/padding/shifted protected events;
+preserve immediate reactions, multipart continuations and intentional contacts. Bake and
+validate freshly decoded endpoints/fractional times/loops/contacts/protected poses; reject
+overconstraints. There is no implemented fill backend or placeholder button in P0.
+
+P4 retains genuine non-Brawl native outputs through the format-neutral core, all Brawl/
+Melee/Ultimate/Rivals II/Dragon Ball/wider source/channel/target routes, title-specific
+folder/image/overlay providers, actual Modkit inspection, vetted app-local tools and optional
+DCC bridges. Do not wait for every ROM reader or force non-Brawl data through CHR0/MDL0.
+Standalone/local/non-AI core and deferred gameplay/compilation remain unchanged.
+
 Current phase decision (2026-10-17): [shared animation/library amendment](FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md)
 supersedes gameplay priority in the earlier briefs. Focus on models and every declared
 animation family, shared disk-backed library/multiple clips per source, reviewed FK/IK,

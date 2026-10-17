@@ -3,6 +3,21 @@
 Inherited implementation is source-inspected, not automatically verified support.
 No previous FighterPort counts or capabilities transfer to this codebase.
 
+2026-10-17 ordinary-animation addition after bee76e5 (per-operation evidence):
+
+| Operation | Evidence | Limits |
+|---|---|---|
+| Visible native animation navigation | Real source list/search/Preview event selects native CHR0; evaluated bones and framebuffer geometry change; native Play advances despite compact/read-only and old hidden layout | Opened Brawl native channels are listed by type/path; new animation fidelity evidence is skeletal CHR0 v4 only |
+| Separate model/motion PAC opening | Main browser/model wrapper, model-first and motion-first picker, explicit selected raw BRRES for opaque motion containers; actual local Snake/Mario geometry/playback | No name-based companion guessing, image/install reader, universal rig compatibility or opaque-package round trip |
+| Unified project/shared/assignment scopes | One session/store, bounded metadata pages; contextual shared revision use and explicit Apply through existing backend; different source audition retains selected target; other project/revisions unchanged | Project registration still requires the supported source-bound route; automatic model-only registration remains queued |
+| New separate native motion output | Real numeric edit/export control, guarded new destination, atomic validated output and fresh decoded keys/tangents/timing/flags | Selected skeletal document only; no merged character package, ancillary fidelity, non-Brawl writer or gameplay claim |
+| Actual ordinary product restart | Two normal executable launches, clean then persisted settings, visible clip name, Play/Stop, separate native output and normal exit | Control automation at 96 DPI, OS pickers bypassed; focused GL captures provide geometry evidence separately |
+
+Miscellaneous recipe fill, automatic project setup, broader native/channel fidelity and
+Godot reference prototypes remain queued. H3 Mario-to-Snake contact rejection is retained
+immediately afterward, without threshold changes or mirror priority. Earlier rows below
+remain receipts for their historical subsets, not superseding current scoped evidence.
+
 2026-10-17 H1/H2 addition after 7458be7 (historical rows below retain their original scope):
 
 | Resource/operation | New evidence | Limits |

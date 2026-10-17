@@ -24,6 +24,7 @@ public static class LibraryWindows {
  [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc callback,IntPtr data);
  [DllImport("user32.dll")] public static extern bool EnumChildWindows(IntPtr parent,EnumProc callback,IntPtr data);
  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hwnd);
+ [DllImport("user32.dll")] public static extern IntPtr GetParent(IntPtr hwnd);
  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hwnd,out uint pid);
  [DllImport("user32.dll",CharSet=CharSet.Unicode)] public static extern int GetClassName(IntPtr hwnd,StringBuilder name,int count);
  [DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr hwnd,uint msg,IntPtr wp,IntPtr lp);
@@ -109,7 +110,7 @@ try {
     Click-Library $preview 'Inspect / activate target instance'
    }
    Select-WorkspaceTab $preview 'Project / Output'
-   $edits=@([LibraryWindows]::Children($preview) | Where-Object {[LibraryWindows]::IsWindowVisible($_) -and [LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})
+   $edits=@([LibraryWindows]::Children($tabs[0]) | Where-Object {[LibraryWindows]::IsWindowVisible($_) -and [LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})
    # The visible output page has the new-project path followed by native output path.
    if($edits.Count -ne 2){throw 'Previewer output controls are missing or ambiguous'}
    $null=[LibraryWindows]::SetText($edits[1],12,[IntPtr]::Zero,$output)

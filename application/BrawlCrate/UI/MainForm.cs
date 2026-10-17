@@ -114,6 +114,10 @@ namespace BrawlCrate.UI
                 new ToolStripMenuItem("Character &Library...", null,
                     (sender, args) => CharacterLibraryForm.ShowProject(this))
                 { Name = "characterLibraryToolStripMenuItem" });
+            fileToolStripMenuItem.DropDownItems.Insert(5,
+                new ToolStripMenuItem("Animation &workspace...", null,
+                    (sender,args)=>new ModelForm().Show(this,new System.Collections.Generic.List<BrawlLib.Modeling.IModel>()))
+                {Name="animationWorkspaceToolStripMenuItem"});
             checkForUpdatesToolStripMenuItem.Text = "Upstream updates disabled";
             checkForUpdatesToolStripMenuItem.Enabled = false;
             Text = Program.AssemblyTitleFull;

@@ -219,7 +219,12 @@ namespace BrawlCrate.UI
 
             modelEditControl1.ModelPanel.Capture();
             ReadSettings();
+            // FighterPort: legacy saved layouts must not hide the only playback surface.
+            // Detailed editing panels remain available through Native details.
+            if(Document==null)Editor.AuthoringLayout(true);
             InitializeBoundDocument(true);
+            Animations.RefreshClips();
+            BeginInvoke(new Action(()=>{if(!IsDisposed)FrameNativeModel();}));
 
             base.OnShown(e);
         }

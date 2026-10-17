@@ -12,10 +12,124 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [Humanoid admission and native contacts](#humanoid-admission-and-native-contacts--2026-10-17).
-Continued actual HEAD 7458be7d9a11f95c4c4c1dd586819fd9dc40e831, preserving the complete
+Current checkpoint: [Ordinary animation browser and playback](#ordinary-animation-browser-and-playback--2026-10-17).
+Continued actual HEAD bee76e53e5e19cc719bbd9ef21a2d2e7741d3b9f, preserving the complete
 BrawlCrate application and passing discovery/library/slots/anchor work. Historical receipts
 below retain their original scope. docs/plans/current.md is the only next executable task.
+
+## Ordinary animation browser and playback — 2026-10-17
+
+The latest simple-workflow brief is persisted verbatim as
+FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md, SHA256
+69ae1e77633766c429082141997ea4bb78f78cc5b2d922a6fe772275aeb7b9ac.
+The master/prior specifications carry the dated priority amendment; no restart, shell/
+renderer/runtime replacement, codec rollback, new dependency or Godot import occurred.
+
+Reproduction through ordinary main-browser model Preview plus a separate motion PAC
+found one loaded CHR0 in a hidden native list; compact read-only mode also disabled it.
+An old saved plain-viewer layout could hide playback. Earlier helpers setting SelectedCHR0
+directly had not proved that navigation was usable. These are observed failures, not a
+claim that every reported symptom had the same cause. Unregistered shared metadata and
+opaque motion-PAC admission are separate paths, addressed by contextual revision use
+and explicit selected-BRRES attachment, respectively.
+
+ModelForm now has one visible searchable, resizable animation browser for opened native
+sources, selected character, project, shared catalogue and target assignments. It uses
+the existing session/store/edit leases and native timeline. Native rows retain file/
+container/type/index identity; source staging labels show original file/hash/range.
+Multi-model inputs require an explicit visible indexed-model choice. Native channel
+selection sets the inherited editor type explicitly; stale channel selection cannot
+silently become CHR0 export or Apply. Read-only retains browsing/scrub/Play/camera while
+mutation remains gated. Source A audition retains a different selected target B, and
+an audition invalidates an obsolete asynchronous preview request. Native details and
+Animations/Frame model controls remain available. New commands clear stale error status.
+
+File > Animation workspace and the native model Preview use this same surface. Open
+Character and Add Source inspect and stage selected files/ranges under existing guards,
+without manual .fpcompanion setup for auditions. Project/shared Apply Animation uses the
+existing valid assignment/transfer path, never a guessed rig approval. Save/Export opens
+project output or writes a new matching native skeletal-motion document. Edited curves
+use the already tested Hermite encoder; a fresh decode checks selected keys/tangents/
+timing/flags before atomic publication to a new local file. Separate motion output does
+not merge character packages, certify opaque/ancillary preservation or create gameplay.
+
+Observed focused original GUI actions: main model + separate motion PAC, motion-first/
+previewer-first picker, real search/list/Preview, native type switching, Play progression,
+changing bone poses and >100 changed framebuffer pixels. Inspected frames show actual
+textured geometry in different poses. Empty SRT0 is used only to test channel dispatch/
+wrong-channel rejection, not animated UV fidelity. Tests cover explicit multi-model
+choice, cancellation, missing/changed inputs, overwrite rejection, exact edited native
+save/decode, shared-only clip registration on Preview, valid Apply Animation, small-window
+both-panel visibility, hide/reopen, immutable revisions and untouched separate project.
+
+Both configured local Snake/Mario model PACs were opened through the main resource tree;
+the explicitly selected companion BRRES in their separate motion PACs fed the real
+browser. Selecting Wait1 among same-name channels changed bone matrices and rendered
+textured geometry; native Play advanced. New separate motion BRRES outputs were freshly
+decoded. No manual manifest/dummy animation/project registration was needed for those
+auditions. All 41 original local files retain their earlier hashes. Inputs, derivatives,
+settings, private paths and captures stay ignored. No commercial rig review or game
+result is claimed.
+
+Actual product ordinary checks launched the real exe with original fixtures, drove
+File/source-picker/browser/Preview/Play/Stop/native export controls and observed normal
+exits: clean settings, a local copy of the existing portable settings, then restart.
+The original user settings file was hashed unchanged. Product PrintWindow captures
+show restored UI separately from focused GL geometry. This is control automation at
+96 DPI with OS pickers bypassed, not manual clicking or physical high-DPI verification.
+Two independent saved projects also retain their separate native/project restart checks.
+
+Release/x86/net472 build and doctor pass. The focused browser and retained default,
+companion, dump, container, library, shared, FK, workspace and humanoid suites have their
+own native/GUI receipts. New binding checks are covered by final focused/workspace/
+humanoid runs. The old four-panel test helper was corrected to invoke Native details:
+blind toggles had hidden the newly restored bottom panel. An overlapping test build hit
+the expected Windows executable lock and was rerun after the earlier GUI process exited.
+Exploratory failures remain local and are not counted as passes. A distinct 8.3 alias
+remains a skip; no old WPF counts, external native-tool, Modkit or game checks are claimed.
+
+Current executable: application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe,
+SHA256 b1ce96e00f1aafe7f27d88b18b436e262fd6aca9b57508e9e43a0919d681a8d5.
+Upstream pin remains d56cbac89dc2cd0e5c3f923e1d03041b16902add; comparison reports all
+6237 baseline entries with no missing imported file. The external recovery remains
+intact. Source-only commit/publication is recorded by Git and the ignored review receipt,
+not predeclared by this status. Existing component/corresponding-source audit still applies.
+
+Local evidence: browser-before-01 (expected navigation failure), final focused
+browser-native-20261017-181107-534 and browser-gui-20261017-181114-784;
+browser-product-20261017-181137-173 (clean/existing-settings/restart);
+p0-local-repeat-02 and p0-local-error-guard-final-03; p0-final-regressions-20261017-175032;
+p0-default-final.log, p0-workspace-final.log, p0-browser-guard-final-03.log and final
+binding/product receipts. p0-originals-and-brief.json records 41 unchanged originals and
+the canonical-brief hash; p0-upstream.json records imported-baseline comparison.
+Final workspace/humanoid receipts: workspace-gui-20261017-180723-584 and
+humanoid-gui-20261017-180858-984 plus their native pairs. Independent project product
+receipts: library-product-20261017-180633-426 and library-product-20261017-180654-215.
+
+One sequential local run, p0-local-target-final-01, encountered an unexpected
+System.Drawing.Graphics.FromHdcInternal/Button.OnPaint OutOfMemoryException. Its private
+stack is preserved; the process was about 175 MiB private memory, so capacity/codec cause
+is not established. The diagnostic dialog was dismissed and the run completed, but it is
+explicitly NOT a clean GUI pass. A fresh pair repeat passed without intervention, then
+another passed with a harness handler that records/fails unexpected GUI-thread exceptions
+instead of accepting an interactive dismissal. Cause remains unclassified/intermittent;
+preserve this diagnostic and watch native paint/resource lifecycle during H3. Do not
+claim the exception was fixed or prove universal GUI reliability from those repeats.
+
+The next executable criterion remains H3 Mario-to-Snake reachable, temporally stable
+contact-native output at unchanged tolerances. Both local FK directions and the forward
+contact diagnostic remain distinct from the rejected reverse contact case. Automatic
+model-only project registration, dependency-aware common character catalogue, reviewed
+family reuse, fixed-duration semantic miscellaneous fill/atomic batch undo and selected
+Godot reference prototypes remain incomplete. No placeholder fill button implements them.
+Broader Brawl versions/channels, genuine non-Brawl outputs, actual Modkit/game checks and
+vetted app-local tools remain scoped. Gameplay stays deferred; mirror is not a prerequisite.
+
+The P0 reverse diagnostic p0-reverse-contact-retained-01 exits 1 as expected
+for the retained boundary: 108 unreachable samples, contact 4.833102665 FK -> 1.145646282,
+native error .368991651 position / 7.881017096 degrees / .417223322 mesh units. No corrected
+assignment is committed and tolerances stay .02 / .15 / .03. Both directed FK diagnostics
+pass separately. This is an observed failure, not a completed reverse-contact feature.
 
 ## Humanoid admission and native contacts — 2026-10-17
 

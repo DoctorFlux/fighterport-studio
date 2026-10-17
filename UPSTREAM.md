@@ -1,5 +1,12 @@
 # Upstream provenance
 
+2026-10-17 ordinary-animation continuation: original FighterPort browser/picker/native
+output controls integrate the existing ModelForm, ModelEditControl and native timeline.
+The inherited LeftPanel modification separates read-only animation navigation from
+mutation; startup restores playback despite hidden saved layouts. Existing codecs,
+native editors and upstream pin remain. Edited-motion export opts into the previously
+tested Hermite encoding; no new dependency, Godot import or runtime/renderer migration.
+
 Source: https://github.com/soopercool101/BrawlCrate
 Selected commit: `d56cbac89dc2cd0e5c3f923e1d03041b16902add` (live default `master`, checked 2026-10-17).
 Original app: BrawlCrate v0.42 Hotfix 1, assembly 0.42.0.1 (project Version 42.0.1).

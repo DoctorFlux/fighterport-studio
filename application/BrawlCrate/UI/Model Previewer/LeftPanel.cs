@@ -18,6 +18,17 @@ namespace BrawlCrate.UI.Model_Previewer
 {
     public class LeftPanel : UserControl
     {
+        // FighterPort 2026-10-17: navigation remains usable on immutable comparisons.
+        public void SetReadOnly(bool value)
+        {
+            Enabled=true;
+            btnSaveAnims.Enabled=btnLoad.Enabled=!value;
+            foreach(ToolStripItem item in ctxAnim.Items)item.Enabled=!value;
+            ctxAnimList.Enabled=ctxTextures.Enabled=!value;
+            // Visibility/texture toggles can author VIS0 or change native material state.
+            pnlObjects.Enabled=pnlTextures.Enabled=chkSyncVis.Enabled=!value;
+            listAnims.Enabled=fileType.Enabled=txtSearchAnim.Enabled=chkContains.Enabled=true;
+        }
         #region Designer
 
         public CheckedListBox lstObjects;
@@ -1886,6 +1897,7 @@ namespace BrawlCrate.UI.Model_Previewer
 
         private void listAnims_MouseDown(object sender, MouseEventArgs e)
         {
+            if((_mainWindow as ModelEditControl.ModelEditControl)?.AuthoringReadOnly==true){listAnims.ContextMenuStrip=null;return;}
             if (e.Button == MouseButtons.Right)
             {
                 if (_mainWindow.TargetAnimation != null)

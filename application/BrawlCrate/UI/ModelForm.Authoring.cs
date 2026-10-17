@@ -2,6 +2,7 @@
 using BrawlCrate.Authoring;
 using BrawlCrate.UI.Model_Previewer.ModelEditControl;
 using BrawlLib.Modeling;
+using BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase;
 using BrawlLib.SSBB.ResourceNodes;
 using System;
 using System.Drawing;
@@ -15,6 +16,17 @@ namespace BrawlCrate.UI
         public ModelEditControl Editor=>modelEditControl1;
         public PreviewDocument Document {get;private set;}
         public PreviewWorkspacePane Workspace {get;private set;}
+        public PreviewAnimationBrowser Animations {get;private set;}
+        private readonly System.Collections.Generic.List<BrawlCrate.Sources.StagedSource> _previewSources=new System.Collections.Generic.List<BrawlCrate.Sources.StagedSource>();
+        internal void CheckSourceBudget(long size){if(_previewSources.Count>=16 || size<16 || size>64L*1024*1024 || _previewSources.Sum(s=>s.Length)+size>128L*1024*1024)throw new System.IO.IOException("This viewer's selected sources exceed 16 files / 128 MiB or 64 MiB per file. Open a separate viewer; existing source limits remain.");}
+        internal void RecordSource(BrawlCrate.Sources.StagedSource source)=>_previewSources.Add(source);
+        internal string NativeSourceLabel(ResourceNode root)
+        {
+            if(root==Document?.Root)return "project "+Document.Session.Project.State.Id.Substring(0,8)+" / "+Document.Mode;
+            var source=_previewSources.FirstOrDefault(s=>string.Equals(s.StagedPath,root._origPath,StringComparison.OrdinalIgnoreCase));
+            string path=source?.SourcePath??root._origPath;
+            return string.IsNullOrEmpty(path)?root.Name:System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path))+"/"+System.IO.Path.GetFileName(path)+(source==null?"":" #"+source.Sha256.Substring(0,8)+(source.SelectedContainer==null?"":" ["+source.SelectedContainer+"]"));
+        }
         private SplitContainer _workspaceSplit;
         private ToolStripLabel _identity;
         private void InitializeAuthoringWorkspace()
@@ -23,16 +35,21 @@ namespace BrawlCrate.UI
             Controls.Remove(Editor);
             _workspaceSplit=new SplitContainer {Width=1200,Dock=DockStyle.Fill,Name="previewWorkspaceSplit",FixedPanel=FixedPanel.Panel1,SplitterDistance=340,Panel1MinSize=240,Panel2MinSize=240,Panel1Collapsed=true};
             Workspace=new PreviewWorkspacePane(this){Dock=DockStyle.Fill};_workspaceSplit.Panel1.Controls.Add(Workspace);_workspaceSplit.Panel2.Controls.Add(Editor);
+            Animations=new PreviewAnimationBrowser(this){Dock=DockStyle.Top};_workspaceSplit.Panel2.Controls.Add(Animations);
+            var browserSplitter=new Splitter{Dock=DockStyle.Top,Height=4,MinSize=100,MinExtra=200};_workspaceSplit.Panel2.Controls.Add(browserSplitter);browserSplitter.BringToFront();Animations.BringToFront();
             var bar=new ToolStrip {Name="previewWorkspaceBar",Dock=DockStyle.Top,GripStyle=ToolStripGripStyle.Hidden};
             var toggle=new ToolStripButton("FighterPort workspace") {Name="previewWorkspaceToggle"};toggle.Click+=(s,e)=>ToggleWorkspace();bar.Items.Add(toggle);
             var reset=new ToolStripButton("Reset layout");reset.Click+=(s,e)=>{_workspaceSplit.Panel1Collapsed=false;_workspaceSplit.SplitterDistance=Math.Min(340,Math.Max(240,Width-340));};bar.Items.Add(reset);
             var compact=new ToolStripButton("Authoring layout");compact.Click+=(s,e)=>Editor.AuthoringLayout(true);bar.Items.Add(compact);
-            var native=new ToolStripButton("Native details");native.Click+=(s,e)=>{if(Editor.Width<650){Workspace.Report("Enlarge the window or hide the workspace for native details; the native timeline stays visible.");return;}Editor.AuthoringLayout(false);};bar.Items.Add(native);
+            var native=new ToolStripButton("Native details");native.Click+=(s,e)=>Editor.AuthoringLayout(false);bar.Items.Add(native);
+            var animations=new ToolStripButton("Animations"){Name="previewAnimationsToggle"};animations.Click+=(s,e)=>{Animations.Visible=!Animations.Visible;if(Animations.Visible)Animations.RefreshClips();};bar.Items.Add(animations);
+            var frame=new ToolStripButton("Frame model"){Name="previewFrameModel"};frame.Click+=(s,e)=>FrameNativeModel(true);bar.Items.Add(frame);
             _identity=new ToolStripLabel("Native model — not associated with a character project");bar.Items.Add(_identity);
             Controls.Add(_workspaceSplit);Controls.Add(bar);MinimumSize=new Size(720,520);
             SizeChanged+=(s,e)=>{if(!_workspaceSplit.Panel1Collapsed && Editor.Width<640)Editor.AuthoringLayout(true);};
         }
         public void ToggleWorkspace()=>_workspaceSplit.Panel1Collapsed=!_workspaceSplit.Panel1Collapsed;
+        internal void ShowProjectOutput(){_workspaceSplit.Panel1Collapsed=false;Workspace.ShowOutput();}
         internal void DisplayDocument(PreviewDocument doc,double frame)
         {
             bool first=Document==null || Document.TargetId!=doc.TargetId;DetachDocument();Document=doc;Editor.AuthoringDocument=doc;_models=new System.Collections.Generic.List<IModel>{doc.Model};
@@ -52,6 +69,7 @@ namespace BrawlCrate.UI
             var doc=Document;Editor.StopAnim();Editor._resetCamera=false;Editor.TargetModel=null;Editor.SelectedCHR0=null;Editor.ModelPanel.ClearAll();Editor._targetModels.Clear();Editor._openedFiles.Clear();
             Editor._openedFiles.Add(doc.Root);Editor.AppendTarget(doc.Model);Editor._resetCamera=false;Editor.TargetModel=doc.Model;Editor.EditingAll=false;
             var a=doc.Session.Project.State.Animations.Single(n=>n.Id==doc.AnimationId);
+            Editor.TargetAnimType=NW4RAnimType.CHR;
             Editor.SelectedCHR0=(CHR0Node)BrawlProjectAdapter.At(doc.Root,a.NativePath);Editor.SetFrame(_initialFrame);
             Editor._undoSaves.Clear();Editor._redoSaves.Clear();Editor._currentUndo=null;Editor._saveIndex=0;Editor.UpdateUndoButtons();
             Editor.SetAuthoringReadOnly(!doc.Editable);
@@ -70,7 +88,19 @@ namespace BrawlCrate.UI
         internal void MarkDocumentStale(){Editor.SetAuthoringReadOnly(true);_identity.Text="Stale target instance — select and reopen its current revision";}
         internal void UpdateAuthoringIdentity()
         {
-            _identity.Text=Document==null?(Editor.AuthoringReadOnly?"Native comparison (read-only) — not associated with a character project":"Native model — not associated with a character project"):Document.Mode+" | project "+Document.Session.Project.State.Id.Substring(0,8)+" | target "+Document.TargetId.Substring(0,8)+" / rig "+Document.TargetFingerprint.Substring(0,8)+" | "+(Document.InstanceId??(Document.Mode.StartsWith("Source")?"immutable source":"unassigned native comparison"))+" r"+Document.InstanceRevision;
+            _identity.Text=Document==null?(Editor.AuthoringReadOnly?"Native comparison (read-only) — not associated with a character project":"Native model — not associated with a character project"):Document.Mode+" | project "+Document.Session.Project.State.Id.Substring(0,8)+" | selected target "+(Workspace.TargetId?.Substring(0,8)??"none")+" / preview rig "+Document.TargetFingerprint.Substring(0,8)+" | "+(Document.InstanceId??(Document.Mode.StartsWith("Source")?"immutable source":"unassigned native comparison"))+" r"+Document.InstanceRevision;
+            Animations?.BindSession();
+        }
+        internal void FrameNativeModel(bool includeBound=false)
+        {
+            if(Document!=null && !includeBound || Editor.TargetModel==null)return;
+            Editor._resetCamera=false;Editor.ModelPanel.CurrentViewport=(BrawlLib.Internal.Windows.Controls.Model_Panel.ModelPanelViewport)Editor.ModelPanel.First();
+            var box=Editor.TargetModel.GetBox();var span=box.Max-box.Min;var camera=Editor.ModelPanel.Camera;
+            double tangent=Math.Tan(Math.Max(5,Math.Min(150,camera.VerticalFieldOfView))*Math.PI/360);
+            double aspect=Math.Max(.1,(double)Editor.ModelPanel.Width/Math.Max(1,Editor.ModelPanel.Height));
+            float distance=(float)Math.Max(1,Math.Max(span._x/aspect,span._y)/(2*tangent)*1.35+span._z/2);
+            if(!float.IsNaN(distance)&&!float.IsInfinity(distance))Editor.ModelPanel.Camera.ZoomExtents((box.Min+box.Max)/2,distance);
+            Editor.ModelPanel.Invalidate();
         }
         private void DetachDocument()
         {

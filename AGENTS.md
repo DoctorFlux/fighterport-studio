@@ -26,6 +26,14 @@ priority with proportion-aware/contact-preserving humanoid retargeting; mirrorin
 a prerequisite. Profiles require exact rig/mesh identity and honest review. Local commercial
 inputs/derivatives/captures/private paths remain excluded; never mount the repository root.
 
+Read docs/FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md. Ordinary animation browsing
+and native playback take priority over new solvers. Read-only restricts mutation, never
+browse/select/scrub/orbit/Play. Compact/saved layouts must retain a visible clip browser
+and native timeline. Preserve the Mario-to-Snake contact rejection immediately afterward;
+no mirror prerequisite, tolerance relaxation or guessed commercial approval. Automatic
+model-only registration and fixed-duration semantic miscellaneous filling remain required;
+do not mark them implemented with placeholders. Godot references do not authorize an engine migration.
+
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.
 - Local, standalone, non-AI core; no mandatory DCC/cloud. All requested games, channels,

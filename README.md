@@ -1,6 +1,6 @@
 # FighterPort Studio
 
-FighterPort Studio is restarting directly on the complete BrawlCrate application source.
+FighterPort Studio builds on the complete BrawlCrate application source.
 The main program is the real native resource editor, targeting .NET Framework 4.7.2 / x86.
 The former WPF application is retained only in Git history and verified offline recovery.
 
@@ -11,6 +11,18 @@ targeting pack: `./scripts/build.ps1`. Run: `./scripts/run.ps1`. Original-fixtur
 Use native File > Open for the inherited editor workflow. File > Open Source adds a bounded
 read-only folder mount and opens recognized Brawl resources as separate staged working copies.
 See [testing](docs/TESTING.md) for the exact verified workflow and limitations.
+
+For a model with a separate motion PAC, use File > Animation workspace (or the model's
+native Preview). Open Character selects/stages the model; Add Source attaches its motion
+file without replacing the model. Inspect each selected file and choose its native
+container; opaque motion PACs require an explicit BRRES choice. Search the visible
+Animations list, select the skeletal clip, click Preview, then use native Play/frame
+controls below. No companion manifest or project is required for these auditions.
+Frame model restores framing after resizing; Animations hides/reopens the browser.
+Save/Export writes a new validated skeletal-motion document. It does not merge a separate
+motion PAC into a character package. Project/shared assignments retain their existing
+explicit target, reviewed transfer, edit and save controls in FighterPort workspace.
+Automatic model-only project setup and Fill Missing Miscellaneous are still pending.
 
 File > Brawl Companions resolves a model BRRES, exact-name RGBA8 textures, and one
 skeletal motion from separately selected files. Choose every dependency explicitly;
@@ -43,8 +55,9 @@ automatically deleted. Upstream profiles are not imported.
 
 This is a source development checkpoint, not a released binary or a playable-fighter exporter.
 The product roadmap is a source-character-bound animation/attack library and moveset
-editor with semantic rigging/IK/FK and native target builders. The library/project/
-retarget/gameplay/template/tool-provisioning services remain planned; see the
+editor with semantic rigging/IK/FK and native target builders. Shared-library/project
+and bounded reviewed FK/humanoid services now have declared evidence;
+broader retargeting, gameplay/templates and tool provisioning remain planned. See the
 [master specification](docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md).
 All remaining games and conversion goals remain in [the master plan](docs/MASTER_PLAN.md).
 Current evidence: [development status](docs/DEVELOPMENT_STATUS.md).

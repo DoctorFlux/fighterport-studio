@@ -1,5 +1,48 @@
 # Testing the restarted application
 
+Ordinary animation regression (2026-10-17):
+
+```powershell
+./scripts/test.ps1 -AnimationBrowser -Gui
+./tests/NativeSmoke/VerifyAnimationBrowserProduct.ps1 -Model <original-model-PAC> -Motion <original-motion-PAC>
+```
+
+The focused suite generates separate original model/motion PACs and two different rigs,
+opens the main native browser/model wrapper, and selects the clip through real visible
+list/search/Preview controls. It checks native bone transforms, >100 changed framebuffer
+pixels, actual Play progression, read-only exploration, compact/old hidden layout recovery,
+motion-first/previewer-first protected picker controls, cancellation/missing/changed inputs,
+small windows with both panels, separate numeric edit/native export/decode, source overwrite
+rejection and unchanged originals/shared revision/second project. Project/shared/assignment
+scopes share the authoritative session; source A preserves an explicitly different target B.
+No helper directly sets SelectedCHR0 for these new workflow acceptance checks.
+
+The product helper launches the normal exe twice, initially with a clean isolated profile,
+then persisted settings/guards. It drives File > Animation workspace via native menu/control
+messages, opens separate files through the actual picker, sees OriginalSwing, invokes
+Preview/Play/Stop, exports with decoded validation and requires normal exits/unchanged
+input hashes. Its fixed native menu hit point is a 96-DPI automation constraint, not a
+physical high-DPI claim. Product PrintWindow captures are separate from focused OpenGL
+geometry captures. OS file pickers are bypassed; this is control automation, not manual use.
+Optional `-SavedSettings <existing settings.xml>` adds a third launch, copying only that
+configuration into the isolated profile before launch two. The donor settings are hashed
+unchanged. Do not copy or publish user libraries/game data. The original empty SRT0 marker
+tests channel routing/export rejection only; animated ancillary fidelity stays queued.
+
+Opt-in local ordinary checks: `NativeSmoke.exe --local-browser <private localHumanoid XML>
+<new private evidence directory>` reuses the configured explicit model path/motion BRRES/
+clip selectors. It opens both real model PACs through the main native browser, attaches
+separate motions with picker controls, selects the exact CHR0 among same-name channels,
+checks matrices/rendered geometry/Play, exports separate motion BRRES and freshly decodes
+it, then checks original hashes. It does not register/approve a commercial rig or create
+a playable character. Keep all inputs, private configs, paths, derivatives and captures
+ignored. Normal product project restart remains VerifyLibraryProduct -PreviewWorkspace;
+run it for both independently saved shared projects. All retained suites remain required.
+The opt-in browser has a 120-second watchdog and records/fails unexpected GUI thread
+exceptions rather than waiting in or silently dismissing the interactive product report.
+An observed GDI button-paint exception is retained in status; a resumed run is not a clean
+pass, even if all later motion checks succeed. Repeated clean runs do not establish its cause.
+
 Use Windows, installed Visual Studio 2022 MSBuild and the .NET Framework 4.7.2
 targeting pack. The verified toolchain also has .NET SDK 9.0.300. Run from the
 repository root:

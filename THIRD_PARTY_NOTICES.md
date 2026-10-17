@@ -52,6 +52,10 @@ The Model Previewer workspace continuation adds original repository-licensed sou
 uses existing framework/native editor dependencies. It adds no third-party package or
 binary. Existing upstream/component notices and unresolved distribution obligations remain.
 
+The 2026-10-17 ordinary-animation UI continuation adds original repository-licensed
+controls/tests only. Godot is a queued pinned research reference, not an imported library
+or engine dependency. No new package/binary/game asset is distributed by this checkpoint.
+
 The 2026-10-17 humanoid/input continuation adds original repository-licensed services,
 controls and procedural test generators. The inherited bfloat and opt-in CHR0 encoding
 changes are recorded in UPSTREAM.md and source modification notices. It adds no package,

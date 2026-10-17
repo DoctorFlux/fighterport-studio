@@ -38,6 +38,7 @@ internal static partial class NativeSmoke
         if (args.Length == 3 && args[0] == "--inspect-brawl") return InspectConfiguredBrawl(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--probe-brawl") return ProbeBrawl(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--local-humanoid") return LocalHumanoid(args[1], args[2]);
+        if (args.Length == 3 && args[0] == "--local-browser") return LocalAnimationBrowser(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--verify-container") return VerifyContainerRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-workspace") return VerifyWorkspaceRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-shared") return VerifySharedRestart(args[1]);
@@ -83,7 +84,7 @@ internal static partial class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui", "--library-native", "--library-gui", "--retarget-native", "--retarget-gui", "--shared-native", "--shared-gui", "--workspace-native", "--workspace-gui", "--humanoid-native", "--humanoid-gui" }.Contains(args[0]))
+        if (args.Length != 2 || !new[] { "--browser-native", "--browser-gui", "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui", "--library-native", "--library-gui", "--retarget-native", "--retarget-gui", "--shared-native", "--shared-gui", "--workspace-native", "--workspace-gui", "--humanoid-native", "--humanoid-gui" }.Contains(args[0]))
         {
             Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
@@ -104,6 +105,7 @@ internal static partial class NativeSmoke
             // pumping can create WinForms handles on this STA thread.
             if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if(args[0].StartsWith("--browser",StringComparison.Ordinal)){ExerciseAnimationBrowser(args[0].EndsWith("gui",StringComparison.Ordinal));return 0;}
             if(args[0].StartsWith("--humanoid",StringComparison.Ordinal)){ExerciseHumanoid(args[0].EndsWith("gui",StringComparison.Ordinal));Log("PASS: original full-humanoid native/contact checkpoint; declared subset only, no commercial approval/clearance/Modkit/game claim.");return 0;}
             if (args[0].StartsWith("--workspace",StringComparison.Ordinal)) {ExerciseWorkspace(args[0].EndsWith("gui",StringComparison.Ordinal));Log("PASS: previewer workspace/native slots/anchors; no fitting/Modkit/game claim");return 0;}
             if (args[0].StartsWith("--shared", StringComparison.Ordinal))
@@ -387,8 +389,9 @@ internal static partial class NativeSmoke
         viewer.Activate();
         // Expand the inherited editor's initially collapsed panels through its
         // real toggle buttons so playback and numeric editing are visible actions.
-        foreach (string name in new[] { "btnTopToggle", "btnLeftToggle", "btnRightToggle", "btnBottomToggle" })
-            ((Button)editor.Controls.Find(name, true).Single()).PerformClick();
+        // Select a known visible layout through the actual command. Blindly toggling
+        // saved panel flags can hide the playback surface after compact startup.
+        ((ToolStrip)editor.FindForm().Controls.Find("previewWorkspaceBar",true).Single()).Items.Cast<ToolStripItem>().Single(item=>item.Text=="Native details").PerformClick();
         // Select the viewport installed by inherited viewer settings, then frame
         // this original fixture with the native camera API. Its mesh lies at z=0;
         // an origin camera cannot see that plane through the near clip distance.

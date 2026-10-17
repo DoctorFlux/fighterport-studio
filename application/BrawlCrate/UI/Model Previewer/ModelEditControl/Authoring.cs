@@ -15,7 +15,7 @@ namespace BrawlCrate.UI.Model_Previewer.ModelEditControl
         {
             AuthoringReadOnly=value;
             if(value){SelectedBone=null;ControlType=BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase.TransformType.None;}
-            leftPanel.Enabled=!value;rightPanel.Enabled=!value;animCtrlPnl.Enabled=!value;toolStrip1.Enabled=!value;
+            leftPanel.SetReadOnly(value);rightPanel.Enabled=!value;animCtrlPnl.Enabled=!value;toolStrip1.Enabled=!value;
             menuStrip1.Enabled=!value;
             if(AuthoringDocument!=null){fileToolStripMenuItem.Enabled=false;rightPanel.pnlOpenedFiles.Enabled=false;}
             AllowDrop=!value && AuthoringDocument==null;ModelPanel.AllowDrop=false;

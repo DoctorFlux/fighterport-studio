@@ -1,5 +1,37 @@
 # Architecture after the clean restart
 
+Ordinary animation browsing amendment (2026-10-17, after bee76e5): ModelForm now hosts
+PreviewAnimationBrowser above the inherited editor, independently of the collapsible
+authoring pane/native left panel. Its splitter/toggle retain viewport/timeline space.
+Opened native roots, selected character, project, shared catalogue and assignments are
+views over the existing documents/project/store, not another project implementation.
+Selection/search never assign a slot. Preview uses the native TargetAnimation/timeline;
+project/shared sources and assignment auditions use the same explicit session, with
+read-only document ownership. Shared pages remain metadata-only (32 results/cursor page).
+Importing a selected shared revision reuses UseSharedClip; all assignment compatibility,
+pending edit leases and validated transactions stay in the existing backend.
+
+Plain preview startup restores native playback even when old settings hid the bottom.
+Read-only native animation navigation remains enabled, with mutation/context actions
+gated; key/curve/material editing stays disabled. The always-visible browser survives
+compact layout. Advanced project selectors remain service-backed setup controls, not a
+second catalogue. Source preview preserves the explicitly selected project target.
+
+PreviewSourcePicker performs bounded audit/directory inspection before staging/decoding
+one deliberate file/range. Canonical whole files retain their hierarchy; opaque motion
+PACs require explicit BRRES selection. Existing narrow source-root and staging guards,
+64 MiB/file, 16 files/128 MiB per viewer and 4096-entry/depth-16 browser limits remain.
+It does not scan a dump, infer a character from names or silently bind companion files.
+PreviewNativeExportForm exports the selected skeletal motion's native document separately,
+uses existing Hermite encoding for edits, checks decoded keys/tangents/flags/timing, then
+moves a validated unique temporary file to a new guarded destination. It does not combine
+separate model/motion archives or claim opaque/package/other-channel fidelity.
+
+Automatic model-only project registration, common dependency-aware character catalogue,
+reviewed family reuse and fixed-duration semantic miscellaneous filling remain queued.
+No Godot code/package is imported. The format-neutral solver/native adapters are retained;
+H3 Mario-to-Snake contact rejection follows the navigation repair, without mirror priority.
+
 The active executable is `application/BrawlCrate/BrawlCrate.csproj`, branded FighterPort Studio.
 It retains upstream WinForms, .NET Framework 4.7.2, x86, OpenTK/OpenGL, native wrappers,
 resource tree/property grid and ModelEditControl. BrawlLib is an in-process native resource

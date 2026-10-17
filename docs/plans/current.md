@@ -1,5 +1,14 @@
 # Next executable acceptance criterion
 
+2026-10-17 priority amendment: the ordinary animation navigation/playback repair (P0)
+precedes new solver features. See FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md.
+The passing P0 checkpoint adds the visible searchable source/project/shared/assignments
+browser, native Play/timeline access despite compact/saved layouts, protected explicit
+separate motion-PAC/BRRES attachment and validated separate native motion output. It does
+not complete automatic model-only project registration or semantic miscellaneous filling.
+Retain the H3 regression below as the immediate next implementation; do not replace it
+with mirroring or loosen its thresholds. All ordinary workflow regressions must stay passing.
+
 H3: make the independently tested Mario -> Snake standing-contact diagnostic a faithful,
 reachable, temporally stable native transfer in the existing Model Previewer. Continue the
 H1/H2 checkpoint after 7458be7; do not restart, reimplement discovery/slots, replace native
@@ -23,6 +32,14 @@ Mario -> Snake corrected trial rejects. After continuous pelvis margin handling 
 7.881017 degrees / .417223 mesh units (limits .02 / .15 / .03). Worst position is the knee
 at native 10.25; worst orientation is the other knee at 6.5. No corrected assignment was
 committed. FK passes separately. The private receipt is h2-local-contact-reverse-03.
+The P0 rerun p0-reverse-contact-retained-01 reproduces the same 108 unreachable
+samples and .368991651 position / 7.881017096 degrees / .417223322 mesh decode error,
+with contact 4.833102665 FK -> 1.145646282 corrected. It exits 1 without committing a
+corrected assignment; both directed FK trials pass separately. This failure is retained,
+not counted among passing regressions.
+Also retain the private p0-local-target-final-01 native GDI button-paint exception. Two
+fresh pair repeats pass, including the fail-on-GUI-error harness; its cause is unclassified.
+Watch paint/resource lifecycle during the next GUI acceptance and investigate if it recurs.
 Do not solve this by relaxing tolerances, marking proposals reviewed, hiding reach losses,
 stretching/resizing the target, or claiming every requested standing goal is reachable.
 
@@ -60,6 +77,13 @@ all game-image providers. Melee/Ultimate/Rivals II/Dragon Ball/wider games, real
 inspection, native outputs, app-local vetted tools and optional DCC bridges remain scoped.
 No mandatory DCC/cloud/AI, global installs, guessed APIs or animation-only playable claims.
 Gameplay scripting/hitboxes/damage/ACMD/PSA/Lua and playable compilation stay deferred.
+
+Supporting simplification remains queued without blocking H3 behind all providers:
+contextual model-only/shared-source registration without dummy motions or manual manifests;
+tested exact/family recognition with unresolved review; semantic fixed-duration miscellaneous
+recipes with change preview, protected existing parts, atomic Apply/Undo and freshly decoded
+native timing/contact proof. Study/prototype selected pinned Godot references before reuse;
+no whole-engine migration. These are required future backends, not implemented UI claims.
 
 Finish coherent tested increments and document exact unsupported boundaries. Review staged
 AND outgoing source-only diffs, verify exact public origin/main/remote SHA and push under

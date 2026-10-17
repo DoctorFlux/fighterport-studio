@@ -1,5 +1,21 @@
 # FighterPort Studio — proportion-aware humanoid retargeting
 
+## Simple workflow amendment — 2026-10-17 (after bee76e5)
+
+The latest authority is [FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md](FIGHTERPORT_SIMPLE_AUTO_RETARGET_MISC_WORKFLOW.md).
+Repair ordinary visible animation browsing/playback before new solver work, then retain
+the independently failing Mario-to-Snake contact regression. Read-only allows navigation,
+scrubbing, orbit, Play and comparisons. Keep one explicit target and shared live session;
+source auditions never assign a slot. Automatically manage source/project registrations
+behind contextual actions, with independent model-only registration and honest ambiguity.
+Fixed-duration miscellaneous recipes need change preview, protected assignments, atomic
+Apply/Undo and freshly decoded native timing/contact proof; no padding or blanket Idle/Fall
+fit. These remain backend requirements, not placeholder controls. Selected pinned Godot
+algorithm study does not migrate the application. All games/channels/native routes, vetted
+app-local tools and optional DCC scope remain. Gameplay stays deferred; mirror is optional.
+Only docs/plans/current.md defines the next executable task. The supplied body below remains
+historical requirements where it conflicts with this later user amendment.
+
 ## Product amendment and implementation directive
 
 Date: 2026-10-17.

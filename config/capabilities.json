@@ -1,7 +1,20 @@
 {
   "schemaVersion": 1,
   "baseline": "d56cbac89dc2cd0e5c3f923e1d03041b16902add",
-  "evidencePolicy": "inherited source does not imply tested support",
+  "evidencePolicy": "inherited source does not imply tested support; original checkpoint objects retain historical receipts, current per-operation coverage is in FORMAT_SUPPORT.md",
+  "ordinaryAnimationBrowser": {
+    "status": "native-control-and-product-restart-tested-with-declared-Brawl-subsets",
+    "scopes": ["opened native sources", "selected character", "project", "shared metadata pages", "target assignments"],
+    "selection": "real list/search/Preview event, native bone transforms, changed framebuffer geometry and Play progression; browsing never assigns",
+    "readOnly": "browse/select/scrub/native Play and comparisons remain usable; mutation stays gated",
+    "target": "a different explicitly selected target survives source audition; immutable shared and second project preserved",
+    "sourceAdmission": "canonical raw PAC/BRRES/CHR0 plus explicitly selected companion BRRES; existing guards and budgets, no manual manifest for auditions",
+    "output": "new matching native skeletal-motion document; decoded keys/tangents/timing/flags validated; no whole-package or ancillary fidelity claim",
+    "localPair": "opt-in Snake/Mario separate model/motion PAC native browser and actual geometry/playback tested; original hashes unchanged; private receipts only",
+    "restart": "two actual executable launches via File menu/source picker/browser/export with clean then persisted settings",
+    "unsupported": ["automatic model-only project registration", "common dependency-aware game/image catalogue", "fixed-duration semantic miscellaneous fill", "new non-Brawl output", "Modkit/game validation"],
+    "evidenceGuide": "docs/DEVELOPMENT_STATUS.md"
+  },
   "originalBrawlFixture": {
     "formats": [
       "BRRES",
@@ -59,10 +72,10 @@
   },
   "independentSettings": "scalar, XML/binary, collections, complex viewer settings, scoped reset and separate-process reload tested",
   "standaloneEntrypoint": "actual FighterPort.Studio.exe opened saved original fixture using default portable UserData; normal exit observed",
-  "existingCommercialInputs": "679 files matched verified recovery hashes; not loaded into tests",
+  "existingCommercialInputs": "historical reset matched 679 recovery files without loading them; current opt-in Snake/Mario native browser checks preserve 41 original hashes, see ordinaryAnimationBrowser and FORMAT_SUPPORT.md",
   "externalNativeToolAndModkitValidation": "unrun",
   "otherGames": "planned per format/version/operation; full scope in MASTER_PLAN.md",
-  "retargetingGameplayAndPlayableFighters": "not implemented in restarted product",
+  "retargetingGameplayAndPlayableFighters": "reviewed original FK and bounded humanoid/contact subsets tested; see FORMAT_SUPPORT.md. Gameplay/playable compilation remains deferred",
   "brawlLooseDumpProvider": {
     "status": "original-fixture-native-and-real-GUI-tested",
     "discovery": "lazy pages, metadata and at most 16 header bytes per file; no dump staging/hashing/native decoding",
@@ -132,7 +145,7 @@
     "nativeToolAndGame": "unrun"
   },
   "sourceCharacterLibraryAndMovesets": {
-    "status": "required-planned-not-implemented",
+    "status": "source-bound library/shared projects and bounded reviewed FK/humanoid implemented; native gameplay/templates/provisioning remain planned; see current FORMAT_SUPPORT.md",
     "specification": "docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md",
     "concepts": [
       "SourceCharacterProfile",
@@ -145,9 +158,10 @@
       "native gameplay translators/templates",
       "vetted app-local tool provisioning"
     ],
-    "next": "first visible source-bound library and actual edit-project increment; one authoritative task in docs/plans/current.md"
+    "next": "docs/plans/current.md is the sole executable task; retain independent source/target/library and ordinary browser regressions"
   },
   "configuredBrawlHeaderInventory": {
+    "checkpoint": "historical header-only receipt; current opt-in native operations are recorded separately above and in FORMAT_SUPPORT.md",
     "status": "explicit-opt-in-read-only-metadata-observed",
     "observed": [
       "ARC 0x0101",
