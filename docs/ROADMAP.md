@@ -25,3 +25,7 @@ Status describes acceptance criteria, not whole-game support. Local files are au
 - **M5.E Remaining fighters — planned:** separate Wii U and 3DS adapters, verify NUD/NUT/VBN/OMO/BCH; distinct Smash 64 pipeline; future independent game adapters; costumes and remaining channels.
 
 Gameplay/moveset/hitbox conversion is excluded; preserve opaque resources and report remaining game integration. Asset export never equals a playable fighter. Initial UI and synthetic tests do not complete M1/M2 in full.
+
+## Classic UI checkpoint — 2026-10-17
+
+M1.B/E classic Resource Browser and Model Editor now share the existing session/viewport, categorized validated property subset, bounded search/recent lists, embedded VIS/SRT controls, saved splitters and broader dirty guards. Actual original captures, keyboard routing, resize/scaling and native edit/save/export smoke passed. See UI_UX_PLAN.md and DEVELOPMENT_STATUS.md for current counts and the missing optional source-manifest entries. Next CI4/palette then bounded native material composition; no native archive/full-game support is implied.

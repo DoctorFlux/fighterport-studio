@@ -7,10 +7,15 @@ namespace FighterPort.Desktop;
 
 public sealed partial class Workbench
 {
+    private VisibilityEditSession? visibilityEdit;
+    private bool visibilityHistoryActive;
+    private Action? refreshVisUi;
     private void EditVisibility(bool smoke=false)
     {
         if(workspace.Data.Visibility is not {} source)throw new InvalidOperationException("Bind a VIS0 to the active model first");
-        var ownerWorkspace=workspace;var edit=new VisibilityEditSession(P,source);
+        visibilityHistoryActive=true;uvHistoryActive=false;
+        if(visibilityEdit==null||visibilityEdit.Group!=source)visibilityEdit=new(P,source);
+        var ownerWorkspace=workspace;var edit=visibilityEdit;
         var tracks=new ComboBox{Margin=new(5)};var bones=new ComboBox{ItemsSource=P.Bones.Select(b=>b.Name+" ["+b.Id+"]").ToArray(),Margin=new(5)};
         var frame=new TextBox{Text=((int)timeline.Value).ToString(),Margin=new(5)};var visible=new CheckBox{Content="Visible at this group frame",Margin=new(5),IsChecked=true};
         var status=new TextBlock{TextWrapping=TextWrapping.Wrap,Margin=new(5)};
@@ -28,7 +33,7 @@ public sealed partial class Workbench
             var save=new SaveFileDialog{Filter="Native visibility animation|*.vis0",FileName="edited-visibility.vis0"};if(save.ShowDialog()!=true)return;
             workspace.Data.Project=P;await workspace.ExportVisibility(save.FileName,operation?.Token??default);status.Text="VIS0 written and decoded: metadata, targets, constant flags and every visibility sample match. Container repacking and in-game checks remain unimplemented.";
         }));
-        panel.Children.Add(status);Refresh();
+        panel.Children.Add(status);refreshVisUi=Refresh;Refresh();
         Exception? smokeError=null;
         if(smoke)window.ContentRendered+=(_,_)=>
         {
@@ -42,6 +47,13 @@ public sealed partial class Workbench
             }
             catch(Exception e){smokeError=e;}finally{window.Close();}
         };
+        if(!smoke)
+        {
+            var buttons=panel.Children.OfType<Button>().ToArray();panel.Children.Clear();window.Content=null;
+            var grid=new Grid();grid.ColumnDefinitions.Add(new(){Width=new(300)});grid.ColumnDefinitions.Add(new(){Width=new(1,GridUnitType.Star)});
+            var left=new StackPanel();left.Children.Add(tracks);left.Children.Add(bones);grid.Children.Add(left);
+            var right=new StackPanel();Grid.SetColumn(right,1);grid.Children.Add(right);var fields=new WrapPanel();frame.Width=70;fields.Children.Add(frame);fields.Children.Add(visible);right.Children.Add(fields);var commands=new WrapPanel();foreach(var button in buttons)commands.Children.Add(button);right.Children.Add(commands);right.Children.Add(status);HostEditor(grid,"VIS0 visibility");return;
+        }
         window.ShowDialog();if(smokeError!=null)throw smokeError;
     }
 }

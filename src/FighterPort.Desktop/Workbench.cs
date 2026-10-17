@@ -19,13 +19,13 @@ public sealed partial class Workbench : Window
     private readonly Viewport3D viewport=new();
     private readonly Model3DGroup scene=new();
     private readonly ComboBox clips=new(){MinWidth=150}, channels=new(){MinWidth=140};
-    private readonly TreeView tree=new(){Background=new SolidColorBrush(Color.FromRgb(26,34,45)),Foreground=Brushes.White,BorderThickness=new(0)};
+    private readonly TreeView tree=new(){BorderThickness=new(0)};
     private readonly Slider timeline=new(){Minimum=0,Maximum=60,Width=430};
-    private readonly TextBlock status=new(){Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)};
-    private readonly TextBlock inspector=new(){Foreground=Brushes.White,TextWrapping=TextWrapping.Wrap,Margin=new(12)};
+    private readonly TextBlock status=new(){TextWrapping=TextWrapping.Wrap,Margin=new(12)};
+    private readonly TextBlock inspector=new(){TextWrapping=TextWrapping.Wrap,Margin=new(12)};
     private readonly TextBox value=new(){Text="25",Width=70,Margin=new(4)};
-    private readonly CheckBox skeleton=new(){Content="Skeleton",Foreground=Brushes.White,Margin=new(8),IsChecked=true};
-    private readonly CheckBox skin=new(){Content="Skin",Foreground=Brushes.White,Margin=new(8),IsChecked=true};
+    private readonly CheckBox skeleton=new(){Content="Skeleton",Margin=new(8),IsChecked=true};
+    private readonly CheckBox skin=new(){Content="Skin",Margin=new(8),IsChecked=true};
     private readonly DispatcherTimer timer=new(){Interval=TimeSpan.FromMilliseconds(33)};
     private readonly Stopwatch watch=Stopwatch.StartNew();
     private readonly string root;
@@ -47,42 +47,23 @@ public sealed partial class Workbench : Window
 
     public Workbench(string[] args)
     {
-        root=FindRoot();Title="FighterPort Studio • resource workspace";Width=1440;Height=900;MinWidth=1000;MinHeight=600;Background=new SolidColorBrush(Color.FromRgb(15,22,31));Foreground=Brushes.White;
+        root=FindRoot();Title="FighterPort Studio";Width=1280;Height=800;MinWidth=900;MinHeight=600;
         var dock=new DockPanel();Content=dock;
-        InitializeWorkspace();AddMenus(dock);
-        var tools=new WrapPanel{Margin=new(10)};DockPanel.SetDock(tools,Dock.Top);dock.Children.Add(tools);
-        Button(tools,"New",()=>{if(!KeepUvEdits())return;uvEdit=null;workspace=CreateWorkspace();resourceTree.Items.Clear();textureCache.Clear();SetProject(new CharacterProject());});
-        Button(tools,"Open…",OpenDialog);Button(tools,"Save workspace…",SaveWorkspaceDialog);
-        Button(tools,"Convert…",ConvertDialog);
-        DockPanel.SetDock(status,Dock.Bottom);dock.Children.Add(status);
-        var playback=new WrapPanel{Margin=new(10)};DockPanel.SetDock(playback,Dock.Bottom);dock.Children.Add(playback);
-        Button(playback,"Play / Pause",()=>playing=!playing);playback.Children.Add(clips);playback.Children.Add(timeline);playback.Children.Add(skeleton);playback.Children.Add(skin);playback.Children.Add(sourceMaterials);playback.Children.Add(visibilityEnabled);playback.Children.Add(uvEnabled);
-        var left=new TabControl{Margin=new(8)};DockPanel.SetDock(left,Dock.Left);dock.Children.Add(left);
-        left.Items.Add(new TabItem{Header="Resources",Content=resourceTree});left.Items.Add(new TabItem{Header="Skeleton",Content=tree});
-        var right=new StackPanel{Margin=new(8)};DockPanel.SetDock(right,Dock.Right);dock.Children.Add(right);
-        right.Children.Add(new TextBlock{Text="PROPERTIES",Foreground=Brushes.LightSteelBlue,Margin=new(12)});right.Children.Add(inspector);right.Children.Add(new Expander{Header="Resource / material details",IsExpanded=true,Content=resourceProperties,Foreground=Brushes.White});
-        channels.ItemsSource=new[]{"Scale X","Scale Y","Scale Z","Rotate X °","Rotate Y °","Rotate Z °","Translate X cm","Translate Y cm","Translate Z cm"};channels.SelectedIndex=5;
-        right.Children.Add(channels);right.Children.Add(value);Button(right,"Set key at current frame",EditKey);Button(right,"Undo",()=>{session.Undo();Render();});Button(right,"Redo",()=>{session.Redo();Render();});
-        Button(right,"Frame character",()=>{yaw=.35;pitch=.12;FitCharacter();Render();});
-        right.Children.Add(new TextBlock{Text="Drag: orbit\nShift + drag: pan\nWheel: zoom\n\nKeys preserve Euler turns and Hermite tangents. Editing adds a locked key.\n\nSource appearance uses one selected direct sampler (default 0). Native TEV composition, alpha-test and material/shape animation remain unevaluated. Right-click a resource for applicable actions.",Foreground=Brushes.LightSteelBlue,TextWrapping=TextWrapping.Wrap,Margin=new(12)});
-        var border=new Border{Background=new SolidColorBrush(Color.FromRgb(22,30,42)),CornerRadius=new(8),Margin=new(0,10,0,0),Child=viewport};
-        dock.Children.Remove(left);dock.Children.Remove(right);
-        var area=new Grid();area.ColumnDefinitions.Add(new(){Width=new GridLength(290),MinWidth=180});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(1,GridUnitType.Star),MinWidth=300});area.ColumnDefinitions.Add(new(){Width=new GridLength(5)});area.ColumnDefinitions.Add(new(){Width=new GridLength(260),MinWidth=200});
-        var advanced=new StackPanel();foreach(UIElement child in right.Children.Cast<UIElement>().Skip(3).ToArray()){right.Children.Remove(child);advanced.Children.Add(child);}right.Children.Add(new Expander{Header="Advanced bone/key editing",Foreground=Brushes.White,Content=advanced});
-        var properties=new ScrollViewer{Content=right,VerticalScrollBarVisibility=ScrollBarVisibility.Auto};Grid.SetColumn(properties,4);Grid.SetColumn(border,2);area.Children.Add(left);area.Children.Add(border);area.Children.Add(properties);
-        foreach(int column in new[]{1,3}){var splitter=new GridSplitter{Width=5,HorizontalAlignment=HorizontalAlignment.Stretch,Background=new SolidColorBrush(Color.FromRgb(43,59,77))};Grid.SetColumn(splitter,column);area.Children.Add(splitter);}dock.Children.Add(area);
+        InitializeWorkspace();AddMenus(dock);BuildClassicShell(dock);
+        var border=viewportBorder;
         viewport.Children.Add(new ModelVisual3D{Content=scene});viewport.ClipToBounds=true;
-        border.MouseDown+=(_,e)=>{mouse=e.GetPosition(border);border.CaptureMouse();};
+        border.MouseDown+=(_,e)=>{autoFrame=false;mouse=e.GetPosition(border);border.CaptureMouse();};
         border.MouseUp+=(_,_)=>border.ReleaseMouseCapture();
         border.MouseMove+=(_,e)=>{if(!border.IsMouseCaptured)return;var pos=e.GetPosition(border);var delta=pos-mouse;mouse=pos;if(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)){panX-=delta.X*.3;panY+=delta.Y*.3;}else{yaw-=delta.X*.01;pitch=Math.Clamp(pitch+delta.Y*.01,-1.3,1.3);}Render();};
-        border.MouseWheel+=(_,e)=>{distance=Math.Clamp(distance*Math.Exp(-e.Delta*.001),1,10000);Render();};
+        border.MouseWheel+=(_,e)=>{autoFrame=false;distance=Math.Clamp(distance*Math.Exp(-e.Delta*.001),1,10000);Render();};
         timeline.ValueChanged+=(_,_)=>{if(!refreshing)Render();};
         clips.SelectionChanged+=(_,_)=>{if(refreshing)return;if(workspace.Data.ClipIndex!=clips.SelectedIndex){if(!KeepUvEdits()){refreshing=true;clips.SelectedIndex=workspace.Data.ClipIndex;refreshing=false;return;}workspace.ClearAncillary();uvEdit=null;}workspace.Data.ClipIndex=clips.SelectedIndex;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;Render();};
         skeleton.Checked+=(_,_)=>Render();skeleton.Unchecked+=(_,_)=>Render();skin.Checked+=(_,_)=>Render();skin.Unchecked+=(_,_)=>Render();
-        tree.SelectedItemChanged+=(_,e)=>{if(e.NewValue is TreeViewItem t&&t.Tag is int i){selectedBone=i;Render();}};
+        tree.SelectedItemChanged+=(_,e)=>{if(e.NewValue is TreeViewItem t&&t.Tag is int i){selectedBone=i;ShowBoneFields();Render();}};
         timer.Tick+=(_,_)=>{double now=watch.Elapsed.TotalSeconds;if(playing&&SelectedClip is { } c){double next=timeline.Value+(now-last)*c.FramesPerSecond;if(next>timeline.Maximum){if(c.Loop)next%=c.FrameCount;else{next=timeline.Maximum;playing=false;}}timeline.Value=next;}last=now;};timer.Start();
         Closed+=(_,_)=>{timer.Stop();operation?.Cancel();};
         Refresh();
+        if(args.Length==4&&args[0]=="--classic-smoke")Loaded+=async(_,_)=>await ClassicSmoke(args[1],args[2],args[3]);
         if(args.Length==4&&args[0]=="--workspace-smoke")Loaded+=async(_,_)=>await WorkspaceSmoke(args[1],args[2],args[3]);
         if(args.Length>=2&&args[0]=="--smoke")
         {
@@ -114,33 +95,34 @@ public sealed partial class Workbench : Window
     }
     private void Button(Panel panel,string text,Action action)
     {
-        var b=new Button{Content=text,Margin=new(3),Padding=new(9,6,9,6),Background=new SolidColorBrush(Color.FromRgb(43,59,77)),Foreground=Brushes.White,BorderThickness=new(0)};
+        var b=new Button{Content=text};
         b.Click+=(_,_)=>{try{action();}catch(Exception e){SetStatus(e.Message);}};panel.Children.Add(b);
     }
     private async void Native(Func<Task> job)
     {
         if(operation!=null){SetStatus("A native job is already running.");return;}
-        operation=new();playing=false;SetStatus("Native worker running…");
-        try{await job();}catch(Exception e){SetStatus(e.Message);}finally{operation.Dispose();operation=null;}
+        operation=new();jobProgress.Visibility=Visibility.Visible;jobProgress.IsIndeterminate=true;playing=false;SetStatus("Native worker running…");
+        try{await job();}catch(Exception e){SetStatus(e.Message);}finally{operation.Dispose();operation=null;jobProgress.IsIndeterminate=false;jobProgress.Visibility=Visibility.Collapsed;if(status.Text=="Native worker running…")SetStatus("Ready");}
     }
     private void SetProject(CharacterProject p){ProjectStore.Validate(p);session=new(p);selectedBone=0;playing=false;FitCharacter();Refresh();}
     private void FitCharacter()
     {
         var points=P.Meshes.SelectMany(m=>m.Vertices).Select(v=>Animation.V(v.Position)).ToArray();if(points.Length==0)return;
-        var min=points.Aggregate(System.Numerics.Vector3.Min);var max=points.Aggregate(System.Numerics.Vector3.Max);var center=(min+max)/2;panX=center.X;panY=center.Y;distance=Math.Max(10,(max-min).Length()*1.8);
+        var min=points.Aggregate(System.Numerics.Vector3.Min);var max=points.Aggregate(System.Numerics.Vector3.Max);var center=(min+max)/2;panX=center.X;panY=center.Y;double aspect=viewport.ActualWidth/Math.Max(1,viewport.ActualHeight);var extent=max-min;distance=Math.Max(10,Math.Max(extent.X,extent.Y*aspect)*.6/Math.Tan(Math.PI/8)+extent.Z*.6);autoFrame=true;
     }
-    private void SetStatus(string text)=>status.Text=text;
+    private void SetStatus(string text){status.Text=text;status.ToolTip=text;}
     private void Refresh()
     {
         refreshing=true;clips.ItemsSource=P.Clips.Select(c=>c.Name).ToArray();clips.SelectedIndex=P.Clips.Count>0?0:-1;timeline.Maximum=Math.Max(0,(SelectedClip?.FrameCount??1)-1);timeline.Value=0;
-        tree.Items.Clear();var model=new TreeViewItem{Header=P.Name,IsExpanded=true,Foreground=Brushes.White};tree.Items.Add(model);
-        model.Items.Add(new TreeViewItem{Header=$"{P.Meshes.Count} mesh regions • {P.Clips.Count} clips",Foreground=Brushes.White});
-        var nodes=new List<TreeViewItem>();for(int i=0;i<P.Bones.Count;i++){var b=P.Bones[i];var item=new TreeViewItem{Header=b.Name,Tag=i,IsExpanded=i<8,Foreground=Brushes.White};nodes.Add(item);if(b.Parent<0)model.Items.Add(item);else nodes[b.Parent].Items.Add(item);}
-        refreshing=false;SetStatus($"{P.Name} • {P.Bones.Count} joints • {P.Meshes.Sum(m=>m.Vertices.Count)} vertices • {P.TargetProfile}");Render();
+        tree.Items.Clear();var model=new TreeViewItem{Header=P.Name,IsExpanded=true};tree.Items.Add(model);
+        model.Items.Add(new TreeViewItem{Header=$"{P.Meshes.Count} mesh regions • {P.Clips.Count} clips"});
+        var nodes=new List<TreeViewItem>();for(int i=0;i<P.Bones.Count;i++){var b=P.Bones[i];var item=new TreeViewItem{Header=b.Name,Tag=i,IsExpanded=i<8};nodes.Add(item);if(b.Parent<0)model.Items.Add(item);else nodes[b.Parent].Items.Add(item);}
+        refreshing=false;RefreshClassicLists();ShowBoneFields();SetStatus($"{P.Name} • {P.Bones.Count} joints • {P.Meshes.Sum(m=>m.Vertices.Count)} vertices • {P.TargetProfile}");Render();
     }
     private void EditKey()
     {
-        uvHistoryActive=false;
+        uvHistoryActive=false;visibilityHistoryActive=false;
+        if(operation!=null)throw new InvalidOperationException("Wait for the active native job");
         if(SelectedClip==null||P.Bones.Count==0)throw new InvalidOperationException("Select a character and clip.");
         session.EditKey(clips.SelectedIndex,P.Bones[selectedBone].Name,channels.SelectedIndex,(float)Math.Round(timeline.Value),float.Parse(value.Text,CultureInfo.InvariantCulture));Render();SetStatus("Key changed; undo/redo available. Save Project to retain edits.");
     }
@@ -150,11 +132,11 @@ public sealed partial class Workbench : Window
         if(refreshing)return;
         scene.Children.Clear();scene.Children.Add(new AmbientLight(Color.FromRgb(90,90,90)));scene.Children.Add(new DirectionalLight(Colors.White,new(-1,-2,-3)));
         var target=new Point3D(panX,panY,0);var eye=new Point3D(panX+distance*Math.Sin(yaw)*Math.Cos(pitch),panY+distance*Math.Sin(pitch),distance*Math.Cos(yaw)*Math.Cos(pitch));
-        viewport.Camera=new PerspectiveCamera(eye,target-eye,new(0,1,0),45){NearPlaneDistance=.1,FarPlaneDistance=3000};
+        viewport.Camera=orthographic?new OrthographicCamera(eye,target-eye,new(0,1,0),distance*.8){NearPlaneDistance=.1,FarPlaneDistance=3000}:new PerspectiveCamera(eye,target-eye,new(0,1,0),45){NearPlaneDistance=.1,FarPlaneDistance=3000};
         var state=SceneEvaluator.Sample(P,SelectedClip,workspace.Data.Visibility,(float)timeline.Value);var world=state.Pose;
         if(skin.IsChecked==true)for(int mi=0;mi<P.Meshes.Count;mi++)
         {
-            var mesh=P.Meshes[mi];if(!state.DrawVisibility[mi].Any(v=>v))continue;
+            var mesh=P.Meshes[mi];if(objectVisible.TryGetValue(mesh.Name,out bool shown)&&!shown)continue;if(!state.DrawVisibility[mi].Any(v=>v))continue;
             var geometry=new MeshGeometry3D();foreach(var v in mesh.Vertices){var skinned=Animation.Skin(v,P,world);geometry.Positions.Add(Point(skinned.Position));geometry.Normals.Add(new(skinned.Normal.X,skinned.Normal.Y,skinned.Normal.Z));geometry.TextureCoordinates.Add(new(v.UV[0],v.UV[1]));}
             geometry.TriangleIndices=new Int32Collection(mesh.Indices);
             var color=Color.FromScRgb(1,mesh.Color[0],mesh.Color[1],mesh.Color[2]);
@@ -184,7 +166,7 @@ public sealed partial class Workbench : Window
             Directory.CreateDirectory(output);await Task.Delay(700);Capture(Path.Combine(output,"demo.png"));
             int clipIndex=Math.Min(2,P.Clips.Count-1);
             timeline.Value=30;clips.SelectedIndex=clipIndex;timeline.Value=30;channels.SelectedIndex=4;selectedBone=10;value.Text="-45";EditKey();session.Undo();session.Redo();
-            string project=Path.Combine(output,"gui.fpproj");ProjectStore.Save(P,project);SetProject(ProjectStore.Load(project));clips.SelectedIndex=clipIndex;timeline.Value=30;
+            string project=Path.Combine(output,"gui.fpproj");ProjectStore.Save(P,project);SetProject(ProjectStore.Load(project));MarkClean();clips.SelectedIndex=clipIndex;timeline.Value=30;
             await Task.Delay(300);Capture(Path.Combine(output,"edited.png"));
             string native="";
             if(P.Resources.Count>0)
@@ -194,7 +176,7 @@ public sealed partial class Workbench : Window
                 native=" Native source project loaded; GUI edit exported and decoded successfully.";
             }
             File.WriteAllText(Path.Combine(output,"gui-smoke.txt"),$"PASS: Loaded window {ActualWidth}x{ActualHeight}; skinned viewport; scrub; key edit; undo/redo; save/reopen; screenshot. Rendering tier: {RenderCapability.Tier>>16}.{native} Native tool/in-game checks unrun.");
-            Application.Current.Shutdown(0);
+            MarkClean();Application.Current.Shutdown(0);
         }
         catch(Exception e){File.WriteAllText(Path.Combine(output,"gui-smoke.txt"),e.ToString());Application.Current.Shutdown(1);}
     }

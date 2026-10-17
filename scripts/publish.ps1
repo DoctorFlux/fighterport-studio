@@ -1,6 +1,9 @@
+param([string]$Destination='artifacts/publish')
 . $PSScriptRoot/environment.ps1
 & $PSScriptRoot/build.ps1 -Native
-$destination = Join-Path $repoRoot 'artifacts/publish'
+$destination = [IO.Path]::GetFullPath((Join-Path $repoRoot $Destination))
+$artifactRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'artifacts')) + [IO.Path]::DirectorySeparatorChar
+if (!$destination.StartsWith($artifactRoot,[StringComparison]::OrdinalIgnoreCase)) { throw 'Publish destination must be inside this workspace artifacts directory' }
 Invoke-Dotnet publish src/FighterPort.Desktop -c Release --no-restore --self-contained false -o "$destination/desktop"
 Invoke-Dotnet publish src/FighterPort.Cli -c Release --no-restore --self-contained false -o "$destination/cli"
 New-Item -ItemType Directory -Force "$destination/native", "$destination/notices" | Out-Null

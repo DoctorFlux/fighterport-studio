@@ -1,3 +1,11 @@
+# Current verification — 2026-10-17
+
+Classic UI: `scripts/classic-smoke.ps1 -Published -PublishRoot artifacts/publish-classic -Fixtures <original-test-output>` launches the actual application, captures both views and embedded editors, checks shared state/search, typed DataGrid validation, routed keyboard transport/text focus, undo/redo, dirty Cancel logic, save/reopen and genuine SRT/VIS export/decode. Two window sizes plus explicit 150% WPF scaling stress; actual monitor 96 DPI. Real 150% OS-DPI and external native-tool/game checks remain unrun. Published 736 original rendered-pixel probes pass.
+
+Full local-assets run currently reports **49 pass / 1 failure** (`artifacts/tests/20261017-014719`): missing baseline `Brawl mario/FitMario00.mdl0` prevents the all-source-integrity gate. Do not alter that manifest or describe the gate as passed. Portable/native/SSBH checks passed **46/46**, `artifacts/tests/20261017-014904`. Manifest audit reports **678 existing unchanged, zero changed, 10 missing**. The following receipts are historical and their counts/next-task wording do not supersede current.md.
+
+---
+
 # Testing and evidence
 
 ## Current continuation evidence — supersedes historical counts/limitations above

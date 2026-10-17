@@ -1,4 +1,14 @@
-# Resource workspace — tested initial slice
+# Classic resource workspace — current workflow
+
+Launch `artifacts/publish-classic/desktop/FighterPort.Desktop.exe` (published alongside the open/locked older build). Default view is Resource Browser: Open sources, expand/select the native tree, inspect categorized properties above the selected preview. Find searches indexed native resources and reveals their ancestors. File → Recent sources is local-only. Double-click a model or its context action to activate Model Editor.
+
+Model Editor shares the same project/session: animation type/filter and resource list, objects/materials/textures on the left, large viewport, bone tree/validated key fields on the right and playback/context editing below. Double-click eligible animation resources from any open source explicitly. Select material to inspect fields or double-click for sampler inspection. Existing VIS0/SRT0 actions host the same edit services in the lower contextual tab; native write/decode semantics are unchanged. View provides reset layout, frame model and perspective/orthographic. Ctrl+O/S/Shift+S, contextual Ctrl+Z/Y, and space/arrows transport outside text fields are available. Escape cancels property text entry; unsupported native writes remain disabled.
+
+Save/reopen FPWORK retains native links and edited groups. Dirty guards now cover the current skeletal/VIS/SRT session. Layout/recent preferences are in ignored local configuration. Full OS-DPI/keyboard accessibility and unrestricted native property/archive editing remain incomplete; see UI_UX_PLAN.md. The following dated instructions are historical operation recipes; SRT0 editing/export and individual sampler inspection are completed subsets.
+
+---
+
+# Historical resource workspace recipes — 2026-10-16
 
 Launch `artifacts/publish/desktop/FighterPort.Desktop.exe`. The existing WPF application now uses one Open command, lazy native trees, a large resizable viewport, context properties, menus and one playback timeline. Tools > Map / Retarget retains semantic/manual mapping and approved transfer modes. Demos contains the original rigs. Advanced bone/key editing retains scalar key edits and undo/redo.
 

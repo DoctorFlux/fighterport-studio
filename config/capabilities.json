@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedDate": "2026-10-16",
+  "checkedDate": "2026-10-17",
   "operations": [
     {
       "game": "Original",
@@ -1414,6 +1414,15 @@
       "state": "LocalReferenceTested",
       "evidence": "WorkspaceTests.RunLocal; artifacts/tests/20261016-200811",
       "limitations": "Standalone working-copy export and decode preserves all 12 supplied tracks, including eight not displayed by default. Original inputs unchanged; output local only. Original fixtures separately exercise edits. No BrawlCrate GUI, repacking or game validation."
+    },
+    {
+      "game": "FighterPort",
+      "format": "WPF classic workspace",
+      "version": "1",
+      "operation": "resource-browser-model-editor",
+      "state": "SyntheticTested",
+      "evidence": "ClassicSmoke.cs; scripts/classic-smoke.ps1; docs/UI_UX_PLAN.md",
+      "limitations": "Shared session/viewport, categorized validated property subset, resource search/recent sources, model lists and embedded existing VIS/SRT edit/export. Original running-app captures at 1280x800/1920x1080, 96 actual DPI and separate 150% WPF scaling stress; real 150% OS-DPI environment unrun. Native archive writes blocked; not full BrawlCrate parity."
     }
   ]
 }

@@ -12,27 +12,28 @@ public sealed partial class Workbench
 {
     private UvEditSession? uvEdit;
     private bool uvHistoryActive;
+    private Action? refreshUvUi;
     private bool UvHistory(bool redo)
     {
         if(!uvHistoryActive||uvEdit==null||workspace.Data.Uv!=uvEdit.Group)return false;
-        if(redo)uvEdit.Redo();else uvEdit.Undo();workspace.Data.Uv=uvEdit.Group;Render();return true;
+        if(redo)uvEdit.Redo();else uvEdit.Undo();workspace.Data.Uv=uvEdit.Group;refreshUvUi?.Invoke();Render();return true;
     }
     private bool KeepUvEdits()
     {
-        if(!workspace.IsUvDirty)return true;
-        var result=MessageBox.Show(this,"SRT0 has unsaved working-copy edits. Save the workspace before replacing it? Yes saves; No discards; Cancel keeps editing.","Unsaved SRT0",MessageBoxButton.YesNoCancel);
+        if(!workspace.IsUvDirty&&!HasEdits)return true;
+        var result=smokeDirtyChoice??MessageBox.Show(this,"The working session has unsaved edits. Save the workspace before replacing it? Yes saves; No discards; Cancel keeps editing.","Unsaved workspace",MessageBoxButton.YesNoCancel);
         if(result==MessageBoxResult.Cancel)return false;
-        if(result==MessageBoxResult.Yes){SaveWorkspaceDialog();return !workspace.IsUvDirty;}return true;
+        if(result==MessageBoxResult.Yes){SaveWorkspaceDialog();return !workspace.IsUvDirty&&!HasEdits;}return true;
     }
     private void EditUv(bool smoke=false)
     {
-        uvHistoryActive=true;
+        uvHistoryActive=true;visibilityHistoryActive=false;
         var source=workspace.Data.Uv??throw new InvalidOperationException("Activate an SRT0 first");
         if(uvEdit==null||uvEdit.Group!=source)uvEdit=new(P,source);
         var edit=uvEdit;workspace.Data.Uv=edit.Group;
         var panel=new StackPanel{Margin=new(12)};var window=new Window{Owner=this,Title="SRT0 curves and native bindings — "+source.Name,Width=690,Height=740,Content=new ScrollViewer{Content=panel}};
         var tracks=new ComboBox{Margin=new(4)};var channel=new ComboBox{ItemsSource=new[]{"Scale U","Scale V","Rotation degrees","Translation U","Translation V"},SelectedIndex=3,Margin=new(4)};
-        var frame=new TextBox{Text="0",Margin=new(4)};var value=new TextBox{Text="0",Margin=new(4)};var tangent=new TextBox{Text="0",Margin=new(4)};
+        var frame=new TextBox{Name="UvFrame",Text="0",Margin=new(4)};var value=new TextBox{Name="UvValue",Text="0",Margin=new(4)};var tangent=new TextBox{Name="UvTangent",Text="0",Margin=new(4)};
         var nativeName=new TextBox{Margin=new(4)};var slot=new TextBox{Text="0",Margin=new(4)};var indirect=new CheckBox{Content="Indirect native track (retained; preview unsupported)",Margin=new(4)};
         var materials=new ComboBox{ItemsSource=new[]{"Unbound"}.Concat(P.Materials.Select(m=>m.Name+" ["+m.Id+"]")).ToArray(),SelectedIndex=0,Margin=new(4)};
         var keys=new ListBox{Height=110,Margin=new(4)};var status=new TextBlock{TextWrapping=TextWrapping.Wrap,Margin=new(4)};
@@ -68,8 +69,18 @@ public sealed partial class Workbench
         Button("Export SRT0 v4 / decode validate…",()=>Native(async()=>{var save=new SaveFileDialog{Filter="Native UV animation|*.srt0",FileName="edited.srt0"};if(save.ShowDialog()!=true)return;workspace.Data.Project=P;await workspace.ExportUv(save.FileName,operation!.Token);status.Text="Written and decoded: all tracks, bindings, metadata, keys and tangents retained. PAC/BRRES repacking and native-tool rendering are separate checks.";}));
         panel.Children.Add(status);
         window.PreviewKeyDown+=(_,e)=>{if(Keyboard.Modifiers==ModifierKeys.Control&&e.Key is System.Windows.Input.Key.Z or System.Windows.Input.Key.Y){if(e.Key==System.Windows.Input.Key.Z)edit.Undo();else edit.Redo();Refresh();e.Handled=true;}};
-        Refresh();Exception? failure=null;
+        refreshUvUi=Refresh;Refresh();Exception? failure=null;
         if(smoke)window.ContentRendered+=(_,_)=>{try{frame.Text="10";value.Text="0.375";tangent.Text="0.03125";panel.Children.OfType<Button>().Single(b=>b.Content.ToString()!.StartsWith("Set key")).RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));if(!edit.Group.Tracks[0].Curves.Single(c=>c.Channel==3).Keys.Any(k=>k.Frame==10&&k.Tangent==.03125f))throw new InvalidOperationException("SRT0 GUI key edit failed");edit.Undo();Refresh();edit.Redo();Refresh();}catch(Exception e){failure=e;}finally{window.Close();}};
+        if(!smoke)
+        {
+            var children=panel.Children.Cast<UIElement>().ToArray();panel.Children.Clear();((ScrollViewer)window.Content).Content=null;window.Content=null;
+            var grid=new Grid();grid.ColumnDefinitions.Add(new(){Width=new(300)});grid.ColumnDefinitions.Add(new(){Width=new(1,GridUnitType.Star)});
+            var left=new StackPanel();left.Children.Add(tracks);left.Children.Add(channel);keys.Height=110;left.Children.Add(keys);grid.Children.Add(left);
+            var right=new StackPanel();Grid.SetColumn(right,1);grid.Children.Add(right);right.Children.Add(fields);
+            var buttons=new WrapPanel();foreach(var b in children.OfType<Button>().Where(b=>!b.Content.ToString()!.StartsWith("Apply native")))buttons.Children.Add(b);right.Children.Add(buttons);
+            var advanced=new StackPanel();foreach(var control in new UIElement[]{materials,nativeName,slot,indirect})advanced.Children.Add(control);advanced.Children.Add(children.OfType<Button>().Single(b=>b.Content.ToString()!.StartsWith("Apply native")));right.Children.Add(new Expander{Header="Native / preview bindings (explicit)",Content=advanced});right.Children.Add(status);
+            HostEditor(grid,"SRT0 curves");return;
+        }
         window.ShowDialog();if(failure!=null)throw failure;
     }
 }

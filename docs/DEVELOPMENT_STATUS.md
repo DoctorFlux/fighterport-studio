@@ -1,4 +1,18 @@
-# Development status — 2026-10-16
+# Development status — 2026-10-17
+
+Classic Resource Browser and Model Editor are implemented and verified for the declared UI subset. Next: CI4/palette conformance, then a bounded native material composition subset. See [UI acceptance plan](UI_UX_PLAN.md) and [one authoritative task queue](plans/current.md). The dated receipts below are history, not current-task instructions.
+
+Completed and retained: CHR0 editing/export, VIS0 v3 and all-track SRT0 v4 editing/undo/save/native export/decode, bitmap-row/address-mode fixes, individual direct sampler/UV inspection, retargeting subsets and the full multi-game roadmap. SRT0 export is not a pending implementation task. Baseline this run: native build succeeded, focused workspace **8 passed / 0 failed**, `artifacts/tests/20261017-013935` (original fixtures, no commercial inputs requested in that baseline). Updated full run: **49 passed / 1 failed**, `artifacts/tests/20261017-014719`; the failure is the unchanged-source manifest gate because 10 recorded extracted MDL0/PNG entries are absent. PAC and Ultimate integration and Mario all-track export still passed. Audit: **678 existing files match, zero changed, 10 missing**. The baseline manifest is preserved; no all-688-unchanged claim is made this run. Portable/native/SSBH run: **46/46 passed**, `artifacts/tests/20261017-014904`. Published 736 rendered samples passed with the original native asymmetric texture.
+
+Repository remains only **PUBLIC** https://github.com/DoctorFlux/fighterport-studio on main. Prior verified HEAD: `a50c435d85209f21c72a00b339b522701adc5e22`. All source pushes require staged review and scripts/push.ps1 live remote/visibility/SHA verification. Current classic executable: `D:/Users/ChatGPT/ROA2TOOL/artifacts/publish-classic/desktop/FighterPort.Desktop.exe`. Default publish was locked by an open application; the tested build is published alongside it.
+
+Remaining renderer limits: native TEV composition, nearest/LOD, alpha-test/cull/depth, indirect/projected texgen and Maya rotation discrepancy; PAT0/CLR0/SHP0 and full native model/container outputs remain pending. Individual sampler inspection does not establish material fidelity. Brawl/Melee/Ultimate/Rivals 2 remain peer bidirectional targets; Dragon Ball source adapters and equal optional Blender/Maya/Max bridges remain required. Native-tool/game and remote CI checks are unrun.
+
+Classic UI evidence: published original smoke at `artifacts/classic-smoke-20261017-015053`; actual screenshots inspected at 1280×800/1920×1080, 96 monitor DPI plus separately labelled 150% WPF scaling stress. Categorized fields, search/recent sources, model lists, shared session, embedded SRT/VIS services, dirty Cancel, property rejection/undo and export/decode/save/reopen pass. Full 150% OS-DPI, external BrawlCrate and in-game checks remain unrun. Current UI scope/known differences: UI_UX_PLAN.md.
+
+---
+
+# Historical receipts — 2026-10-16
 
 Current tested checkpoint: **M3.C1 / M3.D1 Brawl bitmap-row/addressing correction and all-track SRT0 v4 editing/native export**, following the retained M3.A2 and unified resource workspace subsets. Existing WPF/native workers/tests are preserved. Full requirements, IDs and multi-game scope remain in MASTER_PLAN.md, ROADMAP.md and the unified continuation specification.
 
@@ -60,13 +74,13 @@ Final review follow-up: duplicate bound UV targets now reject before rendering; 
 - VIS0 v3 working-copy sample and explicit target-binding edits, separate bounded undo/redo, FPWORK persistence, genuine native standalone export and decoded metadata/target/constant/sample validation. Original-path metadata is preserved from the verified source, including older workspace saves. Constant expansion/undo and duplicate binding rejection are tested. Source overwrite, existing destination and unencoded timing overrides reject. v4 user data, opaque metadata beyond this subset, native container repacking and native-tool/game checks are not claimed.
 - First published original workflow passed with actual visibility editor buttons, undo/redo, native export, rotating UV capture and texture-window mip/palette/alpha checks. Only original screenshots were viewed; commercial captures remain local. Final targeted/source-metadata and publish checks follow in the checkpoint record below.
 
-Next executable task: implement typed SRT0 v4 key/tangent and binding edits/undo, a genuine native writer and decoded fractional validation without dropping the currently unevaluated direct/indirect sampler tracks. Keep all four peer character destinations and the entire multi-game roadmap.
+At that historical checkpoint the pending task was typed SRT0 v4 key/tangent and binding edits/undo, a genuine native writer and decoded fractional validation without dropping the currently unevaluated direct/indirect sampler tracks. Keep all four peer character destinations and the entire multi-game roadmap.
 
 
 Final ancillary checkpoint verification: **6/6 focused cases passed**, `artifacts/tests/20261016-192803`, including original-path metadata, constant expansion/undo, duplicate-binding rejection and opt-in Mario. Final publish completed with **zero warnings/errors**. Published original and Mario workspace smokes passed at `artifacts/gui-workspace-workspace-model` and `artifacts/gui-workspace-FitMario00`; original uses the newly generated fixtures in the targeted test directory. Packaged CLI doctor reports runtime 10.0.11, Windows true, native worker true. Source review/push uses the exact PUBLIC repository workflow; actual commit identity is recorded in Git and the ignored verified receipt. No commercial assets, native outputs, local settings or build artifacts are staged.
 
 
-## Texture / SRT0 checkpoint (latest)
+## Texture / SRT0 checkpoint — 2026-10-16
 
 See [diagnosis and exact scope](TEXTURE_DIAGNOSIS.md). Full suite **49/49**, `artifacts/tests/20261016-200030`; zero build warnings/errors, all **688 supplied input hashes unchanged**. Native asymmetric RGBA8 fixture and WPF DiffuseMaterial: **736 rendered samples**, independent address modes/alpha/negative scales/fractional loop/reset/two materials, max **3/255**. Distinct original UV1 survives genuine native generation/import. Additional UV arrays are retained but not yet composed in preview.
 
@@ -75,7 +89,7 @@ SRT0 v4 contextual set/move/delete/value/tangent/binding editor, persistent 16-s
 Local published executable remains `D:/Users/ChatGPT/ROA2TOOL/artifacts/publish/desktop/FighterPort.Desktop.exe`. Published sampling **736/736** passed. Published original and Mario workspaces passed at `artifacts/gui-workspace-workspace-model` and `artifacts/gui-workspace-FitMario00`; original smoke exercised the SRT0 editor and native export. Mario local captures include rest, CHR0-only and CHR0+SRT0. The reviewed commit and verified public push receipt identify this checkpoint; source-only public repo policy remains unchanged. Remaining: precise user-reported Mario area not visually confirmed; Maya rotation discrepancy, nearest/LOD, eye TEV/multisampler, alpha-test/cull/depth, PAT0/CLR0/SHP0 and full character writers. Continue the full retained multi-game queue.
 
 
-## Individual sampler inspection checkpoint (latest)
+## Individual sampler inspection checkpoint — 2026-10-16
 
 Texture/SRT0 checkpoint **8b85515a2a119b1baef7e528f12167a714287549** was pushed and its SHA verified against the live PUBLIC remote. The next increment adds the material-tree context action **Inspect material / individual sampler…**, expandable properties and saved per-material sampler selection. It uses that sampler's native UV array and static/animated transform, wrap modes and binding. Min/mag filtering, LOD bias, projection and texgen are preserved/reported; unsupported STQ/emboss texgen or missing UVs produce neutral fallback/problems. This is isolated-layer inspection, not native material composition.
 
