@@ -22,7 +22,7 @@ internal static partial class NativeSmoke
         string v1=Path.Combine(_output,"original-v1.fpcharacter");seed.Save(v1);
         // Reproduce the b45fcc3 schema, which has none of the new optional fields.
         var legacyXml=new XmlDocument {XmlResolver=null};legacyXml.Load(v1);
-        foreach(XmlNode node in legacyXml.SelectNodes("//AnimationAsset/NativeHash|//AnimationAsset/AdditionalOriginals|//SourceCharacterProfile/InitialAnimationId|//State/RigMaps|//State/LibraryRoot|//State/LibraryId|//State/LibraryPins|//MoveInstance/NativeAnimationId|//MoveInstance/MappingId|//MoveInstance/MappingRevision|//MoveInstance/BakeEvidence").Cast<XmlNode>().ToArray())node.ParentNode.RemoveChild(node);
+        foreach(XmlNode node in legacyXml.SelectNodes("//AnimationAsset/NativeHash|//AnimationAsset/AdditionalOriginals|//SourceCharacterProfile/InitialAnimationId|//State/AnimationSets|//State/Anchors|//State/RigMaps|//State/LibraryRoot|//State/LibraryId|//State/LibraryPins|//MoveInstance/NativeAnimationId|//MoveInstance/MappingId|//MoveInstance/MappingRevision|//MoveInstance/BakeEvidence").Cast<XmlNode>().ToArray())node.ParentNode.RemoveChild(node);
         legacyXml.Save(v1);string oldHash=Hash(v1);
         seed=CharacterProject.Load(v1,storage);seed.MigrateToSharedLibrary(library);
         Assert(seed.State.Version==2 && seed.State.LibraryId==seed.SharedLibrary.Id,"deliberate v1 migration into shared library");

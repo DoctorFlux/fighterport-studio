@@ -101,6 +101,8 @@ namespace BrawlCrate.Authoring
         public string LibraryRoot { get; set; }
         public string LibraryId { get; set; }
         public List<LibraryPin> LibraryPins { get; set; } = new List<LibraryPin>();
+        public List<CharacterAnimationSet> AnimationSets { get; set; } = new List<CharacterAnimationSet>();
+        public List<ReferenceAnchor> Anchors { get; set; } = new List<ReferenceAnchor>();
     }
     public sealed class NativeEditLease
     {

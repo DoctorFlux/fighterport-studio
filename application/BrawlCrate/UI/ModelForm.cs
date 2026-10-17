@@ -11,7 +11,8 @@ using System.Windows.Forms;
 
 namespace BrawlCrate.UI
 {
-    internal class ModelForm : Form
+    // FighterPort modification 2026-10-17: explicit authoring documents and shared workspace.
+    internal partial class ModelForm : Form
     {
         #region Designer
 
@@ -53,6 +54,7 @@ namespace BrawlCrate.UI
         public ModelForm()
         {
             InitializeComponent();
+            InitializeAuthoringWorkspace();
         }
 
         private List<IModel> _models = new List<IModel>();
@@ -163,7 +165,7 @@ namespace BrawlCrate.UI
 
         protected override void OnShown(EventArgs e)
         {
-            modelEditControl1._openedFiles.Add(Program.RootNode);
+            if(Document==null && Program.RootNode!=null)modelEditControl1._openedFiles.Add(Program.RootNode);
 
             MainForm.Instance.Visible =
                 !Properties.Settings.Default.ViewerSettings.HideMainWindow;
@@ -217,6 +219,7 @@ namespace BrawlCrate.UI
 
             modelEditControl1.ModelPanel.Capture();
             ReadSettings();
+            InitializeBoundDocument(true);
 
             base.OnShown(e);
         }
@@ -233,6 +236,7 @@ namespace BrawlCrate.UI
 
         private void ModelForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(!CloseAuthoringDocument()){e.Cancel=true;return;}
             e.Cancel = !modelEditControl1.Close();
         }
 

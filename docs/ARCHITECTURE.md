@@ -281,7 +281,77 @@ orientation and native weighted mesh errors must be <=.002 native units / .05 de
 Native edits retain the original bake report explicitly as historical measurement.
 
 The current UI hides legacy gameplay fields behind Legacy drafts. Assigning animations
-requires no gameplay record. Free-text slots have no verified runtime binding yet. Typed
-expandable slots/anchors are next, then mirror before final-target fitting, interval IK and
-atomic template fill with saved dependencies. Keep native originals, independent targets
+requires no gameplay record. Legacy free-text slots have no verified runtime binding.
+The v3 workspace below adds typed slots/anchors. Reviewed mirror precedes later final-target
+fitting, interval IK and atomic template fill with saved dependencies. Keep native originals, independent targets
 and modular adapters; non-Brawl sources must not pass through MDL0/CHR0.
+
+
+Model Previewer workspace and project v3 — 2026-10-17:
+
+ModelForm still owns the inherited ModelEditControl and OpenGL viewport. Its additional
+split pane hosts reusable Setup, Library, Animation Set, References, Rig/FK and Project/
+Output surfaces. The native playback panel is reused; compact authoring hides wide native
+edit detail panels to keep frame/playback controls inside small windows. Native details
+remain accessible in a wide editor. Metadata-only edits retain native document/camera/
+playhead; real native revision changes rebind the exact document without camera reset.
+Layout visibility/width is a separately bounded app preference, never project state.
+
+PreviewAuthoringSession wraps the existing CharacterProject. A weak registry returns the
+same live service for the same open file, and the library and previewer subscribe to its
+changes. Project commands publish detached snapshots; atomic batches expose their previous
+committed snapshot until completion and record one undo entry. Native payloads remain in
+the existing immutable shared store. Version 1/2 loading is retained; explicit slot/anchor
+authoring upgrades to version 3 and preserves old custom assignments/legacy drafts. Shared
+migration retains the original embedded file; new/migrated saves require a new path.
+
+Each PreviewDocument carries session, target ID/fingerprint, instance/revision, native
+resource identity, request ID, root/model/editor references, working path and edit lease.
+Authoring files are independently owned native roots, not Program.RootNode. No authoring
+command chooses ModelEditControl.Instances.Last. Exactly one authoring document can edit;
+other project/source/reference views use disabled editing panels/hotkeys and guarded
+mouse handlers while native camera/playback remain available. Explicit activation resolves
+pending Apply/Discard/Cancel and changes edit ownership. Stale comparison writes reject.
+The legacy resource document remains separately owned and must resolve dirty edits before
+handoff. This is not certification of simultaneous editing across inherited legacy tools.
+
+Apply reuses the native lease and current adapter validation. Native Export rebuilds and
+clears dirty flags, so failed capture restores pending status; successful capture cannot
+trigger document disposal during its own transaction. Unsupported model/material/channel
+changes remain pending and can be saved separately, not misrepresented as project edits.
+Save/switch/normal close preserves or explicitly resolves pending state. Closing a busy
+view is blocked until cancellation/completion. Forced process termination is not recovery.
+Project buttons/shortcuts act on structural/applied snapshots; native keys retain native
+Undo, and text fields keep their own editing context. History remains session-only.
+
+Slot records pin a pack ID/version/digest and target fingerprint. The Brawl semantic pack
+v2 has 30 groups, with stable semantic definition IDs; target-scoped slot IDs, pack-scoped
+variant IDs and independent part GUIDs survive rename/reorder. Phases and variant keys
+belong to the versioned pack. Custom legacy entries live outside the immutable pack.
+Authoring quotas: 8 sets, <=64 groups/pack, 512 parts/project and 1..64 parts/batch; these
+are resource limits, not game behavior rules. Parts preserve separate clip/instance/map
+revisions and are never flattened. Verified native bindings pin selected target model/
+container/resource identities, native indexed path/hash and pack version. Duplicate exact
+destinations reject; no current profile enables aliases. Unbound assigned parts persist.
+
+Anchors pin target rig, native instance/clip revisions and hash, native timing/loop convention
+and phase. Choosing a motion and setting its phase are separate commands; Idle/Fall can
+be chosen as one atomic pair. Named pack/custom references use the same service. Current
+native playhead phases are integer frames, stored zero-based (viewer displays one-based);
+loop convention is FrameCount+1. Missing/stale dependencies diagnose and block reference
+preview/phase selection until deliberate re-selection. Only native instances can be anchor
+inputs, so recursive generated-anchor references are not representable. No fitting or
+anchor metadata encoding in native files is claimed.
+
+Assignments/retarget bake and diagnostics use a serialized cancellable session worker.
+Other project controls freeze while work runs; rendering/native playback stay available
+read-only. Worker nodes are separate CPU/native documents; control/GL updates return to
+the UI thread. A result pins its original project/part/target and prior document request;
+it cannot replace another selected view after handoff. Cancellation rolls back project
+batches; unreferenced immutable blobs may remain within store quotas. This is not a general
+thread-safe public CharacterProject API. Library indexing remains metadata-only and paged.
+
+All later mirror/fitting/IK/contact/template/channel/non-Brawl/Modkit/tool features must
+extend this workspace and these explicit bindings. Native animation, mesh rebinding and
+gameplay remain separate, with gameplay deferred in this phase. No dependency/runtime/
+renderer/CPU migration or new third-party package was introduced.

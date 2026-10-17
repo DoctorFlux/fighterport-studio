@@ -1,5 +1,15 @@
 # FighterPort Studio — reusable animation and attack authoring master specification
 
+## Model Previewer amendment — 2026-10-17
+
+[FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md](FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md)
+adds the standing integration rule: model/animation features need functional controls
+inside the actual Model Previewer, using the same project/session as the library and
+resource entry points. Preserve native rendering/camera/playback/editors. Explicit
+project/target/fingerprint/instance/document/editor bindings and safe pending-edit
+handoffs take precedence over last-window/global-root inference. Project slot/anchor
+metadata, native motion fidelity and game/Modkit evidence remain separate.
+
 ## Scope amendment — 2026-10-17
 
 The [shared animation/library amendment](FIGHTERPORT_SHARED_ANIMATION_LIBRARY_SLOTS_TRANSITIONS.md)

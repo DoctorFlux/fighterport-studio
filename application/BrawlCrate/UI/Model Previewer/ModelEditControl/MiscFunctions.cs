@@ -134,6 +134,13 @@ namespace BrawlCrate.UI.Model_Previewer.ModelEditControl
 
         public void CheckDimensions()
         {
+            // FighterPort compact authoring keeps the inherited playback/frame controls visible.
+            if(_authoringCompact)
+            {
+                animCtrlPnl.Visible=false;animEditors.AutoScroll=false;pnlPlayback.Dock=DockStyle.Fill;
+                animEditors.Height=Math.Max(60,pnlPlayback.MinimumSize.Height);return;
+            }
+            animCtrlPnl.Visible=true;animEditors.AutoScroll=true;
             int totalWidth = animEditors.Width;
             Size s = new Size(animCtrlPnl.Width, animEditors.Height);
             if (_currentControl != null && _currentControl.Visible)
@@ -317,6 +324,8 @@ namespace BrawlCrate.UI.Model_Previewer.ModelEditControl
 
         protected override void modelPanel1_MouseMove(object sender, MouseEventArgs e)
         {
+            // FighterPort: read-only source/comparison views retain camera/playback only.
+            if(AuthoringReadOnly)return;
             base.modelPanel1_MouseMove(sender, e);
 
             if (_boneSelection._translating &&

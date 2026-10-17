@@ -1,5 +1,5 @@
-param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions, [switch]$DumpSources, [switch]$Containers, [switch]$Library, [switch]$Retarget, [switch]$SharedLibrary)
-if (@($Companions,$DumpSources,$Containers,$Library,$Retarget,$SharedLibrary | Where-Object {$_}).Count -gt 1) { throw 'Select one focused suite at a time; existing suites remain available separately.' }
+param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions, [switch]$DumpSources, [switch]$Containers, [switch]$Library, [switch]$Retarget, [switch]$SharedLibrary, [switch]$Workspace)
+if (@($Companions,$DumpSources,$Containers,$Library,$Retarget,$SharedLibrary,$Workspace | Where-Object {$_}).Count -gt 1) { throw 'Select one focused suite at a time; existing suites remain available separately.' }
 . $PSScriptRoot/environment.ps1
 $project = Join-Path $repoRoot 'tests/NativeSmoke/NativeSmoke.csproj'
 $logDir = Join-Path $repoRoot 'artifacts/restart'
@@ -34,6 +34,7 @@ if ($SharedLibrary) {
     $modes = @('shared-native')
     if ($Gui) { $modes += 'shared-gui' }
 }
+if ($Workspace) { $modes=@("workspace-native"); if ($Gui) {$modes+="workspace-gui"} }
 foreach ($mode in $modes) {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
     $evidence = Join-Path $logDir "$mode-$stamp"

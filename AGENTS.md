@@ -14,6 +14,12 @@ animation-first scope. Gameplay scripting/compilation is deferred; retain old ma
 drafts as compatibility data. Animation assignment never requires a gameplay draft.
 Shared source/clip revisions belong to a bounded disk-backed library across separate
 projects. Preserve native edits, v1 migration, explicit reviews and independent instances.
+Read docs/FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md: every FighterPort model/animation
+feature needs working controls inside the actual Model Previewer and the same live session.
+Pass explicit project/target/fingerprint/instance/native-document/editor bindings; never
+identify the editable target from window order, names or Program.RootNode alone. Keep one
+editable authoring document with safe pending-edit handoffs and read-only comparisons.
+Preserve the inherited viewport, camera, timeline, native editors and contextual Undo.
 
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.
@@ -35,7 +41,7 @@ projects. Preserve native edits, v1 migration, explicit reviews and independent 
   requires an explicit current instance lease. Roles start unapproved; direct different-rig
   assignments reject. Use the fingerprint-bound reviewed, measured FK path for its declared
   subset only. Shared immutable sources and other projects must stay unchanged. Undo history
-  is session-only; typed animation slots/anchors are the next task.
+  is session-only. Slots/anchors are project metadata, not native runtime behavior or fitting.
 - Standing user authorization, 2026-10-17: push each completed, passing source update
   to the existing public origin/main after committing and reviewing it. This supersedes
   the earlier one-upload/local-only restriction. No repeat permission request is needed

@@ -188,7 +188,7 @@ internal static partial class NativeSmoke
                     tree.SelectedNode=tree.Nodes.Cast<TreeNode>().SelectMany(n=>n.Nodes.Cast<TreeNode>()).Single(n=>(string)n.Tag==otherClip);
                     LibraryButton(form,"libraryPreview");
                     var otherEditor=ModelEditControl.Instances.Single(); PrepareLibraryEditor(otherEditor); otherEditor.SetFrame(16); Pump(150);
-                    Assert(Find<MDL0Node>((ResourceNode)NativeProgram.GetProperty("RootNode").GetValue(null,null)).BoneCache.Length==3,"real preview uses rig B's own source binding");
+                    Assert(Find<MDL0Node>(otherEditor.AuthoringDocument.Root).BoneCache.Length==3,"real preview uses rig B's own source binding");
                     CaptureViewport(otherEditor,"09-library-rig-b-native.png");
                     tree.SelectedNode=tree.Nodes.Cast<TreeNode>().SelectMany(n=>n.Nodes.Cast<TreeNode>()).Single(n=>(string)n.Tag==clip);
                     ((ComboBox)form.Controls.Find("libraryTarget",true).Single()).SelectedIndex=0;
@@ -199,7 +199,7 @@ internal static partial class NativeSmoke
                     var list=(ListView)form.Controls.Find("libraryInstances",true).Single(); list.Items.Cast<ListViewItem>().Single(i=>(string)i.Tag==instance).Selected=true;
                     CaptureWindow(form,"10-source-library.png");
                     LibraryButton(form,"libraryEdit");
-                    var root=(ResourceNode)NativeProgram.GetProperty("RootNode").GetValue(null,null); var model=Find<MDL0Node>(root); var motion=Find<CHR0Node>(root);
+                    var root=otherEditor.AuthoringDocument.Root; var model=Find<MDL0Node>(root); var motion=Find<CHR0Node>(root);
                     var editor=ModelEditControl.Instances.Single(); PrepareLibraryEditor(editor); var viewer=editor.FindForm();
                     editor.SelectedCHR0=motion; editor.SetFrame(16); editor.SelectedBone=model.BoneCache.OfType<MDL0BoneNode>().Single(b=>b.Name=="Paddle"); Pump(130);
                     CaptureViewport(editor,"11-library-native-preview.png");
@@ -243,7 +243,7 @@ internal static partial class NativeSmoke
     }
     private static void AssertCurrentLibraryKey(float value)
     {
-        var root=(ResourceNode)NativeProgram.GetProperty("RootNode").GetValue(null,null);
+        var root=ModelEditControl.Instances.FirstOrDefault(e=>e.AuthoringDocument?.Editable==true)?.AuthoringDocument.Root??(ResourceNode)NativeProgram.GetProperty("RootNode").GetValue(null,null);
         Assert(Math.Abs(Find<CHR0Node>(root).Children.OfType<CHR0EntryNode>().Single().GetKeyframe(5,15)._value-value)<.001,"project undo/redo/reopen updates actual native document");
     }
 }

@@ -35,8 +35,11 @@ namespace BrawlCrate.Authoring
         private readonly string _scratch;
         private AnimationLibraryStore _library;
         private long _generation;
+        private int _transactionDepth;
+        public event EventHandler Changed;
         private readonly Dictionary<NativeEditLease, long> _leases = new Dictionary<NativeEditLease, long>();
-        public CharacterProjectState State => Deserialize<CharacterProjectState>(Serialize(_state), MaxMetadataBytes);
+        private byte[] _publishedTransaction;
+        public CharacterProjectState State => Deserialize<CharacterProjectState>(_publishedTransaction??Serialize(_state), MaxMetadataBytes);
         public bool CanUndo => _undo.Count != 0;
         public bool CanRedo => _redo.Count != 0;
         public bool Dirty { get; private set; }
@@ -110,7 +113,7 @@ namespace BrawlCrate.Authoring
         public void SetSlot(string instanceId, string slot)
         {
             CheckSources(); CheckText(slot, 120);
-            Commit(s => { var instance = s.Instances.Single(i => i.Id == instanceId); instance.Slot = slot; instance.Revision++; });
+            Commit(s => { var instance = s.Instances.Single(i => i.Id == instanceId); instance.Slot = slot; instance.Revision++;foreach(var part in s.AnimationSets.SelectMany(n=>n.Parts).Where(n=>n.InstanceId==instanceId))part.Label=slot; });
         }
         public string ReviewRigMap(ReviewedRigMap proposed)
         {
@@ -118,7 +121,7 @@ namespace BrawlCrate.Authoring
             map.Id=Id();map.Reviewed=true;
             map.ReviewDigest=null;map.ReviewDigest=Hash(Serialize(map));
             RigTransfer.Validate(map,Character(map.SourceCharacterId),Character(map.TargetCharacterId));
-            Commit(s=> {s.Version=2;s.RigMaps.Add(map);});return map.Id;
+            Commit(s=> {s.Version=Math.Max(s.Version,2);s.RigMaps.Add(map);});return map.Id;
         }
         public string AssignRetargeted(string animationId,string targetAnimationId,string mapId,string slot,CancellationToken token=default(CancellationToken))
         {
@@ -132,13 +135,13 @@ namespace BrawlCrate.Authoring
                 string evidence=BrawlProjectAdapter.Bake(sourceFile,source,animation,targetFile,target,native,map,output,token);
                 var instance=new MoveInstance {Id=Id(),AnimationId=animation.Id,AnimationRevision=animation.Revision,TargetCharacterId=target.Id,TargetRigFingerprint=target.RigFingerprint,
                     NativeAnimationId=native.Id,MappingId=map.Id,MappingRevision=map.Revision,Slot=slot,WorkingHash=AddBlob(ReadBounded(output)),BakeEvidence=evidence};
-                CheckSources();token.ThrowIfCancellationRequested();Commit(s=> {s.Version=2;s.Instances.Add(instance);});return instance.Id;
+                CheckSources();token.ThrowIfCancellationRequested();Commit(s=> {s.Version=Math.Max(s.Version,2);s.Instances.Add(instance);});return instance.Id;
             }
             finally {File.Delete(sourceFile);File.Delete(targetFile);if(File.Exists(output))File.Delete(output);}
         }
         public AnimationAsset NativeAnimation(string instanceId)
         {
-            var i=Instance(instanceId);return State.Animations.Single(a=>a.Id==(i.NativeAnimationId??i.AnimationId));
+            var i=Instance(instanceId);return Deserialize<AnimationAsset>(Serialize(_state.Animations.Single(a=>a.Id==(i.NativeAnimationId??i.AnimationId))),MaxMetadataBytes);
         }
         public string PreviewSource(string animationId)
         {
@@ -152,6 +155,7 @@ namespace BrawlCrate.Authoring
                 Path = Materialize(instance.WorkingHash, profile.Extension) };
             _leases.Add(lease, _generation); return lease;
         }
+        public void ReleaseNativeLease(NativeEditLease lease){if(lease!=null)_leases.Remove(lease);}
         public void CaptureNativeEdits(NativeEditLease lease, ResourceNode nativeRoot, string openedPath)
         {
             CheckSources();
@@ -161,6 +165,7 @@ namespace BrawlCrate.Authoring
             var instance = Instance(lease.InstanceId); var profile = Character(instance.TargetCharacterId); var animation = NativeAnimation(instance.Id);
             if (instance.WorkingHash != lease.BaselineHash || nativeRoot == null) throw new IOException("Stale native edit transaction.");
             string edited = Path.Combine(_scratch, Id() + profile.Extension);
+            bool wasDirty=nativeRoot.IsDirty;
             try
             {
                 nativeRoot.Export(edited);
@@ -175,6 +180,7 @@ namespace BrawlCrate.Authoring
                 lease.BaselineHash = hash;
                 _leases[lease] = _generation;
             }
+            catch {if(wasDirty)nativeRoot.IsDirty=true;throw;} // Native Export rebuilds/clears flags before validation; failed Apply must remain pending.
             finally { if (File.Exists(edited)) File.Delete(edited); }
         }
         public void ExportInstance(string instanceId, string destination)
@@ -200,15 +206,17 @@ namespace BrawlCrate.Authoring
             to.Add(Serialize(_state)); _state = Deserialize<CharacterProjectState>(from[from.Count - 1], MaxMetadataBytes); from.RemoveAt(from.Count - 1);
             TrimHistory();
             _generation++; Dirty = true;
+            Changed?.Invoke(this,EventArgs.Empty);
         }
         private void Commit(Action<CharacterProjectState> change)
         {
             byte[] before = Serialize(_state); var next = Deserialize<CharacterProjectState>(before, MaxMetadataBytes);
             change(next); ValidateState(next);
             if (Serialize(next).Length > MaxMetadataBytes) throw new IOException("Project metadata exceeds 1 MiB.");
-            _undo.Add(before); _redo.Clear();
+            if(_transactionDepth==0){_undo.Add(before); _redo.Clear();}
             TrimHistory();
             _state = next; _generation++; Dirty = true;
+            if(_transactionDepth==0)Changed?.Invoke(this,EventArgs.Empty);
         }
         private void TrimHistory()
         {
@@ -249,6 +257,7 @@ namespace BrawlCrate.Authoring
             }
             finally { if (File.Exists(temp)) File.Delete(temp); }
             FilePath = path; Dirty = false;
+            Changed?.Invoke(this,EventArgs.Empty);
         }
         public static CharacterProject Load(string path, string storageRoot = null)
         {
@@ -312,7 +321,7 @@ namespace BrawlCrate.Authoring
 
         private void ValidateState(CharacterProjectState s)
         {
-            if ((s.Version != 1 && s.Version != 2) || s.LibraryPins==null || s.RigMaps==null || s.RigMaps.Count>64 || s.UndoPolicy != new CharacterProjectState().UndoPolicy || !Guid.TryParseExact(s.Id, "N", out _) || s.Characters == null || s.Animations == null || s.Moves == null || s.Instances == null ||
+            if ((s.Version < 1 || s.Version > 3) || s.LibraryPins==null || s.RigMaps==null || s.RigMaps.Count>64 || s.UndoPolicy != new CharacterProjectState().UndoPolicy || !Guid.TryParseExact(s.Id, "N", out _) || s.Characters == null || s.Animations == null || s.Moves == null || s.Instances == null ||
                 s.Characters.Count > 8 || s.Animations.Count > 128 || s.Moves.Count > 64 || s.Instances.Count > 64 || Serialize(s).Length > MaxMetadataBytes)
                 throw new IOException("Unsupported project version or record/metadata budget exceeded.");
             var ids = s.Characters.Select(c => c.Id).Concat(s.Animations.Select(a => a.Id)).Concat(s.Moves.Select(m => m.Id)).Concat(s.Instances.Select(i => i.Id)).Concat(s.RigMaps.Select(m=>m.Id)).ToList();
@@ -344,7 +353,7 @@ namespace BrawlCrate.Authoring
             foreach(var map in s.RigMaps) RigTransfer.Validate(map,s.Characters.Single(c=>c.Id==map.SourceCharacterId),s.Characters.Single(c=>c.Id==map.TargetCharacterId));
             if(!string.IsNullOrEmpty(s.LibraryId))
             {
-                if(_library==null || s.Version!=2 || _library.Id!=s.LibraryId || s.LibraryPins.Count!=s.Characters.Count+s.Animations.Count || s.LibraryPins.Select(p=>p.Kind+":"+p.Id).Distinct().Count()!=s.LibraryPins.Count)throw new IOException("Shared library pins are incomplete or duplicated.");
+                if(_library==null || s.Version<2 || _library.Id!=s.LibraryId || s.LibraryPins.Count!=s.Characters.Count+s.Animations.Count || s.LibraryPins.Select(p=>p.Kind+":"+p.Id).Distinct().Count()!=s.LibraryPins.Count)throw new IOException("Shared library pins are incomplete or duplicated.");
                 foreach(var pin in s.LibraryPins)
                 {
                     var record=_library.Read(pin);
@@ -354,6 +363,7 @@ namespace BrawlCrate.Authoring
                 }
             }
             if (UsedHashes(s).Any(h => h == null || !HasData(h))) throw new IOException("Missing immutable native/project blob.");
+            ValidateAnimationSets(s);
         }
         private static IEnumerable<string> UsedHashes(CharacterProjectState s) => s.Characters.SelectMany(c => new[] { c.NativeHash, c.ResolutionHash }.Concat(c.Originals.Select(o => o.Hash)))
             .Concat(s.Animations.Where(a=>a.NativeHash!=null).SelectMany(a=>new[]{a.NativeHash}.Concat(a.AdditionalOriginals.Select(o=>o.Hash)))).Concat(s.Instances.Select(i => i.WorkingHash)).Distinct();

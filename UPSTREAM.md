@@ -69,3 +69,12 @@ fixtures test independent projects and both FK directions. No inherited native c
 third-party dependency, source baseline manifest or license/header was replaced. The new
 shared-library/slots/transitions brief is preserved verbatim in its canonical docs path;
 the prior library specification retains its body under an explicit scope amendment.
+
+
+2026-10-17 Model Previewer continuation after 8136ea7: original FighterPort versioned
+slot/anchor records, shared session/document bindings, cancellable commands and reusable
+previewer/rig panels extend the actual ModelForm/ModelEditControl. Small inherited hooks
+preserve camera/timeline, gate read-only comparisons and retain dirty edits on failed
+capture. Native codecs, source baseline, renderer and component licenses are unchanged.
+The supplied Model Previewer workspace amendment is preserved verbatim in docs/. New
+original fixtures/GUI/entrypoint regressions remain local, not redistributed game assets.

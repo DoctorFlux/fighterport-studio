@@ -26,7 +26,7 @@ namespace BrawlCrate.Authoring
             foreach(string hash in UsedHashes(next).Concat(_blobs.Keys).Distinct())if(store.PutBlob(Data(hash))!=hash)throw new IOException("Migration payload changed.");
             next.LibraryPins.Clear();foreach(var c in next.Characters)next.LibraryPins.Add(store.Publish(c));foreach(var a in next.Animations)next.LibraryPins.Add(store.Publish(a));
             _library=store;
-            Commit(s=> {s.Version=2;s.LibraryId=store.Id;s.LibraryRoot=store.Root;s.LibraryPins=next.LibraryPins;s.Characters=next.Characters;s.Animations=next.Animations;});
+            Commit(s=> {s.Version=Math.Max(s.Version,2);s.LibraryId=store.Id;s.LibraryRoot=store.Root;s.LibraryPins=next.LibraryPins;s.Characters=next.Characters;s.Animations=next.Animations;});
             _blobs.Clear();FilePath=null; // Never silently overwrite the embedded recovery file.
         }
         public void UseSharedClip(string clipId,int revision=1,string libraryRoot=null)
@@ -47,7 +47,7 @@ namespace BrawlCrate.Authoring
                 try {BrawlProjectAdapter.ValidateArchive(archive,source,clip,_scratch,true);}finally{File.Delete(archive);}
             }
             Commit(s=> {
-                s.Version=2;s.LibraryId=store.Id;s.LibraryRoot=store.Root;
+                s.Version=Math.Max(s.Version,2);s.LibraryId=store.Id;s.LibraryRoot=store.Root;
                 if(!s.Characters.Any(c=>c.Id==source.Id)){s.Characters.Add(source);s.LibraryPins.Add(sourcePin);}
                 foreach(var a in clips)if(!s.Animations.Any(n=>n.Id==a.Id)){s.Animations.Add(a);s.LibraryPins.Add(store.Pin("animations",a.Id,a.Revision));}
             });
@@ -74,7 +74,7 @@ namespace BrawlCrate.Authoring
                     BrawlProjectAdapter.ValidateArchive(output,source,animation,_scratch,true);
                     BrawlProjectAdapter.ValidateEdit(original,output,source,animation,_scratch,true);
                     if(Hash(ReadBounded(staged.SourcePath))!=staged.Sha256)throw new IOException("Motion source changed during import.");token.ThrowIfCancellationRequested();
-                    var pin=_library?.Publish(animation);Commit(s=>{s.Version=2;s.Animations.Add(animation);if(pin!=null)s.LibraryPins.Add(pin);});return animation.Id;
+                    var pin=_library?.Publish(animation);Commit(s=>{s.Version=Math.Max(s.Version,2);s.Animations.Add(animation);if(pin!=null)s.LibraryPins.Add(pin);});return animation.Id;
                 }
             }
             finally{File.Delete(original);if(File.Exists(output))File.Delete(output);}

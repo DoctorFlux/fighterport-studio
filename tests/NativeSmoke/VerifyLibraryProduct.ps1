@@ -1,5 +1,5 @@
 # FighterPort original-fixture entrypoint/restart check, 2026-10-17. No game data.
-param([Parameter(Mandatory=$true)][string]$Project,[ValidateRange(0,63)][int]$InstanceIndex=0)
+param([Parameter(Mandatory=$true)][string]$Project,[ValidateRange(0,63)][int]$InstanceIndex=0,[switch]$PreviewWorkspace)
 $ErrorActionPreference='Stop'
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $exe=Join-Path $repoRoot 'application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe'
@@ -53,11 +53,20 @@ function Click-Library([IntPtr]$handle,[string]$text) {
  if (!$button) {throw "Missing product button: $text"}
  $null=[LibraryWindows]::SendMessage($button,0xF5,[IntPtr]::Zero,[IntPtr]::Zero)
 }
+function Select-WorkspaceTab([IntPtr]$handle,[string]$name) {
+ $names=@('Setup','Library','Animation Set','References','Rig / FK','Project / Output')
+ $index=[Array]::IndexOf($names,$name)
+ $tab=@([LibraryWindows]::Children($handle) | Where-Object {[LibraryWindows]::Class($_) -like '*SysTabControl32*' -and [LibraryWindows]::SendMessage($_,0x1304,[IntPtr]::Zero,[IntPtr]::Zero).ToInt32() -eq 6})
+ if($tab.Count -ne 1 -or $index -lt 0){throw 'Previewer workspace tab identity missing'}
+ $null=[LibraryWindows]::SendMessage($tab[0],0x1330,[IntPtr]$index,[IntPtr]::Zero)
+ Start-Sleep -Milliseconds 150
+ if([LibraryWindows]::SendMessage($tab[0],0x130B,[IntPtr]::Zero,[IntPtr]::Zero).ToInt32() -ne $index){throw 'Native workspace tab selection did not change'}
+}
 $prior=$env:FIGHTERPORT_DATA_ROOT
 $records=@()
 try {
  for($attempt=1;$attempt -le 2;$attempt++) {
-  $env:FIGHTERPORT_DATA_ROOT=Join-Path $evidence "profile-$attempt"
+  $env:FIGHTERPORT_DATA_ROOT=Join-Path $evidence $(if($PreviewWorkspace){"profile-workspace"}else{"profile-$attempt"})
   $process=Start-Process -FilePath $exe -ArgumentList ('"'+$savedProject+'"') -WorkingDirectory (Split-Path $exe) -WindowStyle Hidden -PassThru
   Wait-Product { [LibraryWindows]::Find($process.Id,'Character Library') -ne [IntPtr]::Zero } 'Product project window did not open'
   $window=[LibraryWindows]::Find($process.Id,'Character Library')
@@ -80,20 +89,51 @@ try {
   if ($native.Count -ne 1) {throw 'Product did not restore exact edited native data'}
   Capture-Library ([LibraryWindows]::Find($process.Id,'Advanced Model Editor')) "native-$attempt.png"
   $output=Join-Path $evidence "product-output-$attempt.brres"
-  $edit=@([LibraryWindows]::Children($window) | Where-Object {[LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})
-  if($edit.Count -ne 1) {throw 'Native output path control not found unambiguously'}
-  $null=[LibraryWindows]::SetText($edit[0],12,[IntPtr]::Zero,$output)
-  Click-Library $window 'Export native copy...'
+  $preview=[LibraryWindows]::Find($process.Id,'Advanced Model Editor')
+  if($PreviewWorkspace) {
+   $tabs=@([LibraryWindows]::Children($preview) | Where-Object {[LibraryWindows]::Class($_) -like '*SysTabControl32*' -and [LibraryWindows]::SendMessage($_,0x1304,[IntPtr]::Zero,[IntPtr]::Zero).ToInt32() -eq 6})
+   if($tabs.Count -ne 1){throw 'Previewer workspace tab identity missing'}
+   if($expected.CharacterProjectFile.State.Anchors.ReferenceAnchor) {
+    Select-WorkspaceTab $preview 'References'
+    foreach($role in @('Idle','Fall')) {
+     Click-Library $preview ('Preview '+$role+' on target')
+     $anchor=@($expected.CharacterProjectFile.State.Anchors.ReferenceAnchor | Where-Object {$_.Role -eq $role -and $_.TargetId -eq $instance.TargetCharacterId})[0]
+     if(!$anchor){throw "Missing saved $role anchor"}
+     $frame=([int]$anchor.Frame+1).ToString()
+     Wait-Product {@([LibraryWindows]::Children($preview) | Where-Object {[LibraryWindows]::IsWindowVisible($_) -and [LibraryWindows]::Text($_) -eq $frame}).Count -gt 0} "Restored $role native playhead phase missing"
+     Capture-Library $preview ("workspace-"+$role+"-"+$attempt+".png")
+    }
+    Select-WorkspaceTab $preview 'Setup'
+    Click-Library $preview 'Inspect / activate target instance'
+   }
+   Select-WorkspaceTab $preview 'Project / Output'
+   $edits=@([LibraryWindows]::Children($preview) | Where-Object {[LibraryWindows]::IsWindowVisible($_) -and [LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})
+   # The visible output page has the new-project path followed by native output path.
+   if($edits.Count -ne 2){throw 'Previewer output controls are missing or ambiguous'}
+   $null=[LibraryWindows]::SetText($edits[1],12,[IntPtr]::Zero,$output)
+   Click-Library $preview 'Export native copy'
+   Click-Library $preview 'Save project'
+   Capture-Library $preview "workspace-output-$attempt.png"
+  } else {
+   $edit=@([LibraryWindows]::Children($window) | Where-Object {[LibraryWindows]::Class($_) -like '*EDIT*' -and [LibraryWindows]::Text($_) -eq ''})
+   if($edit.Count -ne 1) {throw 'Native output path control not found unambiguously'}
+   $null=[LibraryWindows]::SetText($edit[0],12,[IntPtr]::Zero,$output)
+   Click-Library $window 'Export native copy...'
+   Click-Library $window 'Save project'
+  }
   Wait-Product {Test-Path -LiteralPath $output} 'Product failed to export native copy'
   if((Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToLowerInvariant() -ne $instance.WorkingHash) {throw 'Native output differs from saved instance revision'}
-  Click-Library $window 'Save project'
   [xml]$actual=Get-Content -LiteralPath $savedProject -Raw
   if($actual.CharacterProjectFile.State.OuterXml -ne $expected.CharacterProjectFile.State.OuterXml) {throw 'Product altered saved source bindings/edits/assignments'}
-  $nativeWindow=[LibraryWindows]::Find($process.Id,$native[0].Name)
-  if($nativeWindow -eq [IntPtr]::Zero) {throw 'Native main resource window missing'}
-  $null=[LibraryWindows]::PostMessage($nativeWindow,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
+  $null=[LibraryWindows]::PostMessage($preview,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
+  Wait-Product {[LibraryWindows]::Find($process.Id,'Advanced Model Editor') -eq [IntPtr]::Zero} 'Previewer did not close safely'
+  $null=[LibraryWindows]::PostMessage($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero)
+  Wait-Product {[LibraryWindows]::Find($process.Id,'Character Library') -eq [IntPtr]::Zero} 'Library did not close safely'
+  $mainWindow=[LibraryWindows]::Find($process.Id,'FighterPort Studio')
+  if($mainWindow -ne [IntPtr]::Zero){$null=[LibraryWindows]::PostMessage($mainWindow,0x10,[IntPtr]::Zero,[IntPtr]::Zero)}
   if(!$process.WaitForExit(10000) -or $process.ExitCode -ne 0) {throw 'Product did not exit normally'}
-  $records += [pscustomobject]@{Attempt=$attempt;Project=$savedProject;Instance=$instance.Id;Slot=$instance.Slot;NativeOutput=$output;SHA256=$instance.WorkingHash;NormalExit=$true}
+  if($PreviewWorkspace -and !(Test-Path -LiteralPath (Join-Path $env:FIGHTERPORT_DATA_ROOT 'preview-layout.xml'))){throw 'Layout preferences were not saved separately from project state'}
+  $records += [pscustomobject]@{Attempt=$attempt;Project=$savedProject;Instance=$instance.Id;Slot=$instance.Slot;NativeOutput=$output;SHA256=$instance.WorkingHash;NormalExit=$true;PreviewWorkspace=[bool]$PreviewWorkspace}
  }
  $records | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $evidence 'result.json') -Encoding UTF8
  Write-Output $evidence

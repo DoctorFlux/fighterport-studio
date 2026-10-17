@@ -14,7 +14,10 @@ namespace BrawlCrate.UI
 {
     public sealed class CharacterLibraryForm : Form
     {
-        private CharacterProject _project;
+        private PreviewAuthoringSession _session;
+        private CharacterProject _project=>_session.Project;
+        private ModelForm _previewOwner;
+        public PreviewAuthoringSession Session=>_session;
         private readonly TreeView _library;
         private readonly ListView _instances;
         private readonly ComboBox _targets;
@@ -22,21 +25,20 @@ namespace BrawlCrate.UI
         private readonly NumericUpDown _startup, _active, _recovery, _damage;
         private readonly Label _status;
         private readonly Button _undo, _redo;
-        private NativeEditLease _lease;
-        private string _nativeInstanceId;
         public CharacterProject Project => _project;
         public string SelectedAnimationId => _library.SelectedNode?.Tag as string;
         public string SelectedInstanceId => _instances.SelectedItems.Count == 1 ? (string)_instances.SelectedItems[0].Tag : null;
 
         public static void ShowProject(IWin32Window owner, string path = null)
         {
-            try { var form = new CharacterLibraryForm(path == null ? null : CharacterProject.Load(path)); form.Show(owner); }
+            try { var form = new CharacterLibraryForm(path == null ? null : PreviewAuthoringSession.Open(path).Project); form.Show(owner); }
             catch (Exception e) { MessageBox.Show(owner, e.Message, "Character project", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
         public CharacterLibraryForm(CharacterProject project = null)
         {
-            _project = project ?? new CharacterProject();
-            if(project==null)_project.MigrateToSharedLibrary(); // New authoring uses the app-wide store; v1 opening stays deliberate.
+            var initial=project??new CharacterProject();
+            if(project==null)initial.MigrateToSharedLibrary();
+            _session=PreviewAuthoringSession.For(initial); // New authoring uses the app-wide store; v1 opening stays deliberate.
             Text = "FighterPort Studio - Character Library"; Name = "CharacterLibraryForm";
             ClientSize = new Size(1160, 740); MinimumSize = new Size(970, 680); StartPosition = FormStartPosition.CenterParent;
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(10), ColumnCount = 1, RowCount = 8 };
@@ -51,7 +53,7 @@ namespace BrawlCrate.UI
             Button(files,"Load project...","libraryLoad",() => {
                 if (!DiscardCurrent()) return;
                 using (var dialog = new OpenFileDialog { Filter = "Character project|*.fpcharacter" })
-                    if (dialog.ShowDialog(this) == DialogResult.OK) { _project = CharacterProject.Load(dialog.FileName); _lease = null; _nativeInstanceId = null; }
+                    if (dialog.ShowDialog(this) == DialogResult.OK) { SetSession(PreviewAuthoringSession.Open(dialog.FileName)); }
             });
             Button(files,"Save project","librarySave",() => {
                 if (_project.FilePath != null) SaveProject(_project.FilePath);
@@ -75,7 +77,7 @@ namespace BrawlCrate.UI
             split.Panel1.Controls.Add(_library); split.Panel2.Controls.Add(_details); layout.Controls.Add(split);
             _library.AfterSelect += (s,e) => ShowDetails();
             var assign = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
-            Button(assign,"Preview library clip","libraryPreview",() => { var id = RequireAnimation(); OpenNative(_project.PreviewSource(id), id); _lease = null; _nativeInstanceId = null; });
+            Button(assign,"Preview library clip","libraryPreview",() => { var doc=_session.ShowSource(RequireAnimation(),_previewOwner?.IsDisposed==false?_previewOwner:null);_previewOwner=doc.Owner; });
             assign.Controls.Add(new Label { Text = "Target", AutoSize = true, Padding = new Padding(0,7,0,0) });
             _targets = new ComboBox { Name = "libraryTarget", DropDownStyle = ComboBoxStyle.DropDownList, Width = 210 }; assign.Controls.Add(_targets);
             _slot = new TextBox { Name = "librarySlot", Width = 130, Text = "DraftSlot" }; assign.Controls.Add(_slot);
@@ -111,9 +113,9 @@ namespace BrawlCrate.UI
             _instances.Columns.Add("Target / stable ID",250); _instances.Columns.Add("Slot",150); _instances.Columns.Add("Source-bound clip / status",340); _instances.Columns.Add("Native revision",160); layout.Controls.Add(_instances);
             _instances.SelectedIndexChanged+=(s,e)=>ShowDetails();
             var edit = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
-            Button(edit,"Open instance in native editor","libraryEdit",() => { var lease = _project.OpenInstance(RequireInstance()); OpenNative(lease.Path,_project.NativeAnimation(lease.InstanceId).Id); _lease = lease; _nativeInstanceId = lease.InstanceId; });
+            Button(edit,"Open instance in native editor","libraryEdit",() => { var doc=_session.ShowInstance(RequireInstance(),_previewOwner?.IsDisposed==false?_previewOwner:null);_previewOwner=doc.Owner; });
             Button(edit,"Capture native edits","libraryCapture",() => {
-                _project.CaptureNativeEdits(_lease, Program.RootNode, Program.RootPath); Program.RootNode.IsDirty = false;
+                _session.Apply(_previewOwner?.Document);
             });
             _outputPath = new TextBox { Name = "libraryOutputPath", Width = 280, AccessibleName = "New native output path (or leave empty to browse)" }; edit.Controls.Add(_outputPath);
             Button(edit,"Export native copy...","libraryExport",() => {
@@ -126,40 +128,17 @@ namespace BrawlCrate.UI
             layout.Controls.Add(edit);
             _status = new Label { Name = "libraryStatus", AutoSize = true, MaximumSize = new Size(1120,0) }; layout.Controls.Add(_status);
             Controls.Add(layout); RefreshProject();
+            _session.Changed+=ProjectChanged;
+            FormClosed+=(s,e)=>_session.Changed-=ProjectChanged;
             FormClosing += (s,e) => { if (!DiscardCurrent()) e.Cancel = true; };
         }
         public void RegisterSource(string resolution, string name) { EnsureCaptured(); _project.RegisterSource(resolution,name); RestoreNativeView(); RefreshProject(); }
         public void SaveProject(string path) { EnsureCaptured(); _project.Save(path); RefreshProject(); }
-        private void EnsureCaptured() { if (_lease != null && string.Equals(Program.RootPath,_lease.Path,StringComparison.OrdinalIgnoreCase) && Program.RootNode?.IsDirty == true) throw new IOException("Capture the bound native edits before this project command, or save/discard them in the native editor."); }
-        private void RestoreNativeView()
-        {
-            _lease = null;
-            if (_nativeInstanceId == null || !_project.State.Instances.Any(i => i.Id == _nativeInstanceId)) return;
-            var lease = _project.OpenInstance(_nativeInstanceId); OpenNative(lease.Path,_project.NativeAnimation(lease.InstanceId).Id); _lease = lease;
-        }
-        private void OpenNative(string path, string animationId)
-        {
-            if (!Program.Open(path)) throw new IOException("Native editor did not open this working copy.");
-            var animation = _project.State.Animations.Single(a=>a.Id==animationId);
-            var profile = _project.State.Characters.Single(c=>c.Id==animation.SourceCharacterId);
-            var model = (MDL0Node)BrawlProjectAdapter.At(Program.RootNode,profile.ModelPath);
-            MainForm.Instance.TargetResource(model);
-            (MainForm.Instance.resourceTree.SelectedNode as MDL0Wrapper)?.Preview();
-            var editor = ModelEditControl.Instances.Last();
-            var nativeRoot = Program.RootNode;
-            // ModelForm.OnShown distributes inherited settings and resets the camera.
-            // Frame the explicitly bound model after that queued initialization completes.
-            editor.BeginInvoke(new Action(() => {
-                if (editor.IsDisposed || Program.RootNode != nativeRoot) return;
-                editor.SelectedCHR0 = (CHR0Node)BrawlProjectAdapter.At(nativeRoot,animation.NativePath);
-                editor.SetFrame(1);
-                editor.ModelPanel.CurrentViewport = (BrawlLib.Internal.Windows.Controls.Model_Panel.ModelPanelViewport)editor.ModelPanel.First();
-                var box = model.GetBox(); var span = box.Max - box.Min;
-                float distance = Math.Max(1,Math.Max(span._x,Math.Max(span._y,span._z))*2);
-                if (!float.IsNaN(distance) && !float.IsInfinity(distance)) editor.ModelPanel.Camera.ZoomExtents((box.Min+box.Max)/2,distance);
-                editor.ModelPanel.Invalidate();
-            }));
-        }
+        private void SetSession(PreviewAuthoringSession session){_session.Changed-=ProjectChanged;_session=session;_session.Changed+=ProjectChanged;_previewOwner=null;}
+        private void ProjectChanged(object sender,EventArgs e){if(!IsDisposed && IsHandleCreated){Enabled=!_session.Busy;RefreshProject();}}
+        protected override void Dispose(bool disposing){if(disposing && _session!=null)_session.Changed-=ProjectChanged;base.Dispose(disposing);}
+        private void EnsureCaptured(){if(PreviewAuthoringSession.Active?.Session==_session && PreviewAuthoringSession.Active.Root.IsDirty)throw new IOException("Apply pending native edits in the previewer before this project command.");}
+        private void RestoreNativeView() { /* Shared session updates exact bound documents; metadata edits retain camera/timeline. */ }
         private bool DiscardCurrent()
         {
             try { EnsureCaptured(); }
@@ -171,7 +150,7 @@ namespace BrawlCrate.UI
         private Button Button(Control parent, string text, string name, Action action)
         {
             var b = new Button { Text = text, Name = name, AutoSize = true };
-            b.Click += (s,e) => { try { action(); RefreshProject(); } catch (Exception error) { _status.Text = "Stopped: " + error.Message; } }; parent.Controls.Add(b); return b;
+            b.Click += (s,e) => { try { if(name=="libraryCapture" || name=="libraryEdit" || name=="libraryPreview")action();else _session.Execute(action); RefreshProject(); } catch (Exception error) { _status.Text = "Stopped: " + error.Message; } }; parent.Controls.Add(b); return b;
         }
         private static NumericUpDown Number(Control parent,string name,int max) { var n = new NumericUpDown { Name = name, Maximum = max, Width = 60 }; parent.Controls.Add(n); return n; }
         private sealed class TargetItem

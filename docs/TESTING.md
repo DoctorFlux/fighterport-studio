@@ -297,5 +297,63 @@ exact roles/helpers/root policy, Transfer reviewed FK, then open the independent
 instance, edit/capture, save project and export a new enclosing native archive. V1 opening
 stays embedded until Share / migrate; save the migrated project to a new file. Keep the
 library directory with the projects; moving it currently requires restoring its pinned
-absolute location. Typed native slots/anchors, drag/drop, mirror/fitting and IK are next
-work, not implemented controls. Legacy drafts are available via their explicit toggle.
+absolute location. The Model Previewer workspace below supplies typed slots/anchors;
+drag/drop, mirror/fitting and IK remain future work. Legacy drafts are available via
+their explicit toggle.
+
+
+Model Previewer workspace acceptance:
+
+```powershell
+./scripts/test.ps1 -Workspace -Gui
+./tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <absolute-workspace-one.fpcharacter> -PreviewWorkspace
+./tests/NativeSmoke/VerifyLibraryProduct.ps1 -Project <absolute-workspace-two.fpcharacter> -PreviewWorkspace
+```
+
+WorkspaceChecks starts with the real resource browser/model wrapper on an original native
+model. From the previewer it attaches the shared live project, browses immutable library
+metadata, installs the semantic pack, adds five jab parts and ground-start/air-loop special
+parts, binds a selected native asset, keeps an assigned extra unbound, renames/reorders
+without changing stable IDs and preserves a legacy custom assignment. It edits an actual
+native key to 25 degrees, applies it, tests native versus project undo independently, chooses
+Idle/Fall as one atomic pair, sets distinct native phases and a named Landing reference,
+and previews all through the inherited timeline. An embedded reviewed rig grid transfers
+original A -> different B and verifies its native output against independent analytic poses.
+Focused text Undo retains the project/native state; the host shortcut handler leaves it
+to the native text control. With the workspace tree focused, Ctrl-Z/Y is consumed once
+by project history and restores exact state. This is handler automation, not physical-key
+injection. The native numeric key editor's own Undo/Redo is tested separately.
+
+Failure checks include invalid/cancelled packs, duplicate destinations, target/phase errors,
+missing/stale anchors, cancelled background assignment, busy-view command rejection,
+source overwrite, pending switch cancellation, unsupported bone edits retained after failed
+Apply, and explicit two-viewer handoff/stale comparison capture rejection. No operation
+may silently mutate another project or make a shared source writable. Version 1 -> 3 authoring
+and undo plus existing exact v1 shared migration are separate tests. Library and previewer
+use the same object/session; no synchronization through saving/reloading separate copies.
+
+Inspect workspace-idle-native.png, workspace-fall-native.png, workspace-source-native.png,
+workspace-fk-native.png and workspace-target-native.png: these are actual GL framebuffer
+captures with nonblank geometry, not just form screenshots. Main target native output is
+fresh-decoded at frames 0/15/30 with intended 0/25/360-degree rigid poses and weighted vertex
+errors <=.002 native units. FK keeps its separate quarter-frame/.002 position/.05 degree/
+.005 mesh limits. Slot/anchor metadata is verified in XML and fresh-process load; it is not
+claimed to exist in CHR0/PAC. No new runtime animation behavior is implied.
+
+The GUI checks 850x620 layout, native playback inside the visible client area, panel hide/
+reopen and simulated 150% scaling with bounded dropdowns. Simulated scaling is not a real
+OS-DPI/monitor test; record the actual desktop DPI separately. Layout preferences are saved
+in preview-layout.xml under app data and tested separately from character project records.
+Native details need a sufficiently wide editor; Authoring layout preserves the native
+frame/playback controls in smaller windows.
+
+VerifyLibraryProduct -PreviewWorkspace launches the normal executable twice using the
+same isolated profile. It selects actual workspace tabs through native tab focus messages,
+previews persisted Idle/Fall phases, reactivates the intended target, exports and saves
+through previewer controls, compares exact saved records/native output hashes and observes
+normal exits. Inputs/pickers are supplied through real path controls; no test startup mode
+or external editor is added. Product window captures may omit GL; use the harness GL images
+for geometry. Run both independent shared projects, then rehash originals, shared metadata/
+payloads and the untouched second project. Retain every prior focused/default suite.
+
+See UI_ACCEPTANCE.md for the usable control path and currently unsupported operations.

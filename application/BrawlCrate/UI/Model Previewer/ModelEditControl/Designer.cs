@@ -2289,6 +2289,8 @@ namespace BrawlCrate.UI.Model_Previewer.ModelEditControl
 
         protected override void modelPanel1_MouseUp(object sender, MouseEventArgs e)
         {
+            // FighterPort: read-only source/comparison views retain camera/playback only.
+            if(AuthoringReadOnly)return;
             if (e.Button == MouseButtons.Left &&
                 !_vertexSelection.IsMoving())
             {

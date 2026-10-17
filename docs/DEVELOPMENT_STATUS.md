@@ -12,11 +12,129 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [shared library and reviewed FK](#shared-library-and-reviewed-fk--2026-10-17).
+Current checkpoint: [Model Previewer slots and anchors](#model-previewer-slots-and-anchors--2026-10-17).
 The first authoring increment follows the completed container checkpoint, preserving HEAD
 9f9405fb925f50b4df33ec1ae41e17b1dd77b6dc and all newer passing work. Earlier receipts
 below describe their historical checkpoints. docs/plans/current.md remains the only
 authoritative next executable acceptance criterion.
+
+## Model Previewer slots and anchors — 2026-10-17
+
+Continued actual HEAD 8136ea72d66d27493b963e528413ecbf6bfd88c9, preserving the shared
+library, reviewed FK, container and discovery checkpoints. The supplied workspace brief
+is persisted verbatim as FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md, SHA256
+87665b37ca4619d5b95fbd7129ca0fab490758788210129a3e496e936a37f19a.
+Its standing UI contract is now in AGENTS.md, the master plan and architecture.
+
+Checkpoint C passes for the declared original Brawl subset. The actual ModelForm hosts
+resizable/collapsible Setup, Shared Library, Animation Set, References, reviewed Rig/FK
+and Project/Output surfaces beside the inherited ModelEditControl. Camera, rendered
+geometry, native playback/frame controls and detailed curve/key editors remain native.
+The standalone library shares the same live project/session. Plain native models need
+an explicit project/target association; no last-window/display-name/global-root inference.
+Source previews and target/reference comparisons are read-only, with one editable
+authoring document and explicit safe handoff. No simultaneous-editing claim is made.
+
+Project v3 adds immutable versioned pack snapshots, stable group/slot/part/variant IDs,
+repeatable parts, ground/air phases, preserved custom assignments and independent target
+instances. The built-in Brawl semantic pack v2 has 30 categories and seven part phases.
+Readable labels do not certify runtime bindings. Exact selected native asset destinations
+carry hashes, indexed identities, model/container and target fingerprints; duplicate
+destinations reject. Assigned extra parts remain visibly unbound. v1/v2 loading and
+deliberate shared migration remain available; undo restores the older state.
+
+Idle/Fall and named references persist target/rig, instance/clip revisions, working hash,
+native timing/loop interpretation and separately selected integer playhead phases.
+The fixture selects Idle frame 5 and Fall frame 10 (native UI frames 6/11), plus Landing
+frame 7. Stale/missing references remain diagnosable and require deliberate reselection.
+These are authoring records, not transition fitting or metadata encoded into CHR0/PAC.
+
+Observed real previewer controls: explicit attach/inspect, immutable library browse/source
+preview, pack install, five jab parts, ground-start/air-loop specials, assignment through
+valid same-source/reviewed-FK routes, bind/unbind, rename/reorder, custom preservation,
+reference motion and phase selection, native editing/Apply, separate project Undo/Redo,
+save, diagnostics and new native export. Idle/Fall pair selection is one undoable change.
+Actual GL framebuffer inspection shows textured geometry in distinct reference poses
+and the blended target after FK. Native Play and scrubbing use the inherited timeline.
+Small-window 850x620, panel hide/reopen and simulated 150% layout pass; the real desktop
+was 96 DPI. Physical high-DPI/monitor transitions remain unverified.
+
+Pending-edit tests cover cancellation, explicit discard, native versus project histories,
+two-project/viewer handoff, stale comparison Apply rejection and unsupported bone edits.
+Focused text Undo retains native/project state; workspace Ctrl-Z/Y routes once to project
+history. These are handler checks, not physical keyboard injection.
+Unsupported changes survive failed Apply and can be saved as a separate native draft;
+they are never claimed as supported project capture. Invalid/cancelled packs, duplicate
+bindings, wrong targets/phases, missing/stale references, source overwrite and cancelled
+background assignment reject without partial project state. A serialized cancellable
+worker freezes project commands; UI/GL refresh returns to the owning UI thread. This
+does not turn CharacterProject into a general concurrent mutation API.
+
+Native output is independently fresh-decoded at frames 0/15/30 against intended
+0/25/360-degree poses, including weighted geometry error <=.002 native units, native
+timing/loop and original resources. Reviewed FK retains its separate quarter-frame
+pose/orientation/mesh checks; reverse transfer passes in the retained retarget suite.
+Project XML/identity/anchor checks are separate from native motion checks.
+
+Four fresh normal FighterPort.Studio.exe launches (two per independently saved project)
+restore exact records, preview persisted Idle/Fall phases, activate the intended instance,
+save/export through the real previewer and exit normally. Product-one output SHA256:
+0d4c9619f02436d6ea38958e378d84e6201e2b6d341b6ffffdc7fb3f610daeb7;
+product-two: 0c7fa14b0e44b0c9284205f02c9814c6a458e4231084b8c4d5962d4447c343b9.
+These match the freshly decoded native outputs. File pickers are bypassed by automation;
+no manual-click, external native-tool, Modkit, commercial-character or game claim.
+After those launches, all three original fixture inputs, five pinned metadata records,
+all referenced shared native revisions and the untouched second project retain hashes.
+
+Primary Release/x86/net472 build: 0 warnings, 0 errors, locked packages, no new dependency.
+Doctor passes with MSBuild 17.14/net472 targeting pack; Cargo remains absent and independent
+build hooks do not require it. All eight suite families pass in native and GUI modes:
+workspace, shared library, character library, retarget, containers, dump, companions and
+baseline. The inherited 8.3-alias probe remains a reported skip where no alias exists;
+hardlink/reparse checks pass. Old WPF test totals are not reused.
+Executable: D:/Users/ChatGPT/ROA2TOOL/application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe.
+SHA256: 4327f2352e1cfd58912cf02e586cb07ad6cbfea899264f3f50974ba419cb9b5c.
+
+Local receipts (inputs, outputs, captures and binaries remain ignored):
+
+- artifacts/restart/workspace-native-20261017-134853-153/result.txt
+- artifacts/restart/workspace-gui-20261017-134908-804/result.txt and GL/layout captures
+- artifacts/restart/library-product-20261017-135310-170/result.json (project one, twice)
+- artifacts/restart/library-product-20261017-135327-865/result.json (project two, twice)
+- artifacts/restart/workspace-final-source-hashes.json (post-product source/shared/other hashes)
+- artifacts/restart/shared-native-20261017-135022-342/result.txt and shared-gui-20261017-133254-018/result.txt
+- artifacts/restart/library-native-20261017-135057-205/result.txt and library-gui-20261017-133328-326/result.txt
+- artifacts/restart/retarget-native-20261017-135136-944/result.txt and retarget-gui-20261017-133356-537/result.txt
+- artifacts/restart/container-native-20261017-135155-503/result.txt and container-gui-20261017-133414-562/result.txt
+- artifacts/restart/dump-native-20261017-135214-674/result.txt and dump-gui-20261017-133436-244/result.txt
+- artifacts/restart/companions-native-20261017-135238-182/result.txt and companions-gui-20261017-133457-395/result.txt
+- artifacts/restart/native-20261017-135257-276/result.txt and gui-20261017-133517-133/result.txt
+- artifacts/restart/build-Release.log
+
+Failures resolved during this checkpoint: rejected native export validation could clear
+dirty flags (restore pending state on failure); worker refresh could touch UI from a
+background thread (marshal it); inherited layout could hide playback/resize the viewport
+away (compact authoring layout); inherited model reset could move the camera on metadata
+commands (retain it); inherited form shortcut handling could consume text Ctrl-Z/Y
+(leave the key with the focused text control without dispatching editor menus).
+Passing receipts supersede exploratory failures. Product tab
+automation uses native focus messages; no UI Automation or physical-DPI claim.
+
+Limits: the existing MDL0 v11 / CHR0 v4/RGBA8 and canonical-container admission gates
+remain; broader Brawl formats/channels/model/material capture are still queued. Native
+slot binding proves a selected asset destination, not game runtime behavior. Anchors
+currently accept integer native frames only. No mirror, fitting, IK/contact solver,
+template fill, automatic rig recognition, non-Brawl adapter or Modkit asset route is
+implemented. Existing FK/storage budgets and losses remain in the prior checkpoint;
+v3 adds <=8 sets/64 anchors/512 parts, <=64 parts per batch and <=1 MiB metadata.
+Gameplay remains deferred and legacy drafts remain compatible.
+
+Recovery is untouched at D:/Users/ChatGPT/FighterPort-Recovery-20261017-01/workspace;
+upstream remains d56cbac89dc2cd0e5c3f923e1d03041b16902add. Licenses/notices and the
+binary-distribution audit remain intact. The next sole executable acceptance is reviewed
+per-assignment native mirroring inside this workspace, before final-target fitting;
+see plans/current.md. Publication follows standing source-only authorization with exact
+public origin/main, staged/outgoing review and post-push SHA verification recorded locally.
 
 ## Initial restart receipts
 

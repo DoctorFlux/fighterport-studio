@@ -47,3 +47,7 @@ The shared-library/FK continuation adds original repository-licensed source and 
 fixtures only, without new dependencies, distributed native fixtures, installers or game
 assets. Existing component/source-distribution obligations remain unchanged and unresolved
 items above still apply before any binary distribution.
+
+The Model Previewer workspace continuation adds original repository-licensed source and
+uses existing framework/native editor dependencies. It adds no third-party package or
+binary. Existing upstream/component notices and unresolved distribution obligations remain.

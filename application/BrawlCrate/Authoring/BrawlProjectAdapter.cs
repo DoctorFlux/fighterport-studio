@@ -40,6 +40,7 @@ namespace BrawlCrate.Authoring
             var motion = At(root, animation.NativePath) as CHR0Node;
             if (motion == null || motion.Name != animation.Name || motion.Version != 4) throw new IOException("Bound native motion identity changed.");
             var model = At(root, profile.ModelPath) as MDL0Node ?? throw new IOException("Bound native model missing.");
+            model.Populate(); // Anchor timing and other fresh-document paths require the native bone cache.
             var names = new HashSet<string>(model.BoneCache.Select(b => b.Name), StringComparer.Ordinal);
             if (motion.FrameCount < 1 || motion.FrameCount > 100000 || motion.Children.Count > 512 ||
                 motion.Children.Select(c => c.Name).Distinct(StringComparer.Ordinal).Count() != motion.Children.Count)

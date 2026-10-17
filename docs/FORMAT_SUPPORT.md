@@ -16,6 +16,7 @@ No previous FighterPort counts or capabilities transfer to this codebase.
 | Source-bound library / .fpcharacter v1 | Two different original native rigs, stable source/clip IDs, full native evidence, actual motion edits, independent instances, manual drafts, atomic project save/load and session undo/redo tested; missing/changed/stale/tampered inputs reject or diagnose | Actual library selectors/assignment and inherited model preview/playback/key edit/capture/undo/redo/native export/reopen tested; fresh executable restarts checked separately | One CHR0 per profile, same-source assignments only; no semantic approval, cross-rig transfer, native attack compiler or playable mod |
 | Shared library / .fpcharacter v2 | Shared immutable source/clip records, several CHR0 v4 clips per registered model, bounded metadata cursor, explicit v1 migration preserving native edits/drafts, separate saved projects and native edit/export/restart tests pass | Actual shared catalogue/Use control and two projects opened/exported through four fresh product launches | Disk-backed Brawl subset; selected graph <=128 clips/project, no whole-library XML; revision-management/portable bundles/shared map records queued |
 | Reviewed original rig A -> B and independent B -> A FK | Exact fingerprint/interpretation review, explicit roles/helpers/root policies, rest/axis/parent/proportion differences, genuine native CHR0 bake, fresh quarter-frame bone/LBS comparisons, full turn/loop endpoint, transaction/undo/reopen and unchanged originals pass | Actual review form, native textured deformed target pose and playback observed | MDL0 v11/CHR0 v4, unit-scale rigid pose subset. Sampled .002 position/.05 degree/.005 mesh limits. No IK, mirror, fitting, mesh rebinding, commercial compatibility or game claim |
+| Actual Model Previewer workspace / .fpcharacter v3 | Stable pack/group/slot/variant/part IDs, rename/reorder, repeatable counts, distinct ground/air phases, preserved custom entries, exact selected native asset bindings/duplicate rejection, target Idle/Fall/named phases and grouped undo/save/reload tested | Real Setup/Library/Animation Set/References/Rig-FK/Project-Output controls; native textured poses, apply/undo, cancellable assign, explicit two-viewer handoff and source read-only playback; fresh product restarts checked separately | Brawl native adapter subset only; semantic labels do not verify runtime slots. Anchors remain project metadata, integer playhead phases; no fitting, mirror, IK, gameplay or Modkit result |
 | Other inherited Brawl editors/resources | Source retained; operation-specific tests pending | Inherited controls retained, unverified | No universal fidelity claim |
 | Smash 64, Melee, Wii U, 3DS, Ultimate | Planned per game/version | Planned | Planned native output/gameplay/game checks |
 | Rivals II installed sources / Modkit projects | Planned separately from cooked extraction | Planned actual Modkit validation | Planned import/build/playtest |
@@ -23,7 +24,7 @@ No previous FighterPort counts or capabilities transfer to this codebase.
 | Additional games / interchange / DCC bridges | Planned modular adapters and explicit subsets | No mandatory DCC | No implied compatibility |
 
 The reviewed original FK subset above is now tested independently from same-format editing.
-Broader retargeting, contacts/IK, mirror, fitting, typed slots/references, template fill and
+Broader retargeting, contacts/IK, mirror, fitting, template fill and
 complete character authoring remain queued. Gameplay conversion is deferred this phase.
 
 Source admission recognizes raw BRRES/ARC and MDL0 v8–11, CHR0 v3–5, TEX0 v1–3,
@@ -80,6 +81,23 @@ Current shared library stores immutable revision-1 characters/clips; conflicting
 changed pinned metadata/payloads, missing libraries and cursor invalidation reject. Source
 registration and extra-motion imports preserve read-only external identities. Project-native
 edits are independent immutable payload references, not library clip rewrites. Full per-game
-model/animation types, verified animation-slot packs, Idle/Fall anchors, motion templates,
+model/animation types, per-game verified runtime animation-slot packs and motion templates,
 previewable missing-slot fill and actual supported Rivals Modkit import remain unverified.
 Legacy gameplay drafts persist but are optional and hidden from primary animation controls.
+
+
+Workspace evidence separates three things: project metadata (v3 pack/part/binding/reference
+identities), decoded native motion/model preservation, and runtime/game behavior. Original
+asset binding verifies the selected target native identity/path/hash/model/container and
+pack version; no game identifier is guessed from a readable slot label. Extra assigned
+parts remain explicitly unbound. No runtime sharing/alias profile is implemented.
+
+The workspace supports one editable authoring document with read-only source/reference/
+comparison views. Full simultaneous editing across inherited legacy tools is unverified.
+Normal Apply/Discard/Cancel handoff and unsupported-edit retention are tested; forced
+termination is not unsaved-state recovery. Native/project/text Undo use separate contexts.
+An 850x620 window and simulated 150% layout scaling are tested; actual desktop DPI is 96,
+so a separate physical high-DPI/monitor transition is unverified. Integer anchor frames
+are current native playhead support; fractional anchors reject rather than truncate.
+Shared reviewed-map/template distribution and full model/material/channel project capture
+remain queued. No game, external native-tool or Modkit validation was performed here.

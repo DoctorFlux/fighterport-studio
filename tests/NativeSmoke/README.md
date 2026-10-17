@@ -157,3 +157,13 @@ shared catalogue and mapping grid/native preview/Play are exercised. See TESTING
 numeric limits, budgets and unsupported cases; no mirror/fitting/Modkit/game claim.
 `VerifyLibraryProduct.ps1 -InstanceIndex 1` selects the shared project's second (retargeted)
 instance; default 0 still verifies older projects. It requires no gameplay draft.
+
+
+`-Workspace -Gui` proves the actual Model Previewer session/typed slots/reference workflow.
+It includes same-object library synchronization, native Apply/Undo, bound/unbound parts,
+repeat counts, stable IDs through rename/reorder, other named references, cancellable worker,
+explicit two-view handoff and unsupported/pending edit rejection. See TESTING.md and
+UI_ACCEPTANCE.md for detailed GUI steps, native pose tolerances and honest DPI limits.
+Use VerifyLibraryProduct.ps1 -PreviewWorkspace on each independently saved fixture project
+for normal application restarts, restored anchor phases, previewer export/save and exits.
+No source assets, generated binaries, settings or captures belong in Git.

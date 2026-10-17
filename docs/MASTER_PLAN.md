@@ -9,7 +9,8 @@ cancel/combo execution and playable moveset compilation are deferred, not erased
 Existing manual drafts remain lossless compatibility data, never animation prerequisites.
 An attack slot in this phase is an animation assignment, not executable behavior.
 Reviewed original FK and shared-library/multi-clip migration checkpoints now pass within
-the subsets in FORMAT_SUPPORT.md. Next are typed expandable slots/anchors, mirror/fitting,
+the subsets in FORMAT_SUPPORT.md. The new Model Previewer workspace and typed slots/anchors
+now pass the declared original Brawl acceptance; next are reviewed mirror, fitting/IK,
 template fill and non-Brawl asset routes. Only plans/current.md defines the next executable acceptance criterion.
 
 Authority: [complete clean-restart brief](CODEX_CLEAN_BRAWLCRATE_RESTART.md), preserved verbatim.
@@ -76,8 +77,9 @@ original v1 subset remains loadable. Version 2 now uses shared immutable disk-ba
 source/clip records across separate projects and supports several CHR0 v4 clips per source.
 Explicit reviewed original rig A -> B and independent reverse FK routes pass sampled
 fresh-native pose/skinning checks. IK, mirror, fitting and other native channels remain
-queued. Next are typed expandable animation slots/anchors, then mirror/fitting and template
-fill; native gameplay/attack translation remains deferred under the current scope.
+queued. Version 3 now adds typed expandable parts/variants, verified asset destinations or explicit
+unbound state, and target reference phases in the actual previewer. Next are reviewed
+mirror, fitting/IK and template fill; native gameplay/attack translation remains deferred under the current scope.
 Develop managed provisioning alongside the first external adapter: original harmless
 package installation/rejection/rollback tests plus one genuinely integrated pinned tool.
 
@@ -102,8 +104,8 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
 4. R3: the first visible source-character-bound library and real edit-project increment
    passes its original-fixture acceptance (see status/testing). Shared disk-backed clips,
    explicit fingerprint-bound role review and a measured original FK subset now pass.
-   Next: typed expandable animation slots/anchors, then reviewed mirror, fitting/IK
-   and dependency-aware template fill. Preserve native originals,
+   Version 3 slots/anchors and their shared-session Model Previewer controls now pass.
+   Next: reviewed native mirror, fitting/IK and dependency-aware template fill. Preserve native originals,
    immutable/revisioned source profiles/animations/moves, non-destructive target instances, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,
@@ -133,3 +135,24 @@ package installation/rejection/rollback tests plus one genuinely integrated pinn
 
 Every game remains a target roadmap row even before its implementation. Track each directed route,
 not a single generic conversion badge. An optional Goku authoring rig is never mandatory globally.
+
+
+Standing workspace amendment (2026-10-17):
+[FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md](FIGHTERPORT_MODEL_PREVIEWER_WORKSPACE.md)
+is preserved as supplied. Every current/future model or animation feature must have a
+usable surface beside the existing ModelEditControl and share the authoritative session.
+The standalone library/resource browser are entry points, not separate project copies.
+The implemented workspace exposes Setup, shared Library, Animation Set, References,
+reviewed Rig/FK and Project/Output/diagnostics, with resizable/collapsible panels and the
+native timeline. Native/project/text Undo contexts remain distinct. Source/reference
+previews are read-only; explicit editable-document handoff protects pending changes.
+
+The initial Brawl semantic pack v2 covers repeatable jabs, directed tilts/smashes/aerials,
+four special directions and all phases/ground-air variants, taunts/movement/guard/ledge/
+climb/item/miscellaneous. Native/runtime identifiers are not inferred from labels. Exact
+selected asset binding evidence and duplicate-destination rejection are separate from
+runtime/game validation. Other game packs/writers still need their own verified evidence.
+Idle/Fall and named reference motions/phases persist in projects; this does not fit or
+encode those authoring records into CHR0/PAC. Mirror, fitting, IK/contact/template fill,
+non-Brawl/channel adapters, source-path and tool services must extend this same workspace
+as their backends become available. No placeholders count as those implementations.
