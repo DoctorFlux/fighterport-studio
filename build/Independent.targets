@@ -1,0 +1,18 @@
+<Project>
+  <!-- FighterPort modification 2026-10-17: replace inherited shell hooks.
+       No updater execution, recursive output deletion, Cargo install or config deletion. -->
+  <Target Name="PreBuild" />
+  <Target Name="PreBuildEvent" />
+  <Target Name="PostBuildEvent" />
+  <Target Name="PostBuild" AfterTargets="Build" Condition="'$(MSBuildProjectName)' == 'BrawlCrate'">
+    <ItemGroup>
+      <FighterPortApi Include="$(MSBuildProjectDirectory)\API\Lib\**\*" />
+      <FighterPortDocs Include="$(MSBuildProjectDirectory)\..\BrawlLib\InternalDocumentation\**\*" />
+      <FighterPortNotices Include="$(MSBuildThisFileDirectory)..\LICENSE;$(MSBuildThisFileDirectory)..\THIRD_PARTY_NOTICES.md;$(MSBuildThisFileDirectory)..\UPSTREAM.md" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FighterPortApi)" DestinationFiles="@(FighterPortApi->'$(TargetDir)BrawlAPI\Lib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FighterPortDocs)" DestinationFiles="@(FighterPortDocs->'$(TargetDir)InternalDocumentation\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FighterPortNotices)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\licenses\GPL-3.0.txt" DestinationFolder="$(TargetDir)licenses" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

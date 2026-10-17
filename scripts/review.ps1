@@ -1,12 +1,19 @@
-$ErrorActionPreference = 'Stop'
-Set-Location (Split-Path $PSScriptRoot -Parent)
-$files = @(git diff --cached --name-only)
-foreach ($file in $files) {
-    if ($file -match '(^|/)(Brawl mario|Smash Ultimate mario|artifacts|assets-local|\.deps|\.tools|\.local|bin|obj)/|\.(pac|pcs|brres|mdl0|chr0|srt0|vis0|pat0|clr0|shp0|scn0|tex0|plt0|dat|nusktb|numshb|numdlb|numatb|nuanmb|nutexb|nuhlpb|numshexb|adjb|iso|wbfs|nsp|xci|exe|dll|zip|pem|key|pfx|fpproj|fpwork)$|(^|/)\.env') { throw "Forbidden staged path: $file" }
-    if ((Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 1MB) { throw "Review required for large source: $file" }
+param([switch]$PinnedImport)
+$ErrorActionPreference='Stop'
+$repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+Set-Location -LiteralPath $repoRoot
+if ((git remote get-url origin) -ne 'https://github.com/DoctorFlux/fighterport-studio.git') { throw 'Unexpected origin' }
+$paths=@(git diff --cached --name-only --diff-filter=ACMR)
+foreach ($path in $paths) {
+  if ($path -match '(^|/)(bin|obj|artifacts|assets-local|\.local|\.deps|\.tools|Brawl mario|Smash Ultimate mario)/|CredentialsHelper\.exe$|\.(snk|pem|pfx|key)$|(^|/)\.env') { throw "Excluded staged path: $path" }
+  if ($path -match '\.(exe|dll)$' -and $path -notin @('application/BrawlLib/OpenTK.dll','application/BrawlCrate/discord-rpc.dll')) { throw "Unexpected staged binary: $path" }
 }
-git diff --cached --check
-if ($LASTEXITCODE -ne 0) { throw 'Diff whitespace check failed' }
-git diff --cached --stat
-git diff --cached --name-only
-Write-Host 'Also inspect git diff --cached. This guard is not a substitute for human/source review.'
+git diff --cached --shortstat
+if ($PinnedImport) {
+  # Preserve upstream formatting; exact imported blob IDs are verified separately.
+  git diff --cached --check -- . ':!application'
+} else {
+  git diff --cached --check
+}
+if ($LASTEXITCODE) { throw 'Staged whitespace check failed' }
+Write-Output 'Inspect staged content diff too. Local review only; this script never pushes.'

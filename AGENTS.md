@@ -1,21 +1,25 @@
 # FighterPort Studio
 
-Read `CODEX_START_FROM_ZERO.md` (unaltered source requirements), `docs/MASTER_PLAN.md`,
-`docs/DEVELOPMENT_STATUS.md`, `docs/plans/current.md`, and `docs/CODEX_CONTINUE_ALL_GAME_WORKBENCH.md` before continuing.
-Also read `docs/CODEX_CLASSIC_BRAWLCRATE_STYLE_WORKSPACE.md` completely and `docs/UI_UX_PLAN.md`; current task instructions supersede dated receipts.
-Also read `docs/CODEX_BRAWL_TEXTURE_FIX_AND_SRT0_CONTINUATION.md` completely and `docs/TEXTURE_DIAGNOSIS.md` for the tested boundary and remaining limitations.
-Also read `docs/CODEX_UNIFIED_RESOURCE_EDITOR_AND_FULL_CHARACTER_PIPELINE.md`; its unified resource workspace queue supersedes the older format-button workflow.
+Read docs/CODEX_CLEAN_BRAWLCRATE_RESTART.md completely, then UPSTREAM.md,
+THIRD_PARTY_NOTICES.md, docs/MASTER_PLAN.md, docs/ARCHITECTURE.md,
+docs/DEVELOPMENT_STATUS.md, docs/FORMAT_SUPPORT.md, docs/TESTING.md and
+docs/plans/current.md. The clean restart supersedes the earlier bridge/WPF strategy.
 
-- Existing standalone, local/non-AI Windows character workbench. No runtime cloud or DCC requirement.
-- Keep all requested games, channels, editing tools and round trips in the master plan.
-- Capabilities are per format/version/operation; tests prove declared subsets only.
-- Never fake native exporters, substitute demo data behind importers, or advertise playable fighters.
-- Game inputs are read-only and stay outside Git. No secrets, commercial assets, builds or dependency clones in commits.
-- Preserve source branch, exact binds, Euler winding, timing, opaque resources and explicit losses.
-- Build/test each increment; update capability records, status, next task and evidence together.
-- Scripts: `./scripts/build.ps1`, `./scripts/test.ps1`, `./scripts/run.ps1`,
-  `./scripts/doctor.ps1`, `./scripts/publish.ps1`, `./scripts/review.ps1`.
-- Before each push verify exact origin and expected PUBLIC status (user-authorized 2026-10-16) against `config/repository.json`;
-  review staged files AND diff. Never force push or reuse another repository.
-- No automatic CI dispatch, paid service, global install, EULA acceptance or embedded input scripts.
-- At a real boundary leave a tested checkpoint. Do not claim unobserved GUI/native-tool/in-game checks.
+- Main application is the actual BrawlCrate-derived WinForms application in application/.
+  Preserve native editors; no external-editor launcher or rebuilt imitation shell.
+- Local, standalone, non-AI core; no mandatory DCC/cloud. All requested games, channels,
+  character/gameplay authoring, source providers and round trips remain in the master plan.
+- Preserve upstream copyright, license texts, authorship and modification provenance.
+  Root LGPL is not a blanket license for every component; see third-party audit.
+- Capabilities are per format/version/operation. Inherited source is not new test evidence.
+  No fake exporters, demo substitution, guessed approved mappings or playable-fighter claims.
+- Game inputs are read-only and excluded from Git. Preserve exact binds, Euler winding,
+  timing, native originals/opaque records and separate target branches with explicit losses.
+- Build/test each increment; update evidence, capabilities/status and the single next task.
+  Commands: scripts/build.ps1, test.ps1, run.ps1, doctor.ps1, review.ps1.
+- This restart is LOCAL ONLY: no pushes/tags, public PRs, uploads, releases, CI dispatch,
+  visibility changes, repository recreation, force push or mirror push. Existing origin:
+  https://github.com/DoctorFlux/fighterport-studio.git (public, independently hosted).
+- No global installs, EULA acceptance, paid services or automatic source-script execution.
+- Recovery outside the working tree must remain intact. At a real boundary record the exact
+  failure and a coherent checkpoint; never claim unobserved GUI/native-tool/game checks.

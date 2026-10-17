@@ -1,0 +1,14 @@
+language: csharp
+install: nuget restore BrawlCrateTools.sln
+script: msbuild /p:Configuration=Mono BrawlCrateTools.sln
+os:
+  - linux
+  - osx
+after_success:
+  - wget https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/$TRAVIS_COMMIT/.discord/HOOKS/TravisCIDiscordHook.sh
+  - chmod +x TravisCIDiscordHook.sh
+  - ./TravisCIDiscordHook.sh success $WEBHOOK_URL
+after_failure:
+  - wget https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/$TRAVIS_COMMIT/.discord/HOOKS/TravisCIDiscordHook.sh
+  - chmod +x TravisCIDiscordHook.sh
+  - ./TravisCIDiscordHook.sh failure $WEBHOOK_URL

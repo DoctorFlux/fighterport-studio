@@ -1,11 +1,7 @@
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path $PSScriptRoot -Parent
-Set-Location $repoRoot
-$env:DOTNET_CLI_HOME = Join-Path $repoRoot '.tools/dotnet-home'
-$env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-$env:DOTNET_NOLOGO = '1'
-$env:NUGET_PACKAGES = Join-Path $repoRoot '.deps/nuget'
-$env:MSBuildEnableWorkloadResolver = 'false'
-$dotnet = Join-Path $repoRoot '.tools/dotnet/dotnet.exe'
-if (!(Test-Path $dotnet)) { $dotnet = 'dotnet' }
-function Invoke-Dotnet { & $dotnet @args; if ($LASTEXITCODE -ne 0) { throw "dotnet failed ($LASTEXITCODE)" } }
+$repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+if (!(Test-Path -LiteralPath $vswhere)) { throw 'Visual Studio MSBuild discovery is unavailable; run doctor.ps1.' }
+$msbuild = & $vswhere -latest -products '*' -requires Microsoft.Component.MSBuild -find 'MSBuild/Current/Bin/MSBuild.exe' | Select-Object -First 1
+if (!$msbuild -or !(Test-Path -LiteralPath $msbuild)) { throw 'Installed Visual Studio MSBuild is required. No global installation was attempted.' }
+$independentTargets = Join-Path $repoRoot 'build/Independent.targets'
