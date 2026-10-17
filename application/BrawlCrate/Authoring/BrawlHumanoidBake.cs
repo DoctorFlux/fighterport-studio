@@ -22,13 +22,16 @@ namespace BrawlCrate.Authoring
         public double FkContactError {get;set;}
         public double CorrectedContactError {get;set;}
         public double CorrectedOrientationError {get;set;}
+        public double EndpointContactError {get;set;}
+        public int ContactSamples {get;set;}
+        public int EndpointContactSamples {get;set;}
         public double MaximumPelvisOffset {get;set;}
         public int UnreachableSamples {get;set;}
         public string WorstPosition {get;set;}
         public string WorstRotation {get;set;}
         public bool ProfilesReviewed {get;set;}
         public List<string> Diagnostics {get;set;}=new List<string>();
-        public override string ToString()=>string.Format(CultureInfo.InvariantCulture,"{0}; {1} quarter-frame samples. Native decode error pos={2:R}, degrees={3:R}, mesh={4:R} (limits .02/.15/.03). Contact quality FK={5:R}, corrected={6:R} native units; orientation={7:R} degrees; pelvis <= {8:R}; unreachable samples={9}. Profiles reviewed={10}. Source optional channels reported, target reference retained; no gameplay/clearance/prop certification.",Algorithm,Samples,NativePositionError,NativeDegreesError,NativeMeshError,FkContactError,CorrectedContactError,CorrectedOrientationError,MaximumPelvisOffset,UnreachableSamples,ProfilesReviewed);
+        public override string ToString()=>string.Format(CultureInfo.InvariantCulture,"{0}; {1} native samples (quarter grid + withheld .137/.619). Native decode error pos={2:R}, degrees={3:R}, mesh={4:R} (limits .02/.15/.03). Contact quality FK={5:R}, corrected={6:R} native units; orientation={7:R} degrees; interval pelvis adjustment <= {8:R}; unreachable samples={9}. Profiles reviewed={10}. Contact samples={11}; held endpoints={13}; error={12:R}. Source optional channels reported, target reference retained; no gameplay/clearance/prop certification.",Algorithm,Samples,NativePositionError,NativeDegreesError,NativeMeshError,FkContactError,CorrectedContactError,CorrectedOrientationError,MaximumPelvisOffset,UnreachableSamples,ProfilesReviewed,ContactSamples,EndpointContactError,EndpointContactSamples);
     }
     public sealed class HumanoidTrial : IDisposable
     {
@@ -93,7 +96,9 @@ namespace BrawlCrate.Authoring
             {
                 var sm=(MDL0Node)At(sroot,source.ModelPath);sm.Populate();var tm=(MDL0Node)At(troot,target.ModelPath);tm.Populate();var motion=Motion(sroot,source,animation);var reference=Motion(troot,target,native);
                 long vertices=tm._objList.OfType<MDL0ObjectNode>().Sum(m=>(long)m.Vertices.Count);int end=motion.Loop?animation.Frames+1:animation.Frames-1;
-                if(vertices*(end*4L+1)*2>8000000)throw new IOException("Humanoid validation exceeds eight million decoded vertex samples; select a smaller motion/model.");
+                var times=HumanoidValidationTimes(end,recipe);
+                if(vertices*times.Count*2>8000000)throw new IOException("Humanoid validation exceeds eight million decoded vertex samples; select a smaller motion/model.");
+                foreach(var contact in recipe.Contacts)if(!times.Any(t=>contact.Weight(Math.Min(t,animation.Frames-1))>.999))throw new IOException("Contact interval cannot be sampled faithfully at native float time precision; widen/review its timing before baking.");
                 foreach(var m in new[]{motion,reference})foreach(CHR0EntryNode e in m.Children)if(e.ScaleCompensateApply||e.ScaleCompensateParent||e.ClassicScaleOff)throw new IOException("Humanoid adapter does not support animated scale-compensation flags.");
                 var activeNames=new System.Collections.Generic.HashSet<string>(sp.Chains.SelectMany(c=>c.Bones).Select(i=>source.Bones[i].Name));
                 foreach(var entry in motion.Children.OfType<CHR0EntryNode>().Where(e=>activeNames.Contains(e.Name)))foreach(var array in entry.KeyArrays.Skip(3).Take(3))if(array.Entries.Any(k=>Math.Abs(k._tangent)>120))throw new IOException("Humanoid source winding/tangent exceeds 120 native degrees/frame; a denser supported route is required.");
@@ -123,9 +128,9 @@ namespace BrawlCrate.Authoring
                 var motion=Motion(sroot,source,animation);var reference=Motion(targetRoot,target,native);var fk=Motion(fkRoot,target,native);var baked=Motion(decoded,target,native);
                 if(fk.FrameCount!=motion.FrameCount || baked.FrameCount!=motion.FrameCount || fk.Loop!=motion.Loop || baked.Loop!=motion.Loop)throw new IOException("Humanoid native bake changed duration/loop.");
                 int end=motion.Loop?animation.Frames+1:animation.Frames-1;var targetRest=tr.World(tr.Rest());
-                for(int q=0;q<=end*4;q++)
+                foreach(float sampleTime in HumanoidValidationTimes(end,recipe))
                 {
-                    token.ThrowIfCancellationRequested();float time=q/4f;if(motion.Loop && time==end)time=0;double contactTime=Math.Min(time,animation.Frames-1);float referenceTime=(float)(contactTime*(native.Frames-1)/(animation.Frames-1d));
+                    token.ThrowIfCancellationRequested();float time=sampleTime;if(motion.Loop && time==end)time=0;double contactTime=Math.Min(time,animation.Frames-1);float referenceTime=(float)(contactTime*(native.Frames-1)/(animation.Frames-1d));
                     var wantedFk=HumanoidSolver.Fk(sr,sp,sb,tr,tp,tb,CommonSample(sm,motion,time,source,sp),CommonSample(referenceModel,reference,referenceTime,target,tp));var wanted=HumanoidSolver.Correct(tr,tp,tb,wantedFk,recipe,contactTime);
                     CheckHumanoidDecoded(fm,fk,time,tr,target,wantedFk,report);CheckHumanoidDecoded(tm,baked,time,tr,target,wanted.Local,report);
                     var fw=tr.World(CommonSample(fm,fk,time,target,tp));var actual=tr.World(CommonSample(tm,baked,time,target,tp));
@@ -133,6 +138,7 @@ namespace BrawlCrate.Authoring
                     {
                         int bone=tp.Chain(c.Chain).Bones.Last();var landmark=tb.Landmark(c.Chain);var goal=c.Anchor=="World"?c.Goal:actual[tp.Chain(c.Anchor).Bones.Last()].Point(c.Goal);
                         report.FkContactError=Math.Max(report.FkContactError,(fw[bone].Point(landmark.Local)-goal).Length);report.CorrectedContactError=Math.Max(report.CorrectedContactError,(actual[bone].Point(landmark.Local)-goal).Length);
+                        report.ContactSamples++;if(time==0 && c.HoldStart || time==animation.Frames-1 && c.HoldEnd){report.EndpointContactSamples++;report.EndpointContactError=Math.Max(report.EndpointContactError,(actual[bone].Point(landmark.Local)-goal).Length);}
                         if(c.RestOrientation)report.CorrectedOrientationError=Math.Max(report.CorrectedOrientationError,actual[bone].R.DegreesFrom(targetRest[bone].R));
                     }
                     report.MaximumPelvisOffset=Math.Max(report.MaximumPelvisOffset,Math.Abs(wanted.PelvisOffset));if(wanted.Diagnostics.Count>0){report.UnreachableSamples++;foreach(string issue in wanted.Diagnostics)if(report.Diagnostics.Count<32 && !report.Diagnostics.Contains(issue))report.Diagnostics.Add(issue);}
@@ -142,28 +148,55 @@ namespace BrawlCrate.Authoring
             if(report.NativePositionError>.02 || report.NativeDegreesError>.15 || report.NativeMeshError>.03)throw new IOException("Humanoid native serialization/evaluation tolerance failed; no assignment committed. "+report+" Worst position: "+report.WorstPosition+"; worst rotation: "+report.WorstRotation);
             return report;
         }
+        private static SortedSet<float> HumanoidValidationTimes(int end,HumanoidRecipe recipe)
+        {
+            var times=new SortedSet<float>();for(int q=0;q<=end*4;q++)times.Add(q/4f);
+            for(int f=0;f<end;f++){times.Add(f+.137f);times.Add(f+.619f);}
+            foreach(var contact in recipe.Contacts)foreach(double time in new[]{contact.Start,contact.End,contact.Start+contact.Margin,contact.End-contact.Margin,(contact.Start+contact.End)/2})times.Add((float)time);
+            return times;
+        }
         private static void WriteHumanoid(ResourceNode root,SourceCharacterProfile target,AnimationAsset native,CHR0Node source,HPose[][] values,Func<double,HPose[]> evaluate,string output,CancellationToken token)
         {
             var old=(CHR0Node)At(root,native.NativePath);var baked=new CHR0Node{Name=old.Name,Version=4,FrameCount=source.FrameCount,Loop=source.Loop};
-            // Fit native Hermite tangents to interior poses at thirds. Differencing
-            // almost coincident native float samples is unstable near a straight knee;
-            // a wide secant also biases endpoint motion. Integer keys stay exact and
-            // fresh quarter-frame decoding remains an independent acceptance sample.
-            var left=new HPose[values.Length-1][];var right=new HPose[values.Length-1][];
-            for(int f=0;f<values.Length-1;f++){token.ThrowIfCancellationRequested();left[f]=evaluate(f+1d/3);right[f]=evaluate(f+2d/3);}
+            // Constrain every integer value exactly, then fit shared Hermite tangents
+            // to five interior phases. Two thirds alone undersample curvature between
+            // keys, notably when a transported anatomical pole changes several local
+            // Euler channels together. Differencing almost coincident float poses is
+            // unstable near straight knees. Withheld .137/.619 validation stays separate.
+            var phases=new[]{1d/6,1d/3,.5,2d/3,5d/6};int intervals=values.Length-1,bones=target.Bones.Count;
+            long scalarCount=(long)intervals*bones*phases.Length*6;
+            if(scalarCount>32L*1024*1024/sizeof(double))throw new IOException("Humanoid tangent fitting exceeds its 32 MiB packed interior-sample budget.");
+            var angles=new double[bones][][];
+            for(int bone=0;bone<bones;bone++)
+            {
+                angles[bone]=new double[values.Length][];double[] previous=null;
+                for(int f=0;f<values.Length;f++){angles[bone][f]=HumanoidEuler(values[f][bone].R,previous);previous=angles[bone][f];}
+            }
+            // Store only rotations/positions, not five native/common pose forests.
+            // The existing million-scalar-key bound limits this buffer to <27 MiB.
+            var interiors=new double[(int)scalarCount];
+            for(int f=0;f<intervals;f++)for(int part=0;part<phases.Length;part++)
+            {
+                token.ThrowIfCancellationRequested();double phase=phases[part];var pose=evaluate(f+phase);
+                for(int bone=0;bone<bones;bone++)
+                {
+                    var reference=new double[3];for(int channel=0;channel<3;channel++)reference[channel]=angles[bone][f][channel]+(angles[bone][f+1][channel]-angles[bone][f][channel])*phase;
+                    var euler=HumanoidEuler(pose[bone].R,reference);int offset=((bone*intervals+f)*phases.Length+part)*6;
+                    for(int channel=0;channel<3;channel++)interiors[offset+channel]=euler[channel];
+                    interiors[offset+3]=pose[bone].P.X;interiors[offset+4]=pose[bone].P.Y;interiors[offset+5]=pose[bone].P.Z;
+                }
+            }
             for(int bone=0;bone<target.Bones.Count;bone++)
             {
-                var entry=baked.CreateEntry(target.Bones[bone].Name);entry.PreserveInterpolation=true;var angles=new double[values.Length][];double[] previous=null;
-                for(int f=0;f<values.Length;f++){angles[f]=HumanoidEuler(values[f][bone].R,previous);previous=angles[f];}
-                var leftAngles=Enumerable.Range(0,values.Length-1).Select(f=>HumanoidEuler(left[f][bone].R,angles[f].Zip(angles[f+1],(a,b)=>a+(b-a)/3).ToArray())).ToArray();var rightAngles=Enumerable.Range(0,values.Length-1).Select(f=>HumanoidEuler(right[f][bone].R,angles[f].Zip(angles[f+1],(a,b)=>a+2*(b-a)/3).ToArray())).ToArray();
+                token.ThrowIfCancellationRequested();var entry=baked.CreateEntry(target.Bones[bone].Name);entry.PreserveInterpolation=true;
                 for(int channel=0;channel<9;channel++)
                 {
-                    Func<int,double> value=f=>channel<3?1:channel<6?angles[f][channel-3]:channel==6?values[f][bone].P.X:channel==7?values[f][bone].P.Y:values[f][bone].P.Z;
+                    Func<int,double> value=f=>channel<3?1:channel<6?angles[bone][f][channel-3]:channel==6?values[f][bone].P.X:channel==7?values[f][bone].P.Y:values[f][bone].P.Z;
+                    Func<int,int,double> sample=(f,part)=>channel<3?1:interiors[((bone*intervals+f)*phases.Length+part)*6+channel-3];
                     double slope=(value(values.Length-1)-value(0))/(values.Length-1);bool linear=Enumerable.Range(0,values.Length).All(f=>Math.Abs(value(f)-value(0)-slope*f)<1e-7);
-                    Func<int,HPose[][],double[][],double> sample=(f,poses,euler)=>channel<3?1:channel<6?euler[f][channel-3]:channel==6?poses[f][bone].P.X:channel==7?poses[f][bone].P.Y:poses[f][bone].P.Z;
                     // Test interiors too: equal integer values do not prove a constant curve.
-                    linear=linear && Enumerable.Range(0,values.Length-1).All(f=>Math.Abs(sample(f,left,leftAngles)-value(0)-slope*(f+1d/3))<1e-7 && Math.Abs(sample(f,right,rightAngles)-value(0)-slope*(f+2d/3))<1e-7);
-                    var tangents=linear?null:FitHumanoidTangents(Enumerable.Range(0,values.Length).Select(value).ToArray(),Enumerable.Range(0,values.Length-1).Select(f=>sample(f,left,leftAngles)).ToArray(),Enumerable.Range(0,values.Length-1).Select(f=>sample(f,right,rightAngles)).ToArray());
+                    linear=linear && Enumerable.Range(0,intervals).All(f=>Enumerable.Range(0,phases.Length).All(part=>Math.Abs(sample(f,part)-value(0)-slope*(f+phases[part]))<1e-7));
+                    var tangents=linear?null:FitHumanoidTangents(Enumerable.Range(0,values.Length).Select(value).ToArray(),phases,sample,token);
                     foreach(int f in linear?new[]{0,values.Length-1}:Enumerable.Range(0,values.Length))
                     {var key=entry.SetKeyframe(channel,f,(float)value(f),true);key._tangent=linear?(float)slope:(float)tangents[f];}
                 }
@@ -172,14 +205,18 @@ namespace BrawlCrate.Authoring
             if(root.CalculateSize(false)>CharacterProject.MaxNativeBytes)throw new IOException("Humanoid native output exceeds 32 MiB before export; working-copy reservation was preserved.");
             root.Export(output);
         }
-        private static double[] FitHumanoidTangents(double[] values,double[] thirds,double[] twoThirds)
+        private static double[] FitHumanoidTangents(double[] values,double[] phases,Func<int,int,double> sample,CancellationToken token)
         {
             int n=values.Length;var diagonal=new double[n];var off=new double[n-1];var rhs=new double[n];
-            for(int f=0;f<n-1;f++)for(int part=1;part<=2;part++)
+            for(int f=0;f<n-1;f++)
             {
-                double u=part/3d,u2=u*u,u3=u2*u,a=u3-2*u2+u,b=u3-u2;
-                double residual=(part==1?thirds[f]:twoThirds[f])-(2*u3-3*u2+1)*values[f]-(-2*u3+3*u2)*values[f+1];
-                diagonal[f]+=a*a;diagonal[f+1]+=b*b;off[f]+=a*b;rhs[f]+=a*residual;rhs[f+1]+=b*residual;
+                token.ThrowIfCancellationRequested();
+                for(int part=0;part<phases.Length;part++)
+                {
+                    double u=phases[part],u2=u*u,u3=u2*u,a=u3-2*u2+u,b=u3-u2;
+                    double residual=sample(f,part)-(2*u3-3*u2+1)*values[f]-(-2*u3+3*u2)*values[f+1];
+                    diagonal[f]+=a*a;diagonal[f+1]+=b*b;off[f]+=a*b;rhs[f]+=a*residual;rhs[f+1]+=b*residual;
+                }
             }
             for(int i=1;i<n;i++){double factor=off[i-1]/diagonal[i-1];diagonal[i]-=factor*off[i-1];rhs[i]-=factor*rhs[i-1];}
             var result=new double[n];for(int i=n-1;i>=0;i--)result[i]=(rhs[i]-(i+1<n?off[i]*result[i+1]:0))/diagonal[i];return result;

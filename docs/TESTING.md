@@ -1,5 +1,44 @@
 # Testing the restarted application
 
+Reach/pole and endpoint continuation after 77d64ce (2026-10-17): run the same
+`scripts/test.ps1 -Humanoid -Gui` and `-AnimationBrowser -Gui`, plus retained suites.
+The new original tests independently check dense upper/lower reach approaches, unequal
+limbs, alternate axes, pole crossings, preferred-segment opposition, declared singular
+charts, opposing constraints, deterministic shuffled evaluation and reachable contact
+margin fades. ReachBlend zero and old interval XML omit optional fields and round-trip
+their old defaults. Explicit held boundaries are distinct from fading contact edges.
+
+Native cases include both directions, a slow deep crouch near the inner reach boundary,
+held first/last sole goals, animated fingers/loop seam, genuine BRRES and standalone CHR0
+save/fresh decode, undo/redo and exact project regeneration. Pure analytic tests cross
+exact reach bounds; the deep native crouch approaches the inner bound and must not be
+reported as a native crossing. Tangents fit five phases (1/6, 1/3, 1/2, 2/3, 5/6);
+independent validation retains quarters, withheld .137/.619 and explicit contact/margin
+milestones. A valid narrow fractional contact must fail if the native curve omits it;
+an interval below native float-time resolution rejects before export approval. Limits
+remain .02 position / .15 degrees / .03 mesh, .005 * target leg length contact, zero
+unreachable samples for approved assignments. These are sampled limits.
+
+Opt-in local configs can deliberately request `holdContacts="true"`, `reachBlend="0.05"`,
+`reachPolicy="RestHemisphere"` and an explicit `polePolicy="World"` or `"TransportedRest"`.
+Omitted settings retain the previous diagnostic behavior. `priorOutput` only reads an
+earlier output for endpoint comparison; it never overwrites it. Native endpoint evidence
+checks each sole against its actual goal as well as first-to-last drift, plus withheld
+.125/.137/.619/.875 samples. Skin minY is diagnostic, not a full toe/mesh-clearance gate.
+The test-only `--local-contact-report <project> <native-output> <new-evidence-directory>`
+inventories older outputs without changing the saved project. All local inputs, outputs,
+configs and captures stay ignored. A local GUI Fit may wait up to 120 seconds inside the
+existing 300-second watchdog; ordinary control waits remain 10 seconds. This is an async
+test deadline, not a loosened motion-quality threshold.
+
+Use the real interval list/New/full-clip/endpoint/reach-blend controls in the Model
+Previewer, test preserved custom pole/orientation/evidence and atomic undo, then compare
+source/FK/corrected and freshly reopened native geometry. Saved World pole overrides need
+explicit clearing before changing coordinate policy. Invalid poles must leave goal/pelvis
+repair handles visible. Parallel World poles, transported antipodal/coincident charts,
+partial unreachable margins, dynamic loop closures and C0 active-constraint corners remain
+diagnosed or incompletely supported. No arbitrary-animation/all-model or clearance claim.
+
 H3 standing continuation (2026-10-17): run `scripts/test.ps1 -Humanoid -Gui` and
 `scripts/test.ps1 -AnimationBrowser -Gui`, plus all retained native/GUI suites. New original
 checks use independent inner-reach geometry/opposing goals, actual calibration controls,

@@ -48,6 +48,14 @@ do not mark them implemented with placeholders. Godot references do not authoriz
   other MDL0 shadows/articles from rendering/playback while preserving native package data.
   Clip-specific stance calibration is distinct from binds/Idle/Fall and never approves a
   guessed commercial profile. Keep the independent forward/reverse standing regressions.
+- Continuation after 77d64ce, 2026-10-17: preserve explicit clip-boundary contact holds and
+  legacy fade defaults. Full-clip standing is an intentional saved constraint; never add
+  automatic aerial floor locks. Preserve World/TransportedRest pole and Nearest/RestHemisphere
+  reach choices, their singular-chart diagnostics and optional ReachBlend (0..0.1 target-leg
+  fraction, legacy zero). Do not certify arbitrary clips from matching endpoint positions.
+  Five-phase native Hermite fitting keeps exact integer poses/duration; validate decoded
+  quarters, withheld .137/.619 and contact edges within 32 MiB fit / 8M vertex-sample budgets.
+  Coupled reach bounds can remain C0; body clearance and universal compatibility stay unproven.
 - Build/test each increment; update evidence, capabilities/status and the single next task.
   Commands: scripts/build.ps1, test.ps1, run.ps1, doctor.ps1, review.ps1.
 - Dump discovery must remain separate from selected-file staging/decoding. Overrides use

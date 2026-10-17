@@ -1,5 +1,12 @@
 # Upstream provenance
 
+2026-10-17 continuation after 77d64ce: original FighterPort code adds explicit held
+contact endpoints, declared transported-rest pole/reach charts and bounded reach blending.
+The existing Brawl adapter fits five interior Hermite phases and checks freshly decoded
+quarters, withheld fractions and contact boundaries. New original analytic/native fixtures
+and opt-in private diagnostics preserve the native codecs, upstream pin, runtime and
+renderer. No third-party source/package, commercial asset or binary is added by this work.
+
 2026-10-17 H3 continuation after 04ef3d9: original FighterPort services add optional
 clip-specific stance calibration, complete two-bone reach-shell intersections and bounded
 native Hermite tangent fitting. The inherited ModelForm entrypoint now catalogues multiple

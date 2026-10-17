@@ -2,6 +2,7 @@
 // Common Y-up, right-handed rigid transforms. No native-format, renderer or UI dependency.
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -168,9 +169,17 @@ namespace BrawlCrate.Authoring.Humanoid
         public bool RestOrientation {get;set;}=true;
         public bool UsePoleOverride {get;set;}
         public HVec Pole {get;set;}=new HVec(0,0,1);
+        [DefaultValue("World")]
+        public string PolePolicy {get;set;}="World";
+        [DefaultValue("Nearest")]
+        public string ReachPolicy {get;set;}="Nearest";
+        [DefaultValue(false)]
+        public bool HoldStart {get;set;}
+        [DefaultValue(false)]
+        public bool HoldEnd {get;set;}
         public string Evidence {get;set;}="Explicit user-authored target goal";
         public double Weight(double time)
-        {if(time<Start || time>End)return 0;if(Margin<=0)return 1;double t=Math.Min(1,Math.Min((time-Start)/Margin,(End-time)/Margin));return t*t*(3-2*t);}
+        {if(time<Start || time>End)return 0;if(Margin<=0)return 1;double a=HoldStart?1:Math.Max(0,Math.Min(1,(time-Start)/Margin)),b=HoldEnd?1:Math.Max(0,Math.Min(1,(End-time)/Margin));double t=Math.Min(a,b);return t*t*(3-2*t);}
     }
     public sealed class HumanoidStance
     {
@@ -195,11 +204,13 @@ namespace BrawlCrate.Authoring.Humanoid
         public string RootPolicy {get;set;}="InPlace";
         public string Algorithm {get;set;}="humanoid-contact-v1";
         public double PelvisBias {get;set;}
+        [DefaultValue(0d)]
+        public double ReachBlend {get;set;}
         // Optional clip-specific calibration, distinct from native binds and Idle/Fall.
         public HumanoidStance Stance {get;set;}
         public List<ContactInterval> Contacts {get;set;}=new List<ContactInterval>();
         public void Validate(int frames)
-        {if(Algorithm!="humanoid-contact-v1" || RootPolicy!="InPlace" || !HVec.Finite(PelvisBias) || Contacts==null || Contacts.Count>32)throw new IOException("Unsupported humanoid recipe/root policy or contact budget.");foreach(var c in Contacts){if(!new[]{"LeftLeg","RightLeg","LeftArm","RightArm"}.Contains(c.Chain) || c.Anchor!="World" && c.Anchor!="Head" && c.Anchor!="Spine" || !HVec.Finite(c.Start) || !HVec.Finite(c.End) || !HVec.Finite(c.Margin) || c.Start<0 || c.End<c.Start || c.End>frames-1 || c.Margin<0 || c.Margin>(c.End-c.Start)/2 || !c.Goal.IsFinite || c.UsePoleOverride && (!c.Pole.IsFinite || c.Pole.Length<1e-6) || string.IsNullOrWhiteSpace(c.Evidence) || c.Evidence.Length>2048)throw new IOException("Invalid contact interval/goal/evidence.");}foreach(var group in Contacts.GroupBy(c=>c.Chain)){var sorted=group.OrderBy(c=>c.Start).ToArray();for(int i=1;i<sorted.Length;i++)if(sorted[i].Start<=sorted[i-1].End)throw new IOException("Overlapping contacts on one chain require a multi-goal policy; no silent winner.");}}
+        {if(Algorithm!="humanoid-contact-v1" || RootPolicy!="InPlace" || !HVec.Finite(PelvisBias) || !HVec.Finite(ReachBlend) || ReachBlend<0 || ReachBlend>.1 || Contacts==null || Contacts.Count>32)throw new IOException("Unsupported humanoid recipe/root policy or contact budget.");foreach(var c in Contacts){if(!new[]{"LeftLeg","RightLeg","LeftArm","RightArm"}.Contains(c.Chain) || c.Anchor!="World" && c.Anchor!="Head" && c.Anchor!="Spine" || !HVec.Finite(c.Start) || !HVec.Finite(c.End) || !HVec.Finite(c.Margin) || c.Start<0 || c.End<c.Start || c.End>frames-1 || c.Margin<0 || c.Margin>(c.End-c.Start)/2 || c.HoldStart && c.Start!=0 || c.HoldEnd && c.End!=frames-1 || !c.Goal.IsFinite || !new[]{"World","TransportedRest"}.Contains(c.PolePolicy) || !new[]{"Nearest","RestHemisphere"}.Contains(c.ReachPolicy) || c.UsePoleOverride && (!c.Pole.IsFinite || c.Pole.Length<1e-6) || string.IsNullOrWhiteSpace(c.Evidence) || c.Evidence.Length>2048)throw new IOException("Invalid contact interval/goal/evidence.");}foreach(var group in Contacts.GroupBy(c=>c.Chain)){var sorted=group.OrderBy(c=>c.Start).ToArray();for(int i=1;i<sorted.Length;i++)if(sorted[i].Start<=sorted[i-1].End)throw new IOException("Overlapping contacts on one chain require a multi-goal policy; no silent winner.");}}
     }
     public sealed class HumanoidResult
     {
@@ -263,10 +274,27 @@ namespace BrawlCrate.Authoring.Humanoid
                 // A two-bone limb occupies a shell, not a ball. Unequal segment
                 // lengths leave an unreachable inner region with two possible Y intervals.
                 double gap=Math.Sqrt(Math.Max(0,inner*inner-horizontal));
-                var allowed=gap>0?new[]{Tuple.Create(center-height,center-gap),Tuple.Create(center+gap,center+height)}:new[]{Tuple.Create(center-height,center+height)};
+                Tuple<double,double>[] allowed;
+                if(c.ReachPolicy=="RestHemisphere")
+                {
+                    // The two disconnected inner-shell branches cannot be selected by
+                    // nearest distance without a possible jump. Pin the anatomical
+                    // hemisphere to the exact native rest stance, never scrub history.
+                    // Keeping this half-shell even when gap is zero makes branch entry
+                    // continuous. A horizontal rest chain needs a different reviewed chart.
+                    double vertical=rest[ids[2]].P.Y-rest[ids[0]].P.Y;
+                    if(Math.Abs(vertical)<reach*1e-6)throw new IOException(c.Chain+": rest-hemisphere reach needs a non-horizontal reviewed native rest chain.");
+                    allowed=vertical<0?new[]{Tuple.Create(center+gap,center+height)}:new[]{Tuple.Create(center-height,center-gap)};
+                }
+                else if(c.ReachPolicy=="Nearest")allowed=gap>0?new[]{Tuple.Create(center-height,center-gap),Tuple.Create(center+gap,center+height)}:new[]{Tuple.Create(center-height,center+height)};
+                else throw new IOException("Unknown humanoid reach policy.");
                 ranges=(from prior in ranges from next in allowed let lo=Math.Max(prior.Item1,next.Item1) let hi=Math.Min(prior.Item2,next.Item2) where lo<=hi select Tuple.Create(lo,hi)).ToList();
             }
-            double shift=ranges.Select(r=>Math.Max(r.Item1,Math.Min(r.Item2,recipe.PelvisBias))).OrderBy(v=>Math.Abs(v-recipe.PelvisBias)).ThenBy(v=>v).DefaultIfEmpty(Math.Max(-body.PelvisLimit,Math.Min(body.PelvisLimit,recipe.PelvisBias))).First();
+            // Legacy recipes still decode and preview in their old nearest policy, but
+            // cannot approve an ambiguous disconnected branch as a continuous solve.
+            if(ranges.Count>1)result.Diagnostics.Add("Ambiguous disconnected pelvis reach branches; choose an explicit reviewed RestHemisphere policy before approval.");
+            if(!HVec.Finite(recipe.ReachBlend) || recipe.ReachBlend<0 || recipe.ReachBlend>.1)throw new IOException("Reach blend must be a finite 0..0.1 fraction of target leg length.");
+            double shift=ranges.Select(r=>SmoothReachClamp(recipe.PelvisBias,r.Item1,r.Item2,recipe.ReachBlend*body.LegLength)).OrderBy(v=>Math.Abs(v-recipe.PelvisBias)).ThenBy(v=>v).DefaultIfEmpty(Math.Max(-body.PelvisLimit,Math.Min(body.PelvisLimit,recipe.PelvisBias))).First();
             // Fade coupled pelvis participation with the same explicit contact interval.
             // A full-weight threshold would cause a discontinuous pelvis jump at margins.
             double participation=active.Where(c=>c.Chain.EndsWith("Leg")).Select(c=>c.Weight(time)).DefaultIfEmpty(0).Max();shift=recipe.PelvisBias+(shift-recipe.PelvisBias)*participation;
@@ -276,7 +304,7 @@ namespace BrawlCrate.Authoring.Humanoid
             {
                 world=target.World(result.Local);var ids=profile.Chain(contact.Chain).Bones;var landmark=body.Landmark(contact.Chain);double weight=contact.Weight(time);var old=world[ids[2]];var wanted=Goal(contact,profile,world);var rotation=contact.RestOrientation?rest[ids[2]].R:old.R;
                 double error=(old.Point(landmark.Local)-wanted).Length;result.PreferredError=Math.Max(result.PreferredError,error);
-                var endpoint=wanted-rotation.Apply(landmark.Local);var solved=SolveLimb(target,result.Local,ids,endpoint,contact.UsePoleOverride?contact.Pole:landmark.Pole,rotation,result.Diagnostics);
+                var endpoint=wanted-rotation.Apply(landmark.Local);var solved=SolveLimb(target,result.Local,ids,endpoint,contact.UsePoleOverride?contact.Pole:landmark.Pole,contact.PolePolicy,rotation,result.Diagnostics);
                 // Blend locals only on explicitly active intervals; outside them the FK pose is exact.
                 foreach(int bone in ids){result.Local[bone].R=HRotation.Blend(preferred[bone].R,solved[bone].R,weight);}
             }
@@ -285,16 +313,88 @@ namespace BrawlCrate.Authoring.Humanoid
             return result;
         }
         private static HVec Goal(ContactInterval c,HumanoidProfile profile,HPose[] world)=>c.Anchor=="World"?c.Goal:world[profile.Chain(c.Anchor).Bones.Last()].Point(c.Goal);
-        private static HPose[] SolveLimb(HRig rig,HPose[] local,IList<int> ids,HVec goal,HVec pole,HRotation endRotation,List<string> issues)
+        private static double SmoothReachClamp(double preferred,double lower,double upper,double requestedBand)
+        {
+            double value=Math.Max(lower,Math.Min(upper,preferred));
+            // A hard clamp followed by the triangle square root creates a knee
+            // velocity cusp when the preferred pelvis enters/leaves straight reach.
+            // Approach each feasible bound quartically instead: knee bend is then
+            // quadratic at entry. Never leave the exact feasible interval or enlarge
+            // the body's pelvis limit. Narrow intersections reduce the band.
+            double band=Math.Min(requestedBand,(upper-lower)/2);
+            if(band<=1e-12)return value;
+            double lowDistance=value-lower,highDistance=upper-value;
+            if(lowDistance<band)return lower+band*QuarticReach(lowDistance/band);
+            if(highDistance<band)return upper-band*QuarticReach(highDistance/band);
+            return value;
+        }
+        private static double QuarticReach(double x)
+        {
+            // F(0)=F'(0)=F''(0)=F'''(0)=0; F(1)=F'(1)=1,
+            // F''(1)=0. On [0,1], 0 <= F(x) <= x and F is monotone.
+            return x*x*x*x*(10+x*(-15+6*x));
+        }
+        // A pole is either an explicitly authored world direction or a native-rest
+        // direction transported with the rest effector axis. No tangent field can be
+        // continuous on the entire sphere: the latter declares an antipodal chart cut.
+        // Reject that cut instead of selecting a different arbitrary axis per sample.
+        public static HVec EffectivePole(HRig rig,IList<int> ids,HVec origin,HVec goal,HVec pole,string policy)
+        {
+            if(!pole.IsFinite || pole.Length<1e-8 || !goal.IsFinite || !origin.IsFinite)throw new IOException("Invalid humanoid pole/effector direction.");
+            var displacement=goal-origin;double distance=displacement.Length;
+            if(distance<1e-9)throw new IOException("Coincident limb root and goal have no unique effector direction; choose a nonzero goal or another reviewed calibration chart.");
+            var direction=displacement/distance;var unitPole=pole.Unit();
+            if(policy=="World")
+            {
+                var projected=unitPole-direction*HVec.Dot(unitPole,direction);
+                if(projected.Length<1e-4)throw new IOException("World pole is parallel or nearly parallel to the effector direction; select TransportedRest or review another pole before baking.");
+                return projected.Unit();
+            }
+            if(policy!="TransportedRest")throw new IOException("Unknown humanoid pole policy.");
+            var rest=rig.World(rig.Rest());var restAxis=rest[ids[2]].P-rest[ids[0]].P;
+            if(restAxis.Length<1e-8)throw new IOException("Transported-rest pole needs a non-coincident native rest effector axis.");
+            restAxis=restAxis.Unit();var restPole=unitPole-restAxis*HVec.Dot(unitPole,restAxis);
+            if(restPole.Length<1e-4)throw new IOException("Transported-rest pole is parallel to its native rest effector axis; review a perpendicular rest pole.");
+            restPole=restPole.Unit();double cosine=Math.Max(-1,Math.Min(1,HVec.Dot(restAxis,direction)));
+            if(cosine<=-1+1e-6)throw new IOException("Transported-rest pole reaches its antipodal calibration chart; split/review the interval with another calibration before baking.");
+            // Rodrigues' minimal-swing action, avoiding an acos/axis fallback close
+            // to coincident directions. This is a function of the sample alone.
+            var cross=HVec.Cross(restAxis,direction);var transported=restPole+HVec.Cross(cross,restPole)+HVec.Cross(cross,HVec.Cross(cross,restPole))/(1+cosine);
+            return (transported-direction*HVec.Dot(transported,direction)).Unit();
+        }
+        private static HPose[] SolveLimb(HRig rig,HPose[] local,IList<int> ids,HVec goal,HVec pole,string polePolicy,HRotation endRotation,List<string> issues)
         {
             var result=local.Select(p=>p.Clone()).ToArray();var world=rig.World(result);var a=world[ids[0]].P;var b=world[ids[1]].P;var c=world[ids[2]].P;double first=(b-a).Length,second=(c-b).Length;if(first<1e-7 || second<1e-7)throw new IOException("Degenerate two-bone limb.");
-            var displacement=goal-a;double distance=displacement.Length;var direction=distance<1e-8?(c-a).Unit():displacement/distance;
-            double bounded=Math.Max(Math.Max(1e-8,Math.Abs(first-second)),Math.Min(first+second,distance));if(Math.Abs(bounded-distance)>1e-5)issues.Add("Unreachable contact: residual reach "+Math.Abs(bounded-distance)+"; target limb lengths preserved.");
-            var projected=pole-direction*HVec.Dot(pole,direction);if(projected.Length<1e-7){projected=new HVec(1,0,0)-direction*direction.X;if(projected.Length<1e-7)projected=new HVec(0,1,0)-direction*direction.Y;}
-            var bend=projected.Unit();double along=(first*first-second*second+bounded*bounded)/(2*bounded),height=Math.Sqrt(Math.Max(0,first*first-along*along));var knee=a+direction*along+bend*height;var ankle=a+direction*bounded;
-            SetWorldRotation(rig,result,ids[0],HRotation.Between(b-a,knee-a,pole)*world[ids[0]].R);world=rig.World(result);
-            SetWorldRotation(rig,result,ids[1],HRotation.Between(world[ids[2]].P-world[ids[1]].P,ankle-world[ids[1]].P,pole)*world[ids[1]].R);
+            var displacement=goal-a;double distance=displacement.Length;var rest=rig.World(rig.Rest());
+            var direction=distance<1e-9?(rest[ids[2]].P-rest[ids[0]].P).Unit():displacement/distance;
+            double inner=Math.Abs(first-second),outer=first+second,bounded=Math.Max(inner,Math.Min(outer,distance));
+            if(Math.Abs(bounded-distance)>1e-5)issues.Add("Unreachable contact: residual reach "+Math.Abs(bounded-distance)+"; target limb lengths preserved.");
+            if(bounded<outer*1e-9)throw new IOException("Coincident equal-segment full fold has no unique bend axis; choose a nonzero goal or another reviewed calibration chart.");
+            var ankle=a+direction*bounded;var bend=EffectivePole(rig,ids,a,ankle,pole,polePolicy);
+            // Factorized triangle area is well behaved at both exact reach bounds;
+            // subtracting first^2 - along^2 loses accuracy near a folded unequal limb.
+            double along=(first*first-second*second+bounded*bounded)/(2*bounded);
+            double areaSquared=Math.Max(0,(outer-bounded)*(outer+bounded)*(bounded-inner)*(bounded+inner));
+            double height=Math.Sqrt(areaSquared)/(2*bounded);var knee=a+direction*along+bend*height;
+            var normal=HVec.Cross(direction,bend).Unit();
+            var upperSwing=polePolicy=="TransportedRest"?BendPlaneSwing(b-a,knee-a,normal):HRotation.Between(b-a,knee-a,bend);
+            SetWorldRotation(rig,result,ids[0],upperSwing*world[ids[0]].R);world=rig.World(result);
+            var lowerSwing=polePolicy=="TransportedRest"?BendPlaneSwing(world[ids[2]].P-world[ids[1]].P,ankle-world[ids[1]].P,normal):HRotation.Between(world[ids[2]].P-world[ids[1]].P,ankle-world[ids[1]].P,bend);
+            SetWorldRotation(rig,result,ids[1],lowerSwing*world[ids[1]].R);
             SetWorldRotation(rig,result,ids[2],endRotation);return result;
+        }
+        private static HRotation BendPlaneSwing(HVec from,HVec to,HVec normal)
+        {
+            var source=from.Unit();var destination=to.Unit();var projected=source-normal*HVec.Dot(source,normal);
+            if(projected.Length<1e-4)throw new IOException("Preferred limb segment is perpendicular to the reviewed bend plane; choose another pole/calibration chart before baking.");
+            projected=projected.Unit();
+            // First enter the reviewed plane by a swing under 90 degrees, then
+            // rotate in that plane. atan2 may wrap numerically at +/-pi, but its
+            // rotation matrix is continuous through segment opposition. A generic
+            // shortest-arc Between has no unique axis at that opposition.
+            var enter=HRotation.Between(source,projected,normal);
+            double angle=Math.Atan2(HVec.Dot(normal,HVec.Cross(projected,destination)),Math.Max(-1,Math.Min(1,HVec.Dot(projected,destination))));
+            return HRotation.Axis(normal,angle)*enter;
         }
         private static void SetWorldRotation(HRig rig,HPose[] local,int bone,HRotation rotation)
         {int parent=rig.Bones[bone].Parent;local[bone].R=parent<0?rotation:rig.World(local)[parent].R.Inverse()*rotation;}

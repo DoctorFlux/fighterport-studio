@@ -12,10 +12,95 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [H3 standing contact and character-only preview](#h3-standing-contact-and-character-only-preview--2026-10-17).
-Continued actual HEAD 04ef3d90bdac60b3522a617a880d5ae608009431, preserving the complete
+Current checkpoint: [H3 reach, pole and held contact endpoints](#h3-reach-pole-and-held-contact-endpoints--2026-10-17).
+Continued actual HEAD 77d64ce34843b5cb4ce6e27e9785ae125929d89f, preserving the complete
 BrawlCrate application and passing discovery/library/slots/anchor work. Historical receipts
 below retain their original scope. docs/plans/current.md is the only next executable task.
+
+## H3 reach, pole and held contact endpoints — 2026-10-17
+
+The reported first/last-foot issue was reproduced on the earlier saved local outputs.
+Contacts faded to weight zero at both clip edges. Mario -> Snake's endpoints matched
+each other but both missed the configured sole goals by 5.24020424 units; Snake -> Mario
+missed by 2.16624634 / 2.16617407. Equal first/last positions alone were insufficient.
+New explicit HoldStart/HoldEnd controls preserve a deliberate planted contact at those
+boundaries; old XML keeps its fade/default policies and zero reach blend. No aerial
+contact is inferred. Saved-contact selection, independent New, custom-data preservation,
+pole override reset, full-clip holds and reach-blend save/undo use the existing previewer
+session and validated project transactions.
+
+The format-neutral solver now has declared World/TransportedRest poles and
+Nearest/RestHemisphere reach branches. It rejects singular charts instead of inventing
+fallback axes. Optional ReachBlend smooths entry to fixed reach bounds without changing
+limb lengths, meshes or pelvis limits. Original dense analytic checks cover unequal limbs,
+contrasting axes, pole/opposition crossings, exact/near inner and outer reach, reachable
+contact margins and deterministic random scrubbing. Native original tests cover both
+directions, held edges, a deep crouch near the inner bound, finger/loop motion and separate
+BRRES/CHR0 save/fresh decode. Five-phase Hermite fitting retains integer values/duration;
+independent quarters, withheld .137/.619 and contact milestones retain .02 position /
+.15 degrees / .03 mesh limits. Narrow omitted fractional contact and subfloat timing
+reject safely. Packed fit storage is <=32 MiB; decoded validation retains its 8M budget.
+
+Observed local World-pole, RestHemisphere, held-edge, .05-reach-blend native diagnostics:
+
+| Direction | Fresh samples | Native position / degrees / mesh | FK -> corrected contact | Unreachable |
+|---|---:|---|---|---:|
+| Mario -> Snake, explicit 10.25 -> 0 stance | 301 | .00551611 / .08557169 / .00674325 | 4.83656460 -> .00526127 | 0 |
+| Snake -> Mario, independently configured without extra stance | 511 | .00000254987 / .00962024 / .000162151 | 2.18319474 -> .00000124131 | 0 |
+
+Independent native first/last goal errors are .00000109015 / .00000109015 reverse,
+with zero drift; .00000056172 / .00000046224 forward, drift .00000099529. Withheld
+.125/.137/.619/.875 maxima are .00485821 / .00000174873 respectively. Both commercial
+characterizations remain UNREVIEWED diagnostics; approved assignment still rejects them.
+These chosen standing clips do not establish arbitrary animation/model compatibility.
+
+Focused receipts humanoid-native-20261017-193746-248 and humanoid-gui-20261017-193900-633
+pass. The latter exercises actual previewer endpoint/pole/reach controls, contextual undo,
+Fit, FK/corrected rendering/playback, handles, native edits/save/reload and compact panel
+hide/reopen. OpenGL captures were inspected separately from form captures. All retained
+native and GUI suites pass again in h3c-regression-* (base, companions, dump, container,
+library, retarget, shared, workspace and browser); source/shared/second-project guards
+remain active. No inherited/old WPF test counts are reused.
+
+Local receipts h3c-local-reverse-world-gui-02 and h3c-local-forward-world-gui-02 both
+pass actual own-rig/FK/corrected preview, native Play progression, real Export/Save and
+new PAC reopen through the main browser's visible animation controls. First/last sole
+goals were checked again on the actual previewer target and freshly reopened output.
+OpenGL captures show the textured Snake/Mario geometry and changed poses with exactly
+one chosen target/render model; shadows/articles remain preserved native package data.
+Both directions save separate corrected PAC and standalone CHR0, compare fresh native
+channels, reload exact recipes and regenerate identical output hashes. Local native
+evidence is MDL0 v9 / CHR0 v4 and selected companion routes; no opaque whole MotionEtc
+container round-trip is inferred. No GUI thread exception was observed in these passes.
+The first new local GUI attempt exceeded the harness's old 10-second Fit wait; the
+explicit 120-second wait then passed inside the unchanged 300-second GUI watchdog.
+The historical intermittent P0 GDI paint exception remains unclassified.
+
+Normal executable restart passes twice each for both independent original workspace
+projects and the local reverse diagnostic project (h3c-product-restart-1/2/3.log): six
+fresh launches, exact project state/native bytes and separate native export controls.
+The local editable instance is own-rig because commercial retarget diagnostics remain
+unapproved; corrected saved-PAC preview is the separate GUI evidence above. All 41
+original local input hashes remain unchanged after the complete run. Shared source
+revisions and untouched second projects pass their retained guards.
+
+Remaining exact failure: TransportedRest Mario -> Snake rejects .228334 degrees of
+fresh native rotation error (.0151039 position / .0210912 mesh), despite solved goals and
+held endpoints. Five-phase fitting did not remove it. No policy fallback or tolerance
+relaxation is hidden. The passing World reverse output also has foot/toe geometry about
+.0286 units below its configured sole ground; a point landmark is not full-foot clearance.
+Partial unreachable margins, moving coupled-bound C0 corners, dynamic loop closures and
+singular charts need broader work. plans/current.md keeps one next H3 acceptance: native
+transported-route accuracy and measured heel/toe/sole correction, then those transitions.
+The wider multi-game/format/channel roadmap remains. No Modkit, game, playable-fighter,
+external-tool, whole-body-clearance or universal retargeting success is claimed.
+
+Release/x86/net472 build and test build: zero warnings/errors. Current executable:
+application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe,
+SHA-256 e5c2c13ff40209a393029f80ae3a81585f7a7f6ee35e5b8a78bd4d21a9cd4d11.
+Doctor passes; Cargo remains unavailable and is not required by this baseline.
+Pinned upstream d56cbac89dc2cd0e5c3f923e1d03041b16902add verifies 6237 manifest entries,
+none missing. External recovery and the four untracked user briefs remain intact.
 
 ## H3 standing contact and character-only preview — 2026-10-17
 

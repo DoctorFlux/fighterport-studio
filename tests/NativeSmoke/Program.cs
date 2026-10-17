@@ -38,6 +38,7 @@ internal static partial class NativeSmoke
         if (args.Length == 3 && args[0] == "--inspect-brawl") return InspectConfiguredBrawl(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--probe-brawl") return ProbeBrawl(args[1], args[2]);
         if (args.Length == 3 && args[0] == "--local-humanoid") return LocalHumanoid(args[1], args[2]);
+        if (args.Length == 4 && args[0] == "--local-contact-report") return LocalContactReport(args[1], args[2], args[3]);
         if (args.Length == 3 && args[0] == "--local-browser") return LocalAnimationBrowser(args[1], args[2]);
         if (args.Length == 2 && args[0] == "--verify-container") return VerifyContainerRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-workspace") return VerifyWorkspaceRestart(args[1]);
@@ -588,7 +589,7 @@ internal static partial class NativeSmoke
     private static void Log(string message) { Results.Add(message); Console.WriteLine(message); File.AppendAllText(Path.Combine(_output, "progress.txt"), message + "\r\n"); }
     private static string Hash(string path) { using (var sha = SHA256.Create()) using (var stream = File.OpenRead(path)) return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant(); }
     private static void Pump(int milliseconds) { var watch = Stopwatch.StartNew(); while (watch.ElapsedMilliseconds < milliseconds) { Application.DoEvents(); Thread.Sleep(5); } }
-    private static void WaitFor(Func<bool> condition, string message) { var watch = Stopwatch.StartNew(); while (!condition() && watch.ElapsedMilliseconds < 10000) Pump(20); Assert(condition(), message); }
+    private static void WaitFor(Func<bool> condition, string message, int timeoutMilliseconds=10000) { var watch = Stopwatch.StartNew(); while (!condition() && watch.ElapsedMilliseconds < timeoutMilliseconds) Pump(20); Assert(condition(), message); }
     private static void CaptureWindow(Form form, string name)
     {
         form.Refresh(); Pump(120);

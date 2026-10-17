@@ -1,5 +1,13 @@
 # Native restart smoke checks
 
+The 2026-10-17 humanoid continuation uses `scripts/test.ps1 -Humanoid -Gui` for
+independent continuous reach/pole tests, explicit held contact endpoints, original deep
+crouch/native loop fixtures, real interval controls and native save/fresh decode. See
+docs/TESTING.md for withheld fractions, budgets, the opt-in local standing diagnostics
+and unsupported charts/clearance cases. The commercial transported-pole route is not
+approved by passing the original fixtures. Existing native/editor/library suites remain
+required; previous checkpoint counts are not new evidence.
+
 The current authoring suite is `./scripts/test.ps1 -Library -Gui`: two original rigs,
 stable source-bound library/project IDs, native motion capture, independent instances,
 session undo/redo and genuine native output/reopen. Run

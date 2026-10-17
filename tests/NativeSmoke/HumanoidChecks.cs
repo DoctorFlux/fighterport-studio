@@ -42,7 +42,10 @@ internal static partial class NativeSmoke
         var reverse=PlantedRecipe(p,bc.Id,ac.Id,false);p.SaveHumanoidRecipe(reverse);var reverseTrial=p.PreviewHumanoid(reverse);Assert(reverseTrial.Report.FkContactError>.1 && reverseTrial.Report.CorrectedContactError<.005,"reverse proportions/contact proof is independent");VerifyHumanoidFeet(reverseTrial.CorrectedPath,false);
         CheckHumanoidDeterminism(p,recipe,a,b);
         CheckHumanoidReachShell(p,bid);
+        CheckHumanoidContinuousReachPoles();
         CheckHumanoidHandGoals(p,ac.Id,bc.Id);
+        CheckHumanoidEndpointPolicy(p,ac.Id,bc.Id,true);
+        CheckHumanoidTemporalNative(p,ac.Id,bc.Id);
         var other=new CharacterProject(Path.Combine(_output,"storage"));other.UseSharedClip(ac.Id,1,p.SharedLibrary.Root);other.UseSharedClip(bc.Id,1,p.SharedLibrary.Root);other.DetectHumanoid(aid);other.DetectHumanoid(bid);Assert(other.State.Humanoids.All(h=>h.Reviewed) && other.State.Bodies.All(h=>h.Reviewed),"reviewed rig/body reused across separately saved projects without re-mapping clips");other.Assign(bc.Id,bid,"Untouched other project");string otherFile=Path.Combine(_output,"humanoid-other.fpcharacter");other.Save(otherFile);string otherHash=Hash(otherFile),sourcePin=p.SharedLibrary.Pin("animations",ac.Id).MetadataHash;
         string saved=Path.Combine(_output,"humanoid.fpcharacter");p.Save(saved);var loaded=CharacterProject.Load(saved,Path.Combine(_output,"storage"));loaded.ExportInstance(instance,Path.Combine(_output,"humanoid-reopened.brres"));VerifyHumanoidFeet(Path.Combine(_output,"humanoid-reopened.brres"),true);
         var bad=PlantedRecipe(p,ac.Id,bc.Id,true);bad.Contacts[0].Goal=new HVec(1.5,100,.4);p.SaveHumanoidRecipe(bad);var unreachable=p.PreviewHumanoid(bad);Assert(unreachable.Report.UnreachableSamples>0 && unreachable.Report.CorrectedContactError>1,"unreachable goals report residuals without stretching");int count=p.State.Instances.Count;Expect<IOException>(()=>p.AssignHumanoid(bad.Id,"unreachable"),"bad quality cannot become a passing assignment");Assert(p.State.Instances.Count==count,"failed fit leaves independent assignments intact");
@@ -112,7 +115,7 @@ internal static partial class NativeSmoke
         using(var root=NodeFactory.FromFile(null,trial.CorrectedPath)){var model=Find<MDL0Node>(root);model.Populate();var motion=root.Children.SelectMany(g=>g.Children).OfType<CHR0Node>().Single(n=>n.Name=="OriginalPlanted");model.ApplyCHR(motion,16);var foot=model.BoneCache.OfType<MDL0BoneNode>().Single(n=>n.Name=="LeftFoot");Assert(foot.Matrix[13]>1.5,"aerial output has no default planted-foot constraint");}
         var turn=w.Resources.Single(r=>r.Kind=="CHR0"&&r.Name=="OriginalFullTurn");string turnId=p.AddAnimationFromContainer(aid,a,"",turn.TreePath);var turning=p.CreateHumanoidRecipe(turnId,native);var turned=p.PreviewHumanoid(turning);
         using(var root=NodeFactory.FromFile(null,turned.CorrectedPath)){var motion=root.Children.SelectMany(g=>g.Children).OfType<CHR0Node>().Single(n=>n.Name=="OriginalPlanted");var track=motion.Children.OfType<CHR0EntryNode>().Single(n=>n.Name=="LeftForearm");Assert(Math.Abs(track.GetFrameValue(3,30)-track.GetFrameValue(3,0))>359,"native winding does not collapse a full source turn");}
-        var loop=w.Resources.Single(r=>r.Kind=="CHR0"&&r.Name=="OriginalLoop");string loopId=p.AddAnimationFromContainer(aid,a,"",loop.TreePath);var looping=p.CreateHumanoidRecipe(loopId,native);var looped=p.PreviewHumanoid(looping);Assert(looped.Report.Samples==129,"nonempty native finger loop includes quarter-frame inherited seam/wrap samples");
+        var loop=w.Resources.Single(r=>r.Kind=="CHR0"&&r.Name=="OriginalLoop");string loopId=p.AddAnimationFromContainer(aid,a,"",loop.TreePath);var looping=p.CreateHumanoidRecipe(loopId,native);var looped=p.PreviewHumanoid(looping);Assert(looped.Report.Samples==193,"nonempty native finger loop retains quarter-frame seam/wrap samples and adds withheld .137/.619 times");
         string negatives=Path.Combine(_output,"humanoid-negative-inputs");Directory.CreateDirectory(negatives);
         foreach(string kind in new[]{"fast-winding","joint-translation","animated-scale","frame-budget"})
         {
@@ -156,6 +159,7 @@ internal static partial class NativeSmoke
                 var beforeStance=WorkspaceStateXml(p);editor.SetFrame(1);Ws<NumericUpDown>(host,"humanoidStanceSourcePhase").Value=7.25m;HumanoidClick(host,"humanoidCalibrateStance");
                 Assert(p.State.HumanoidRecipes.Last(r=>r.AnimationId==clip&&r.TargetAnimationId==native).Stance.SourceTime==7.25 && Ws<Label>(host,"humanoidStanceStatus").Text.Contains(7.25.ToString()),"actual calibration control persists explicit fractional source phase and target native phase");
                 WsClick(host,"workspaceUndo");Assert(beforeStance.SequenceEqual(WorkspaceStateXml(p)),"stance calibration is one undoable project command");WsClick(host,"workspaceRedo");p.Save(p.FilePath);Assert(WorkspaceStateXml(CharacterProject.Load(p.FilePath,p.StorageRoot)).SequenceEqual(WorkspaceStateXml(p)),"stance phases and offset survive project reload");WsClick(host,"workspaceUndo");
+                CheckHumanoidEndpointControls(host,p,clip,native);
                 HumanoidClick(host,"humanoidFit");var panel=Ws<HumanoidWorkspacePanel>(host,"humanoidWorkspace");Assert(panel.Trial!=null && panel.Trial.Report.ProfilesReviewed,"actual Fit button generated reviewed native trial");
                 HumanoidClick(host,"humanoidPreviewFk");editor.SetFrame(16);CaptureViewport(editor,"humanoid-fk-native.png");Assert(editor.AuthoringReadOnly && editor.AuthoringDocument.TargetId==target,"FK comparison is explicit read-only target");
                 HumanoidClick(host,"humanoidPreviewCorrected");editor.SetFrame(16);CaptureViewport(editor,"humanoid-corrected-native.png");
@@ -184,6 +188,6 @@ internal static partial class NativeSmoke
             catch(Exception error){failure=error;}finally{main.Dispose();Application.ExitThread();}
         }));Application.Run(main);if(failure!=null)throw new IOException("Humanoid previewer GUI",failure);
     }
-    private static void HumanoidClick(Control host,string name)
-    {WsInvoke(host,name);Assert(!Ws<Label>(host,"humanoidStatus").Text.StartsWith("Stopped:"),name+": "+Ws<Label>(host,"humanoidStatus").Text);}
+    private static void HumanoidClick(Control host,string name,int timeoutMilliseconds=10000)
+    {WsInvoke(host,name,timeoutMilliseconds);Assert(!Ws<Label>(host,"humanoidStatus").Text.StartsWith("Stopped:"),name+": "+Ws<Label>(host,"humanoidStatus").Text);}
 }

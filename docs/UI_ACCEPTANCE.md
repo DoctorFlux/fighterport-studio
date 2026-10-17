@@ -1,5 +1,23 @@
 # Model Previewer authoring acceptance
 
+Reach/pole/endpoint controls added after 77d64ce (2026-10-17): select a saved contact in
+the existing Rig / FK panel to edit its interval, goal and policies. **New** starts an
+independent interval and rejects an existing chain/start instead of overwriting it.
+Use **Already planted at clip start** and **Still planted at clip end**
+only for contact that exists at those boundaries. The explicit full-clip standing action
+sets 0..last, holds both ends and enables 0.05 reach blend if the saved value was zero.
+It never adds contacts automatically to an aerial. Interior edges retain their margins.
+
+Advanced pole/reach choices declare World versus TransportedRest and Nearest versus
+RestHemisphere. Changing a saved pole override's space requires explicit clearing first.
+The saved reach-blend control is a 0..0.1 fraction of leg length; Save is undoable and
+does not stretch limbs or resize meshes. Keep source/FK/corrected comparison and export
+in the same explicit session/target/native-document binding. Save a new native output,
+reopen it and inspect the first, last and fractional frames. Matching endpoint metadata
+alone is insufficient. Whole sole/toe clearance and complex loop/constraint transitions
+remain separate from the bounded planted-landmark result. Final observed receipts are
+recorded in DEVELOPMENT_STATUS.md; this section specifies the real control surface.
+
 H3 standing workflow (2026-10-17): Brawl multi-model archive Preview and Open Character
 catalogue indexed MDL0 choices; choose the actual character. Only that model is attached to
 native rendering/playback. Shadows/articles remain in the native hierarchy for preservation.

@@ -67,8 +67,8 @@ internal static partial class NativeSmoke
         Assert(p.State.Anchors.Single(n=>n.Role=="Idle").Frame==5 && p.State.Anchors.Single(n=>n.Role=="Fall").Frame==10,"distinct native phases saved");
     }
     private static T Ws<T>(Control host,string name)where T:Control=>(T)host.Controls.Find(name,true).Single();
-    private static void WsInvoke(Control host,string name)
-    {var b=Ws<Button>(host,name);Control parent=b;while(parent!=null && !(parent is TabPage))parent=parent.Parent;if(parent!=null)Ws<TabControl>(host,"workspaceTabs").SelectedTab=(TabPage)parent;b.PerformClick();Pump(30);var workspace=Ws<PreviewWorkspacePane>(host,"previewWorkspace");WaitFor(()=>workspace.Session?.Busy!=true,"bounded previewer operation");Pump(30);}
+    private static void WsInvoke(Control host,string name,int timeoutMilliseconds=10000)
+    {var b=Ws<Button>(host,name);Control parent=b;while(parent!=null && !(parent is TabPage))parent=parent.Parent;if(parent!=null)Ws<TabControl>(host,"workspaceTabs").SelectedTab=(TabPage)parent;b.PerformClick();Pump(30);var workspace=Ws<PreviewWorkspacePane>(host,"previewWorkspace");WaitFor(()=>workspace.Session?.Busy!=true,"bounded previewer operation: "+name,timeoutMilliseconds);Pump(30);}
     private static void WsClick(Control host,string name)
     {WsInvoke(host,name);string status=Ws<Label>(host,"workspaceStatus").Text;Assert(!status.StartsWith("Stopped:"),name+": "+status);}
     private static void WsChoose(ComboBox box,string id)

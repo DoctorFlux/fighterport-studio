@@ -48,8 +48,20 @@ namespace BrawlCrate.UI
             if(contact!=null)
             {
                 var goal=contact.Anchor=="World"?contact.Goal:NativePoint(setup.Profile.Chain(contact.Anchor).Bones.Last(),contact.Goal);result.Add(new HandlePoint{Kind="goal",World=goal,R=0,G=1,B=0});
-                _poleOrigin=NativePoint(setup.Profile.Chain(limb).Bones[0],new HVec());var pole=contact.UsePoleOverride?contact.Pole:setup.Body.Landmark(limb).Pole;
-                result.Add(new HandlePoint{Kind="pole",World=_poleOrigin+pole.Unit()*(setup.Body.LegLength*.35),R=0,G=1,B=1});
+                var ids=setup.Profile.Chain(limb).Bones;var landmark=setup.Body.Landmark(limb);var rig=_session.Project.HumanoidRigFor(c.TargetId);
+                _poleOrigin=NativePoint(ids[0],new HVec());var pole=contact.UsePoleOverride?contact.Pole:landmark.Pole;
+                var soleOffset=contact.RestOrientation?rig.World(rig.Rest())[ids.Last()].R.Apply(landmark.Local):NativePoint(ids.Last(),landmark.Local)-NativePoint(ids.Last(),new HVec());
+                try
+                {
+                    pole=HumanoidSolver.EffectivePole(rig,ids,_poleOrigin,goal-soleOffset,pole,contact.PolePolicy);
+                    result.Add(new HandlePoint{Kind="pole",World=_poleOrigin+pole.Unit()*(setup.Body.LegLength*.35),R=0,G=1,B=1});
+                }
+                catch(System.IO.IOException error)
+                {
+                    // A bad pole must not also hide the valid goal/pelvis repair
+                    // handles. Never draw a fabricated direction for an invalid chart.
+                    _status.Text="Pole needs review: "+error.Message+" Goal/pelvis handles remain available; review the pole policy or clear its override in Advanced, then regenerate Fit.";
+                }
             }
             foreach(var p in result)if(p.Kind==_dragKind)p.World=_dragPoint;return result;
         }
@@ -85,7 +97,7 @@ namespace BrawlCrate.UI
                 else
                 {
                     string limb=(string)_limb.SelectedItem;var contact=r.Contacts.FirstOrDefault(c=>c.Chain==limb&&c.Start==(double)_start.Value)??r.Contacts.First(c=>c.Chain==limb);
-                    if(kind=="pole"){contact.Pole=(_dragPoint-_poleOrigin).Unit();contact.UsePoleOverride=true;}
+                    if(kind=="pole"){contact.Pole=(_dragPoint-_poleOrigin).Unit();contact.UsePoleOverride=true;contact.PolePolicy="World";}
                     else if(contact.Anchor=="World")contact.Goal=_dragPoint;
                     else{int bone=setup.Profile.Chain(contact.Anchor).Bones.Last();var inv=_host.Document.Model.BoneCache[bone].InverseMatrix;var p=inv*new Vector3((float)_dragPoint.X,(float)_dragPoint.Y,(float)_dragPoint.Z);contact.Goal=new HVec(p._x,p._y,p._z);}
                 }

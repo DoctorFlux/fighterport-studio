@@ -1,5 +1,25 @@
 # Capability matrix — verified restart checkpoint
 
+2026-10-17 continuation after 77d64ce (supersedes the endpoint/transition coverage of
+the historical standing rows below):
+
+| Operation | New evidence | Boundary |
+|---|---|---|
+| Held contact edges | Independent original fade mismatch, explicit first/last sole goals, real interval/full-clip controls, grouped undo/reload and new native output | Deliberate contact only; no automatic aerial locks, endpoint pose fitting or general loop fitting |
+| Supported reach/pole continuity | Dense analytic unequal-limb inner/outer trajectories, contrasting axes, transported pole crossing, segment opposition, randomized evaluation and bounded reach blending | Declared charts only; antipodal/coincident/parallel and perpendicular-to-plane singularities reject; coupled bound changes can remain C0 |
+| Native temporal coverage | Both original directions, deep crouch near inner reach, finger/loop channels, fresh BRRES/CHR0 and withheld fractions; narrow/subfloat interval negatives | Native crouch approaches the inner bound; exact crossing has analytic evidence only. Dynamic closure and partial unreachable margins remain limited |
+| Mario -> Snake standing, explicit World pole / held edges / .05 reach blend | 301 fresh samples; FK contact 4.83656460 -> .00526127; native .00551611 position / .08557169 degrees / .00674325 mesh; zero unreachable | Explicit phase 10.25 -> 0 stance, unreviewed local diagnostic; other pole policies/clips require their own evidence |
+| Snake -> Mario standing, independently configured World pole / held edges / .05 blend | 511 fresh samples; contact 2.18319474 -> .00000124131; native .00000254987 position / .00962024 degrees / .000162151 mesh; zero unreachable | No added stance calibration; unreviewed diagnostic, not reverse inference |
+| Independent reopened endpoint goals | Reverse first/last error .00000109015 / .00000109015, drift 0; forward .00000056172 / .00000046224, drift .00000099529 | Separate goal/error checks, not endpoint weight-zero certification. Withheld .125/.137/.619/.875 errors <= .00485821 reverse / .00000174873 forward |
+| Local transported-pole negative | Mario -> Snake rejects .228334-degree native error (limit .15), despite held endpoint goals and zero reach diagnostics | No assignment, tolerance change or automatic World fallback. This remains executable H3 work |
+| Full foot/clearance | Native foot/toe minY now reported independently; reverse is about .0286 units below configured sole ground, forward about .000000969 | Sole-landmark accuracy does not certify toe/mesh clearance, whole-body contacts or arbitrary animation/model compatibility |
+
+Native Hermite fitting uses five interior phases, bounded packed storage and unchanged
+integer values/duration. Fresh validation includes quarters, withheld .137/.619 and exact
+contact milestones within the existing decoded-vertex budget. Actual GUI/restart receipts
+and limitations are recorded in DEVELOPMENT_STATUS.md. Unchanged source files, native binds,
+weights/unrelated records, immutable shared revisions and independent projects remain gates.
+
 2026-10-17 H3 standing extension (supersedes the reverse-failure status of historical rows):
 
 | Operation | New evidence | Boundary |

@@ -1,5 +1,49 @@
 # FighterPort Studio master plan — clean restart
 
+## Continuous reach and held endpoints continuation — 2026-10-17
+
+Continue 77d64ce in the existing Model Previewer/session. The source implementation now
+distinguishes a contact already planted at clip start or still planted at clip end from
+an entry/exit that blends through its saved margin. Old recipes retain fading edges and
+their original XML defaults. Explicit full-clip standing holds both boundaries and enables
+a saved 0.05 reach blend when the recipe previously used zero. No contact is inferred for
+an aerial or added merely by opening an animation. Endpoint placement, motion continuity,
+native serialization and whole-body appearance need separate evidence.
+
+The declared pole choices are an authored World direction or TransportedRest, which
+transports a reviewed rest pole through the current effector direction. Parallel World
+poles, coincident directions and the transported antipodal chart produce explicit failures.
+RestHemisphere pins a leg's reachable branch to the exact rest stance; legacy Nearest
+recipes remain loadable and report ambiguous disconnected branches. Optional ReachBlend
+is bounded to 0..0.1 of target leg length, preserves the feasible reach interval and the
+body's pelvis bound, and is saved as a deliberate recipe edit. It changes neither target
+bone lengths nor meshes. World pole overrides require explicit reset before changing spaces.
+
+Native Hermite tangent fitting now samples five phases per interval while keeping integer
+poses, timing and duration exact. Fresh decode checks the quarter grid, withheld .137/.619
+times and explicit contact/margin edges against the unchanged native limits. Packed interior
+samples are limited to 32 MiB; complete validation stays within eight million decoded vertex
+samples. The first/last held sole goals have distinct measured coverage rather than being
+hidden by zero endpoint weight. These are implementation boundaries; final passing evidence
+belongs in DEVELOPMENT_STATUS.md and FORMAT_SUPPORT.md after the actual checks complete.
+
+The user's goal remains proper animation transfer across supported models. This increment
+does not establish arbitrary animation/model compatibility, automatic contact recognition,
+loop or reference fitting, full-body clearance, spine/clavicle/twist/prop solving, or a
+globally nonsingular pole field. Coupled reach-bound intersections can remain only C0;
+denser baking cannot repair a velocity corner in the intended motion. Diagnose unsupported cases
+and preserve protected timing and native originals. Keep both directed Mario/Snake standing
+regressions, chosen-character-only rendering and the original independent rig tests.
+
+Only plans/current.md selects the next executable acceptance after test results. Preserve
+its remaining H3 transported-route native-accuracy and full-foot-quality acceptance;
+the passing World-pole standing pair is a separate explicitly selected diagnostic route.
+Both commercial characterizations remain unreviewed. Preserve
+the complete Brawl/channel queue, H4 non-Brawl native routes, Melee/Ultimate/Rivals II and
+Dragon Ball/wider sources/targets, automatic setup and miscellaneous filling, actual Modkit
+inspection, vetted app-local tools and optional DCC bridges. Gameplay compilation remains
+deferred and mirroring remains optional. The historical receipts below retain their scope.
+
 ## Standing-contact continuation — 2026-10-17
 
 Continued 04ef3d9 without restarting. The bounded H3 standing checkpoint now supports an

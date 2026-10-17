@@ -1,5 +1,9 @@
 # Third-party notices and distribution audit
 
+The 2026-10-17 reach/pole/held-endpoint continuation adds original repository-licensed
+solver, controls and tests only. It introduces no dependency or license replacement;
+upstream notices, provenance and the distribution requirements below remain applicable.
+
 The 2026-10-17 H3 stance/reach/bake/character-selection increment adds original
 repository-licensed source and tests, with no new dependency or distributed native asset.
 Inherited notices and the unresolved component/binary-distribution audit below still apply.

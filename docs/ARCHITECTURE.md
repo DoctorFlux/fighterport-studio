@@ -1,5 +1,47 @@
 # Architecture after the clean restart
 
+2026-10-17 continuous-reach continuation after 77d64ce: the existing contact recipe stores
+optional HoldStart/HoldEnd flags, World/TransportedRest pole and Nearest/RestHemisphere
+reach policies, plus ReachBlend. XML defaults omit false holds, World, Nearest and zero
+blend, retaining the old project representations and fade behavior. Holds are valid only
+at the corresponding clip boundary; interior entry/exit margins still blend. Outside the
+saved interval the contact is inactive. A full-clip standing command deliberately requests
+both holds and, if previously zero, a 0.05 reach blend. The same previewer panel/session
+edits these records through validated transactions and immutable assigned-recipe forks.
+Selecting or changing endpoint flags alone does not rewrite a legacy pole or reach policy.
+
+The format-neutral solver projects World poles with an explicit parallel-direction guard.
+TransportedRest minimally transports the reviewed rest pole with the rest effector axis;
+its antipodal chart, coincident goals and invalid rest poles reject rather than choosing
+an arbitrary fallback. RestHemisphere fixes a leg's inner-shell branch from exact native
+rest geometry. Nearest remains the old-data policy and reports disconnected ambiguity.
+An optional 0..0.1 target-leg-length ReachBlend smooths approach to feasible pelvis limits
+without leaving the allowed interval or stretching a limb. Its zero default retains older
+hard limits. Intersections of several moving reach bounds can remain C0; this is not a
+globally smooth whole-body solver or body-clearance system. Singular charts and impossible
+opposing goals remain correction requests. Deterministic sampling uses no scrub history.
+
+The Brawl adapter retains exact integer-frame values and fits shared Hermite tangents at
+1/6, 1/3, 1/2, 2/3 and 5/6 within each interval. Packed rotation/position samples have a
+32 MiB budget, alongside the existing one-million-scalar-key and 32 MiB native-file gates.
+Fresh native decode validates the quarter grid (including withheld 1/4 and 3/4), independent
+.137/.619 samples, contact boundaries, margin transitions and interval midpoints. The
+eight-million decoded vertex-sample budget includes those additional times. Position,
+orientation and skinned-geometry tolerances remain .02/.15 degrees/.03. Full-weight contact
+residuals and held first/last-frame residuals are separate from serialization error; no
+held endpoint coverage must not be presented as a perfect endpoint result. Native binds,
+weights, unrelated records, original files, source/library revisions and other projects
+remain protected. Final native/GUI evidence is recorded only after observed checks.
+
+The previewer preserves explicit project/target/instance/document/editor identity and only
+the chosen Brawl character render target. Its contact list restores saved timing, goals
+and advanced policies. New rejects duplicate intervals; editing preserves custom pole,
+orientation and evidence. A deliberate pole reset precedes a coordinate-policy change.
+Invalid pole visualization retains valid goal/pelvis repair handles and reports the issue.
+Endpoint holds do not fit loop poses, Idle/Fall references, ancillary channels or arbitrary
+motions automatically. Those broader services, body clearance and non-Brawl native adapters
+remain modular roadmap work selected only through plans/current.md.
+
 2026-10-17 H3 standing checkpoint after 04ef3d9: optional `HumanoidStance` in the existing
 recipe pins separate native source/target phases and a constant common-space pelvis offset.
 It is clip calibration, not a bind edit, body resize, Idle/Fall anchor or profile approval.
