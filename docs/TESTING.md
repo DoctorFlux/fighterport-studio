@@ -57,3 +57,5 @@ Texture/SRT0 increment: full suite **49/49**, `artifacts/tests/20261016-200030`,
 Sampler inspection adds one focused case: native slot-1/UV1 metadata, independent distinct UV1 coordinates, native animated matrix comparisons, persistent selection and missing-UV/STQ/emboss rejection. SamplingSmoke now routes distinct UV0/UV1 through MeshCoordinates before checking rendered pixels. Published original GUI smoke invokes the actual sampler inspector/apply button; the local Mario case additionally exports/decode-validates all 12 Wait2 SRT0 tracks. Focused **9/9** at `artifacts/tests/20261016-200811`.
 
 Final sampler increment full regression: **50/50**, `artifacts/tests/20261016-200949`; all 688 input hashes unchanged. Published original/Mario workflows and 736 rendered probes passed.
+
+CI4 increment: 10/10 focused cases at artifacts/tests/20261017-015438; new PaletteTests verify native CI4 mip/alpha/nibble ordering and ambiguity/override persistence. Published classic smoke at artifacts/classic-smoke-20261017-015606 verifies actual viewer mip/palette/partial alpha/apply plus existing UI/edit/export tests.

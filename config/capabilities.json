@@ -1423,6 +1423,15 @@
       "state": "SyntheticTested",
       "evidence": "ClassicSmoke.cs; scripts/classic-smoke.ps1; docs/UI_UX_PLAN.md",
       "limitations": "Shared session/viewport, categorized validated property subset, resource search/recent sources, model lists and embedded existing VIS/SRT edit/export. Original running-app captures at 1280x800/1920x1080, 96 actual DPI and separate 150% WPF scaling stress; real 150% OS-DPI environment unrun. Native archive writes blocked; not full BrawlCrate parity."
+    },
+    {
+      "game": "Brawl",
+      "format": "TEX0 / PLT0",
+      "version": "1 CI4 / RGB5A3",
+      "operation": "decode-mips-alpha-ambiguous-palette",
+      "state": "SyntheticTested",
+      "evidence": "PaletteTests.cs; Ci4Fixture.cs; ClassicSmoke.cs; artifacts/tests/20261017-015438",
+      "limitations": "Genuine non-square 32x16 indexed native fixture, mip 0/1, independent nibble order/opaque/109-alpha/transparent colors; ambiguous palettes in distinct native dictionaries and missing palette reject. Explicit handle override and FPWORK persist. Published viewer mip/palette/alpha/apply checked. No general texture/palette writer."
     }
   ]
 }

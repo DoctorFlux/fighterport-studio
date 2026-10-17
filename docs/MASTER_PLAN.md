@@ -365,3 +365,5 @@ M3.D1 next tested slice: contextual isolated native sampler/UV selection, retain
 ## Classic workspace continuation — 2026-10-17
 
 Execute CODEX_CLASSIC_BRAWLCRATE_STYLE_WORKSPACE.md and the focused [UI_UX_PLAN.md](UI_UX_PLAN.md). Two classic views share the existing session and tested native services; current task list is only docs/plans/current.md. Dated earlier next-task statements are historical; SRT0 v4 editing/export is complete for its declared subset. Follow UI changes with CI4/palette and a bounded material-rendering slice, retaining every master game/channel/bridge requirement.
+
+CI4 conformance checkpoint: genuine native non-square TEX0/PLT0 fixtures, alpha/mips, ambiguous/missing palette rejection, explicit handle override/persistence and actual published viewer checks pass. This closes only that declared M3.D1 subset; native material composition and the complete multi-game roadmap remain.

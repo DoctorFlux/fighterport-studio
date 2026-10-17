@@ -70,6 +70,7 @@ internal static class WorkspaceTests
             return Task.CompletedTask;
         });
         await AncillaryTests.Run(output,test);
+        await PaletteTests.Run(output,test);
         await test("M3.D1 isolated native sampler UV1, texgen guards and persisted preview selection",async()=>
         {
             string worker=Path.GetFullPath("src/FighterPort.NativeWorker/bin/Release/net472/FighterPort.NativeWorker.exe"),jobs=Path.GetFullPath(".local/jobs");var transport=new WorkerProcess(worker,jobs);

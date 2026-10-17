@@ -106,7 +106,12 @@ internal static partial class ResourceOperations
                     using(var bitmap=texture.GetImage(request.Mip,palette)??throw new InvalidDataException("Texture decode failed"))
                     {
                         if(operation=="resource-texture")bitmap.Save(output,ImageFormat.Png);
-                        else Write(output,new{Width=bitmap.Width,Height=bitmap.Height,Pixels=new[]{bitmap.GetPixel(bitmap.Width/4,bitmap.Height/4).ToArgb(),bitmap.GetPixel(3*bitmap.Width/4,bitmap.Height/4).ToArgb(),bitmap.GetPixel(bitmap.Width/4,3*bitmap.Height/4).ToArgb(),bitmap.GetPixel(3*bitmap.Width/4,3*bitmap.Height/4).ToArgb()}});
+                        else
+                        {
+                            var points=request.ProbePoints.Count==0?new[]{new[]{bitmap.Width/4,bitmap.Height/4},new[]{3*bitmap.Width/4,bitmap.Height/4},new[]{bitmap.Width/4,3*bitmap.Height/4},new[]{3*bitmap.Width/4,3*bitmap.Height/4}}:request.ProbePoints.ToArray();
+                            if(points.Length>64||points.Any(p=>p.Length!=2||p[0]<0||p[1]<0||p[0]>=bitmap.Width||p[1]>=bitmap.Height))throw new InvalidDataException("Pixel probe quota/range");
+                            Write(output,new{Width=bitmap.Width,Height=bitmap.Height,Pixels=points.Select(p=>bitmap.GetPixel(p[0],p[1]).ToArgb()).ToArray()});
+                        }
                     }
                     break;
                 case "resource-extract":
@@ -217,7 +222,8 @@ internal static partial class ResourceOperations
         using(var arc=new ARCNode{Name="OriginalConformance"})
         {
             var bres=new BRRESNode{Name="OriginalResources",FileType=ARCFileType.ModelData,FileIndex=0,GroupID=0};arc.AddChild(bres);
-            if(operation=="fixture-workspace-palette")
+            if(operation=="fixture-workspace-ci4")CreateCi4Fixture(bres);
+            else if(operation=="fixture-workspace-palette")
             {
                 using(var asymmetric=new Bitmap(8,4))
                 {

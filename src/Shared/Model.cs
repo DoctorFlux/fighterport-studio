@@ -126,6 +126,7 @@ namespace FighterPort.Core
         public string Id { get; set; } = "";
         public int Mip { get; set; }
         public string PaletteId { get; set; } = "";
+        public List<int[]> ProbePoints { get; set; } = new List<int[]>();
     }
     public class BundlePoseRequest
     {
