@@ -43,8 +43,9 @@ One next task: [current plan](docs/plans/current.md).
 Derived from BrawlCrate / BrawlBox / BrawlLib. Original authors and licenses are retained.
 See [UPSTREAM](UPSTREAM.md), [third-party notices](THIRD_PARTY_NOTICES.md),
 [LGPL](LICENSE), and component license files. Independent product; no upstream endorsement.
-No branch, tag, public PR, artifact or release is automatically published for this restart.
-The user authorized uploading the source replacement to this existing repository on
-2026-10-17. The old application remains recoverable in Git history; future publication
-still requires explicit authorization. Local settings, game inputs, builds and test outputs
+The user authorized pushing each completed, passing source update to this existing
+repository on 2026-10-17. Each update is committed and reviewed, with exact origin/public
+status verified before a normal history-preserving push to main. The old application
+remains recoverable in Git history. Tags, public PRs, CI dispatch, artifact uploads and
+binary releases are not authorized. Local settings, game inputs, builds and test outputs
 are excluded. Binary distribution remains pending the component/license audit.

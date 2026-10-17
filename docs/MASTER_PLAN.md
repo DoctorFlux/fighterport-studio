@@ -7,7 +7,9 @@ scope or publication instructions. The newer scope adds gameplay authoring and D
 native-output goals. Implemented status comes only from FORMAT_SUPPORT.md and current evidence.
 The user's 2026-10-17 source-upload instruction supersedes the reset's local-only restriction
 for publishing this replacement to the existing origin/main while preserving history.
-It does not authorize automatic future pushes or binary releases.
+The user's subsequent instruction on the same date gives standing authorization to
+commit and push each completed, passing source update after review and exact public
+origin verification. Binary releases, artifacts, tags and CI dispatch remain unauthorized.
 Supplement: [reviewed continuation milestone](FighterPort_Next_Codex_Milestone_2026-10-17.md),
 preserved as supplied (reviewed snapshot 20a8dc5). Its R2/readiness/R3/R4 refinements
 continue this application. They do not create a second current-task queue.

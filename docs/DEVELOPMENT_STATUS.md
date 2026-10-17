@@ -1,14 +1,16 @@
 # Clean restart status — 2026-10-17
 
-Publication: the user subsequently authorized uploading the source replacement to the
-existing public DoctorFlux/fighterport-studio repository on 2026-10-17. This supersedes
-the earlier local-only instruction for this upload. The target is a normal fast-forward
-update of main from `86f698a3f75eeeb6ea82bd02c9623fe7019c4962`; no history deletion,
-repository recreation, force/mirror push, visibility change, tags, PRs or binary releases.
-The receipts below describe what was local at each implementation checkpoint. Source
-upload does not add GUI/game evidence or resolve the distribution audit. Publication
-success must be established by comparing the remote main SHA with the uploaded commit.
-Automatic publication remains disabled; settings, inputs, builds and evidence remain local.
+Publication: on 2026-10-17 the user first authorized the source replacement upload,
+then gave standing authorization to push each completed, passing source update.
+Commit and review staged/outgoing content, verify the exact public origin and use a
+normal history-preserving push to main. This includes the tested R2 checkpoint
+`c3c991cfc4f7caa39b5fd3adbc5ce4bd17e09673`. No history deletion, repository recreation,
+force/mirror push, visibility change, tags, PRs, CI dispatch, artifact upload or binary
+release is authorized. Earlier local-only receipts below describe their historical
+checkpoints; the subsequent standing instruction supersedes that publication policy.
+Source upload adds no GUI/game evidence and does not resolve the distribution audit.
+Verify publication by comparing remote main with the uploaded local HEAD. Settings,
+inputs, builds and evidence remain local.
 
 Current checkpoint: [multi-root Brawl loose dumps](#multi-root-brawl-loose-dumps--2026-10-17)
 is implemented and verified. Earlier restart/companion receipts remain historical;

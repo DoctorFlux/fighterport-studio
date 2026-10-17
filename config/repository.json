@@ -4,7 +4,8 @@
   "remote": "https://github.com/DoctorFlux/fighterport-studio.git",
   "private": false,
   "branch": "main",
-  "publication": "explicit-authorization-only",
+  "publication": "reviewed-passing-source-updates",
   "sourceUploadAuthorizedOn": "2026-10-17",
-  "automaticPush": false
+  "standingSourcePushAuthorizedOn": "2026-10-17",
+  "automaticPush": true
 }

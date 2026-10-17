@@ -32,8 +32,8 @@ Private local development does not constitute a completed distribution audit. Be
 distribution, identify exact source/build inputs and notices for every included component, resolve
 opaque binary/resource provenance, prepare exact corresponding source and modification notices,
 and verify applicable LGPL/GPL/AGPL conditions including replacement/relink requirements where
-applicable. The user authorized a source repository update on 2026-10-17; this does not
-resolve the audit or authorize installers, binary releases or automatic publication.
+applicable. The user authorized pushing each completed, passing source update on
+2026-10-17; this does not resolve the audit or authorize installers or binary releases.
 The source baseline retains the inherited dependency references and resources listed above;
 their unresolved provenance is explicitly recorded, not represented as distribution clearance.
 

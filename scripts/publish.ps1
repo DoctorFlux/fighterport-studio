@@ -1,1 +1,1 @@
-throw 'Automatic publication and binary packaging are disabled. Source Git updates require explicit user authorization, exact origin/public-status verification and outgoing content review. Resolve the component/license audit before binary distribution.'
+throw 'This script does not package or release binaries. The user authorizes committing and pushing each completed, passing source update via Git after exact origin/public-status verification and staged/outgoing content review; see AGENTS.md. Resolve the component/license audit before binary distribution.'

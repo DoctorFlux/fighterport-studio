@@ -32,4 +32,6 @@ After this single task, continue PCS/container coverage, palette/alpha/mips/mate
 and genuinely animated ancillary fixtures, then R3 versioned edit projects and measured
 different-rig native output, a non-Brawl route, and R4 installed Rivals Modkit import/
 state/attack/build/playtest. Details remain in MASTER_PLAN.md and the supplementary
-FighterPort_Next_Codex_Milestone_2026-10-17.md. No automatic publication is authorized.
+FighterPort_Next_Codex_Milestone_2026-10-17.md. Under the user's standing instruction,
+commit and push each completed, passing source update after review and exact public
+origin verification. This does not authorize binaries, artifacts, tags or CI dispatch.

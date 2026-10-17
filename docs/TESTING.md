@@ -65,10 +65,12 @@ See UPSTREAM.md for the exact boundary and DEVELOPMENT_STATUS.md for final evide
 Review before each local commit with `scripts/review.ps1`, staged paths AND content
 diff. `python scripts/verify-upstream.py` compares preserved baseline hashes and reports
 intentional changes/missing files; new files are reviewed in Git. Source publication
-requires explicit user authorization, exact origin/public-status verification, and review
-of all outgoing files/commits. The user authorized the source replacement upload on
-2026-10-17. No automatic push, CI dispatch, release, artifact upload or binary distribution
-is authorized. The source/component audit remains required before binary distribution.
+requires exact origin/public-status verification and review of all outgoing files/commits.
+The user's standing instruction on 2026-10-17 authorizes committing and pushing each
+completed, passing source update; no repeat permission request is needed. Preserve history
+with normal pushes to origin/main. CI dispatch, releases, tags, artifact uploads and binary
+distribution remain unauthorized. The source/component audit remains required before
+binary distribution.
 
 No broad fidelity, arbitrary skeleton retargeting, separate native tool, Modkit build,
 console or game result follows from these checks. Keep each format/version/operation,

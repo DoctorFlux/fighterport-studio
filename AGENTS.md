@@ -22,11 +22,12 @@ plan. It continues this codebase; plans/current.md is the only next executable t
 - Dump discovery must remain separate from selected-file staging/decoding. Overrides use
   complete logical file/container paths, never global native resource names. Preserve
   explicit hash-pinned choices across scans; root configuration is not a character project.
-- Publication requires explicit user authorization. On 2026-10-17 the user authorized
-  uploading this source replacement to the existing public origin/main; that instruction
-  supersedes the reset's local-only restriction for this upload. Automatic pushes remain off.
+- Standing user authorization, 2026-10-17: push each completed, passing source update
+  to the existing public origin/main after committing and reviewing it. This supersedes
+  the earlier one-upload/local-only restriction. No repeat permission request is needed
+  unless the user revokes or narrows this instruction or an actual blocker requires it.
   Verify exact origin and expected public status against config/repository.json, and review
-  staged files AND the outgoing content diff before every authorized push. Preserve history;
+  staged files AND the outgoing content diff before every push. Preserve history;
   no force/mirror push, repository recreation, visibility change, automatic tags, public PRs,
   CI dispatch, artifact upload or binary release. Existing origin:
   https://github.com/DoctorFlux/fighterport-studio.git (public, independently hosted).
