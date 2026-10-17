@@ -92,7 +92,7 @@ public sealed partial class Workbench
         }
         item.MouseDoubleClick+=(_,e)=>{if(!item.IsSelected)return;e.Handled=true;Native(()=>Activate(selection));};
         var menu=new ContextMenu();item.ContextMenu=menu;
-        void Action(string label,Func<Task> action){var m=new MenuItem{Header=label};m.Click+=(_,_)=>Native(action);menu.Items.Add(m);}
+        MenuItem Action(string label,Func<Task> action){var m=new MenuItem{Header=label};m.Click+=(_,_)=>Native(action);menu.Items.Add(m);return m;}
         if(entry.Kind is "MDL0" or "NUMDLB" or "NUMSHB")Action("Display model / resolve materials",()=>Activate(selection));
         if(entry.Kind is "CHR0" or "NUANMB")Action("Use skeletal animation",()=>Activate(selection));
         if(entry.Kind=="SRT0")
@@ -109,6 +109,8 @@ public sealed partial class Workbench
         }
         if(entry.Kind=="MDL0Material")
         {
+            var surface=Action("Preview static native color / alpha surface",async()=>{var material=P.Materials.SingleOrDefault(m=>m.Id==selection.Entry.Id&&selection.Handle.DocumentId==workspace.Data.ActiveModel?.DocumentId)??throw new InvalidOperationException("Display this model first");await PreviewMaterialSurface(material);});
+            menu.Opened+=(_,_)=>{try{var target=P.Materials.Single(m=>m.Id==selection.Entry.Id&&selection.Handle.DocumentId==workspace.Data.ActiveModel?.DocumentId);MaterialSurface.Validate(target);surface.IsEnabled=true;}catch(Exception error){surface.IsEnabled=false;surface.ToolTip=error.Message;}};
             var inspect=new MenuItem{Header="Inspect material / individual sampler…"};menu.Items.Add(inspect);
             inspect.Click+=(_,_)=>{try{if(operation!=null)throw new InvalidOperationException("Wait for the native job");InspectMaterial(selection);}catch(Exception e){SetStatus(e.Message);}};
         }

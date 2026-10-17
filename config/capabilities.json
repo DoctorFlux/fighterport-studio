@@ -1432,6 +1432,15 @@
       "state": "SyntheticTested",
       "evidence": "PaletteTests.cs; Ci4Fixture.cs; ClassicSmoke.cs; artifacts/tests/20261017-015438",
       "limitations": "Genuine non-square 32x16 indexed native fixture, mip 0/1, independent nibble order/opaque/109-alpha/transparent colors; ambiguous palettes in distinct native dictionaries and missing palette reject. Explicit handle override and FPWORK persist. Published viewer mip/palette/alpha/apply checked. No general texture/palette writer."
+    },
+    {
+      "game": "Brawl",
+      "format": "MDL0 material / TEV",
+      "version": "9",
+      "operation": "static-reference-evaluate",
+      "state": "SyntheticTested",
+      "evidence": "tests/FighterPort.Tests/MaterialTests.cs; src/FighterPort.Desktop/MaterialPreview.cs",
+      "limitations": "Original native three-stage/two-texture fixture; bounded UV0 static CPU plane only, normalized float add/sub/bias/scale/constants/alpha comparisons and nearest/linear magnification. Independent sampler filtering before stages. Model viewport still approximate. No raster lighting, minification/LOD, indirect/projected texgen, nonidentity swaps, signed/unclamped/compare stages, animation, GPU precision or native material writer claim. Unsupported native metadata retained."
     }
   ]
 }

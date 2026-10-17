@@ -6,6 +6,8 @@ Model Editor shares the same project/session: animation type/filter and resource
 
 Save/reopen FPWORK retains native links and edited groups. Dirty guards now cover the current skeletal/VIS/SRT session. Layout/recent preferences are in ignored local configuration. Full OS-DPI/keyboard accessibility and unrestricted native property/archive editing remain incomplete; see UI_UX_PLAN.md. The following dated instructions are historical operation recipes; SRT0 editing/export and individual sampler inspection are completed subsets.
 
+Static material reference test: generate original fixtures with `./scripts/test.ps1 -WorkspaceOnly`, then Open `material.pac` in the reported test directory. Expand the model folder and double-click AsterFixture [MDL0]. Expand its Materials, right-click a material and choose **Preview static native color / alpha surface** (also available in the sampler inspector). Resource Browser shows the reference plane over a checkerboard with explicit limits. Return to Model Editor for the shared skinned model; its rendering remains approximate. Open `ci4.pac`, select a TEX0 and use the texture viewer for mip/palette overrides. A disabled material action explains why the native program exceeds the reference subset.
+
 ---
 
 # Historical resource workspace recipes — 2026-10-16

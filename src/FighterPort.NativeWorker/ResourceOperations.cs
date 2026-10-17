@@ -96,7 +96,7 @@ internal static partial class ResourceOperations
                     if(chr.Version!=4)throw new NotSupportedException("CHR0 v4 subset");Write(output,Program.ReadClip(chr));break;
                 case "resource-vis": Write(output,ReadVisibility(node as VIS0Node??throw new InvalidDataException("Select VIS0")));break;
                 case "resource-uv": Write(output,ReadUv(node as SRT0Node??throw new InvalidDataException("Select SRT0")));break;
-                case "resource-texture":case "resource-texture-probe":
+                case "resource-texture":case "resource-texture-probe":case "resource-texture-pixels":
                     var texture=node as TEX0Node??throw new InvalidDataException("Select TEX0");
                     if(texture.Width<1||texture.Height<1||texture.Width>4096||texture.Height>4096||(long)texture.Width*texture.Height>4*1024*1024||request.Mip<0||request.Mip>=texture.LevelOfDetail)throw new InvalidDataException("Texture dimension/mip quota");
                     var candidates=texture.BRESNode?.Children.SelectMany(g=>g.Children).OfType<PLT0Node>().Where(p=>p.Name==texture.Name).ToArray()??new PLT0Node[0];
@@ -106,6 +106,10 @@ internal static partial class ResourceOperations
                     using(var bitmap=texture.GetImage(request.Mip,palette)??throw new InvalidDataException("Texture decode failed"))
                     {
                         if(operation=="resource-texture")bitmap.Save(output,ImageFormat.Png);
+                        else if(operation=="resource-texture-pixels")
+                        {
+                            var rgba=new byte[checked(bitmap.Width*bitmap.Height*4)];for(int y=0;y<bitmap.Height;y++)for(int x=0;x<bitmap.Width;x++){var c=bitmap.GetPixel(x,y);int i=(y*bitmap.Width+x)*4;rgba[i]=c.R;rgba[i+1]=c.G;rgba[i+2]=c.B;rgba[i+3]=c.A;}Write(output,new TexturePixels{Width=bitmap.Width,Height=bitmap.Height,Rgba=Convert.ToBase64String(rgba)});
+                        }
                         else
                         {
                             var points=request.ProbePoints.Count==0?new[]{new[]{bitmap.Width/4,bitmap.Height/4},new[]{3*bitmap.Width/4,bitmap.Height/4},new[]{bitmap.Width/4,3*bitmap.Height/4},new[]{3*bitmap.Width/4,3*bitmap.Height/4}}:request.ProbePoints.ToArray();
@@ -161,6 +165,7 @@ internal static partial class ResourceOperations
         foreach(var mat in materials)
         {
             var result=new PreviewMaterial{Id=Id(mat),Name=mat.Name};
+            result.Program=ReadMaterialProgram(mat);
             result.Limitations.Add("Source approximation: one selected direct sampler / native UV and decoded color/alpha only. Native TEV, lighting, alpha-test, sampler composition, nearest/mip filtering and animated materials remain unevaluated.");
             foreach(var sampler in mat.Children.OfType<MDL0MaterialRefNode>())
             {
@@ -246,7 +251,7 @@ internal static partial class ResourceOperations
                     {var pal=bres.CreateResource<PLT0Node>("AlternatePalette");pal.ReplaceRaw(TextureConverter.EncodePLT0Palette(image.Palette,WiiPaletteFormat.RGB5A3));pal.Name="AlternatePalette";}
                 }
             }
-            else if(operation=="fixture-workspace-model"||operation=="fixture-workspace-ambiguous")
+            else if(operation=="fixture-workspace-model"||operation=="fixture-workspace-ambiguous"||operation=="fixture-workspace-material")
             {
                 var model=NodeFactory.FromFile(null,request.ModelPath) as MDL0Node??throw new InvalidDataException("Original MDL0 required");
                 bres.GetOrCreateFolder<MDL0Node>().AddChild(model);model.Populate();
@@ -266,6 +271,7 @@ internal static partial class ResourceOperations
                     var extra=new MDL0MaterialRefNode();material.AddChild(extra);extra.Texture="OriginalQuadrants";extra.Coordinates=BrawlLib.Wii.Graphics.TexSourceRow.TexCoord1;extra.UWrapMode=MatWrapMode.Mirror;extra.VWrapMode=MatWrapMode.Clamp;
                 }
                 foreach(MDL0ObjectNode mesh in model._objList)foreach(var draw in mesh._drawCalls)draw.VisibilityBoneNode=model.BoneCache.OfType<MDL0BoneNode>().First(b=>b.Name==(mesh==model._objList.Last()?"LeftHand":"Root"));
+                if(operation=="fixture-workspace-material")CreateMaterialFixture(model,bank);
             }
             else if(operation=="fixture-workspace-motion")
             {

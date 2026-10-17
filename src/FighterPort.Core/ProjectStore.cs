@@ -39,6 +39,11 @@ public static class ProjectStore
         Require(p.Bones.Count<=512&&p.Meshes.Count<=128&&p.Clips.Count<=256,"Project quota exceeded");
         Require(p.Materials.Count<=128&&p.Materials.Select(m=>m.Id).Distinct().Count()==p.Materials.Count,"Material identity/quota");
         foreach(var material in p.Materials)Require(material.PreviewSlot is >=0 and <=7&&(material.PreviewSlot==0||material.Textures.Any(t=>t.Slot==material.PreviewSlot))&&material.Textures.All(t=>float.IsFinite(t.LodBias)),"Invalid preview sampler/LOD metadata");
+        foreach(var material in p.Materials)
+        {
+            var program=material.Program;Require(program!=null&&program.ActiveStages is >=0 and <=16&&program.Stages.Count<=16&&program.Colors.Length is 0 or 4&&program.Constants.Length is 0 or 4,"Material program quota");
+            Require(program!.Colors.Concat(program.Constants).All(c=>c.Length==4&&c.All(v=>v is >=-1024 and <=1023))&&program.Stages.All(s=>s.Color.Length==4&&s.Alpha.Length==4),"Invalid retained TEV register/stage data");
+        }
         foreach(var material in p.Materials)Require(material.Textures.Count<=8&&material.Textures.Select(t=>t.Slot).Distinct().Count()==material.Textures.Count&&material.Textures.All(t=>t.Slot>=0&&t.Slot<=7&&Finite(t.RestSrt,5)),"Sampler identity/quota/rest state");
         Require(p.Bones.Select(b=>b.Name).Distinct().Count()==p.Bones.Count,"Duplicate bone names need explicit binding");
         Require(p.Bones.Select(b=>b.Id).Distinct().Count()==p.Bones.Count,"Duplicate bone IDs");

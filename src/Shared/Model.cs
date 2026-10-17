@@ -169,6 +169,61 @@ namespace FighterPort.Core
         public int PreviewSlot { get; set; }
         public List<TextureBinding> Textures { get; set; } = new List<TextureBinding>();
         public List<string> Limitations { get; set; } = new List<string>();
+        public NativeMaterialProgram Program { get; set; } = new NativeMaterialProgram();
+    }
+    public class NativeMaterialProgram
+    {
+        public int ActiveStages { get; set; }
+        public List<NativeTevStage> Stages { get; set; } = new List<NativeTevStage>();
+        public int[][] Colors { get; set; } = new int[0][];
+        public int[][] Constants { get; set; } = new int[0][];
+        public bool IdentitySwap0 { get; set; }
+        public int Compare0 { get; set; }
+        public int Compare1 { get; set; }
+        public int Reference0 { get; set; }
+        public int Reference1 { get; set; }
+        public int AlphaLogic { get; set; }
+        public bool Blend { get; set; }
+        public int SourceFactor { get; set; }
+        public int DestinationFactor { get; set; }
+        public bool BlendLogic { get; set; }
+        public bool SubtractBlend { get; set; }
+        public string Cull { get; set; } = "";
+        public bool DepthTest { get; set; }
+        public bool DepthWrite { get; set; }
+        public string DepthFunction { get; set; } = "";
+    }
+    public class NativeTevStage
+    {
+        public int TextureMap { get; set; }
+        public int TextureCoord { get; set; }
+        public bool TextureEnabled { get; set; }
+        public int[] Color { get; set; } = new int[0];
+        public int[] Alpha { get; set; } = new int[0];
+        public int ColorOperation { get; set; }
+        public int AlphaOperation { get; set; }
+        public int ColorBias { get; set; }
+        public int AlphaBias { get; set; }
+        public int ColorScale { get; set; }
+        public int AlphaScale { get; set; }
+        public int ColorRegister { get; set; }
+        public int AlphaRegister { get; set; }
+        public bool ColorClamp { get; set; }
+        public bool AlphaClamp { get; set; }
+        public int ConstantColor { get; set; }
+        public int ConstantAlpha { get; set; }
+        public int TextureSwap { get; set; }
+        public int RasterSwap { get; set; }
+        public int RasterSource { get; set; }
+        public uint NativeColor { get; set; }
+        public uint NativeAlpha { get; set; }
+        public uint NativeIndirect { get; set; }
+    }
+    public class TexturePixels
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string Rgba { get; set; } = "";
     }
     public class TextureBinding
     {

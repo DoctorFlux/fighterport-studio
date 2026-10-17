@@ -18,6 +18,7 @@ public sealed partial class Workbench
         slots.SelectionChanged+=(_,_)=>Describe();Describe();
         var apply=new Button{Content="Inspect selected sampler in viewport",Margin=new(5),Padding=new(5)};panel.Children.Add(apply);
         apply.Click+=(_,_)=>Native(async()=>{if(slots.SelectedIndex<0)return;await SelectSampler(material,material.Textures[slots.SelectedIndex].Slot);ShowProperties(selection);Describe();});
+        var reference=new Button{Content="Preview static native color / alpha surface",Margin=new(5)};panel.Children.Add(reference);try{MaterialSurface.Validate(material);}catch(Exception e){reference.IsEnabled=false;reference.ToolTip=e.Message;}reference.Click+=(_,_)=>Native(()=>PreviewMaterialSurface(material));
         Exception? failure=null;
         if(smoke)window.ContentRendered+=async(_,_)=>
         {
