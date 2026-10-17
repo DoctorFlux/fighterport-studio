@@ -11,6 +11,7 @@ repository root:
 ./scripts/test.ps1 -Gui
 ./scripts/test.ps1 -Companions -Gui
 ./scripts/test.ps1 -DumpSources -Gui
+./scripts/test.ps1 -Containers -Gui
 ./scripts/run.ps1
 ```
 
@@ -133,4 +134,45 @@ not manual clicking or independent native-tool/game validation. This script is f
 original fixture resolutions; commercial derivatives/captures must remain local.
 
 Run the existing default and `-Companions` suites separately; the new selection does
-not replace them. Companion checks also verify version 1 resolution compatibility.
+not replace them. Companion checks verify version 1 and 2 resolution compatibility without version 3 container attributes.
+
+
+Container acceptance (`-Containers`, add `-Gui`): original raw ARC/PAC with two nested
+branches, a selected model BRRES, texture/motion BRRES companions and an unrelated
+same-name texture. Explicit indexed choices must create enclosing PAC output. Checks
+compare ARC entry type/index/group/redirect/name/hierarchy, exact unrelated payload
+hashes, original geometry, two blended influences, translated child bind/inverse bind,
+material binding, every original RGBA8 texel, motion timing/loop and edited key.
+
+The original mesh blends Root/Paddle by 75/25 at its bottom and 25/75 at its top, with
+child bind pivot y=6. Native decoded weighted positions at the selected key are compared
+with independent weighted rotation about that pivot: 0.002 native position units, 0.0001
+for bind/weight checks and 0.001 degrees for the key. This is declared sampled/key-frame
+LBS verification, not arbitrary skeleton support or a continuous-error bound. The real
+GUI uses the inherited model preview, Play, CHR0 numeric edit, Program.Save and reopen.
+The saved output is edited-gui.pac. Nine original source hashes must remain unchanged.
+
+Negative cases cover cancelled inventory, entry bounds/depth, stale source/container
+identity, changed unrelated payloads, reserved header bytes the native writer would
+discard, compressed PCS and implicit embedded-resource replacement. Malformed inputs
+are separate disposable copies. The first negative-fixture generation attempt correctly
+hit the source write guard; generation was moved outside the mounted negative folder.
+A source-label encoding issue found in captures was corrected before accepting the final GUI run.
+
+Standalone product check (two launches, exact version 3 choices, normal native PAC open):
+
+```powershell
+./tests/NativeSmoke/VerifyDumpProduct.ps1 -NativeExtension pac -Resolution <absolute-original-container-ui.fpcompanion>
+```
+
+For explicit opt-in local native-header inventory only, after building the harness:
+
+```powershell
+./tests/NativeSmoke/bin/x86/Release/net472/NativeSmoke.exe --inspect-brawl <absolute-configured-PAC-path> <new-local-evidence-directory>
+```
+
+This registers read-only protection, reads bounded raw header metadata without a native
+model/moveset decoder, records versions/unsupported entries locally and checks the one
+input hash. It does not scan a drive, decode commercial geometry or demonstrate gameplay.
+Commercial metadata files/captures/derivatives remain ignored. Header inventory and
+companion admission are separate: unsupported MDL0 versions/opaque contents remain unsupported.

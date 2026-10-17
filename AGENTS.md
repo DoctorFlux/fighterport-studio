@@ -6,6 +6,9 @@ docs/DEVELOPMENT_STATUS.md, docs/FORMAT_SUPPORT.md, docs/TESTING.md and
 docs/plans/current.md. The clean restart supersedes the earlier bridge/WPF strategy.
 Read docs/FighterPort_Next_Codex_Milestone_2026-10-17.md as a supplementary milestone
 plan. It continues this codebase; plans/current.md is the only next executable task.
+Read docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md for the source-character-
+bound library, semantic rigs/IK/FK, native attacks/templates and vetted app-local tool
+provisioning requirements. These extend the product; they do not restart the app.
 
 - Main application is the actual BrawlCrate-derived WinForms application in application/.
   Preserve native editors; no external-editor launcher or rebuilt imitation shell.

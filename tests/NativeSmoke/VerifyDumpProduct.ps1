@@ -1,9 +1,11 @@
 # FighterPort original-fixture product-entrypoint verification, 2026-10-17. No game content.
-param([Parameter(Mandatory=$true)][string]$Resolution)
+param([Parameter(Mandatory=$true)][string]$Resolution, [ValidateSet('brres','pac')][string]$NativeExtension='brres')
 $ErrorActionPreference='Stop'
 $repoRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $exe=Join-Path $repoRoot 'application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe'
-$evidence=Join-Path $repoRoot ('artifacts/restart/dump-product-'+(Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
+$prefix=if($NativeExtension -eq 'pac'){'container-product-'}else{'dump-product-'}
+$nativeTitlePattern='assembled\.'+$NativeExtension
+$evidence=Join-Path $repoRoot ('artifacts/restart/'+$prefix+(Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
 New-Item -ItemType Directory -Path $evidence | Out-Null
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
@@ -78,8 +80,8 @@ try {
   $null=[DumpProductWindows]::SendMessage($return,0x00F5,[IntPtr]::Zero,[IntPtr]::Zero)
   $null=[DumpProductWindows]::SendMessage($button,0x00F5,[IntPtr]::Zero,[IntPtr]::Zero)
   $watch.Restart()
-  do {Start-Sleep -Milliseconds 200;$process.Refresh()} until ($process.MainWindowTitle -match 'assembled.brres' -or $watch.Elapsed.TotalSeconds -gt 25)
-  if($process.MainWindowTitle -notmatch 'assembled.brres'){throw 'Product did not open assembled native output'}
+  do {Start-Sleep -Milliseconds 200;$process.Refresh()} until ($process.MainWindowTitle -match $nativeTitlePattern -or $watch.Elapsed.TotalSeconds -gt 25)
+  if($process.MainWindowTitle -notmatch $nativeTitlePattern){throw 'Product did not open assembled native output'}
   # The selected texture is a ListView subitem, not window text. Verify all exact
   # resource identities in the resolution that the actual product just persisted.
   [xml]$saved=Get-Content -LiteralPath (Join-Path $env:FIGHTERPORT_DATA_ROOT 'CompanionResolutions/last.fpcompanion') -Raw

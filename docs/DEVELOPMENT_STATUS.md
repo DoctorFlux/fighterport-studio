@@ -12,9 +12,10 @@ Source upload adds no GUI/game evidence and does not resolve the distribution au
 Verify publication by comparing remote main with the uploaded local HEAD. Settings,
 inputs, builds and evidence remain local.
 
-Current checkpoint: [multi-root Brawl loose dumps](#multi-root-brawl-loose-dumps--2026-10-17)
-is implemented and verified. Earlier restart/companion receipts remain historical;
-the latest entry records the current executable, checks and next-task boundary.
+Current checkpoint: [raw nested Brawl containers](#raw-nested-brawl-containers--2026-10-17)
+is implemented and verified. Earlier receipts are historical. The animation/attack
+library specification is reconciled into requirements; its authoring services are not
+implemented by this container checkpoint.
 
 ## Initial restart receipts
 
@@ -263,3 +264,110 @@ plans/current.md. Full channels, nontrivial fixtures, actual character projects 
 measured A-to-different-B/native-output/non-Brawl retargeting, then installed Rivals
 Modkit movement/attack/build/playtest remain in the preserved milestone/master plan.
 No branch/tag push, PR, remote upload, CI dispatch or binary release occurred this increment.
+
+## Raw nested Brawl containers — 2026-10-17
+
+Continued actual HEAD `19ae7b2aa14c24d9cd6e6e8ef0bbe6769e9cbda4`; no newer completed
+work was replaced. The only initial untracked file was the supplied library master spec.
+It is preserved byte-for-byte as docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md
+(case rename on Windows), SHA256
+`63a211fdb31307530b2cbd84500ebd082516329708c8f6299fc1ee06db26a6d0`.
+The user's requested filename takes precedence over the different path proposed inside
+that document. MASTER_PLAN/AGENTS/ARCHITECTURE now trace SourceCharacterProfile,
+AnimationAsset/MoveAsset/MoveInstance, actual-edit projects, semantic recognition,
+interval IK/FK, native attack/template builders and vetted app-local provisioning.
+Those are product requirements, not fabricated implemented services or attack data.
+
+The current container-preserving acceptance criterion is complete for canonical raw
+ARC/PAC 0x0101 -> BRRES with the existing MDL0 v11 / TEX0 v1 RGBA8 / CHR0 v4 gates.
+Companion inventory now traverses nested ARC children and displays indexed resources
+and native lineage. Version 3 resolutions pin enclosing BRRES identity; versions 1/2
+remain readable. Explicit dependencies in different BRRES of the same PAC are imported
+into the selected base, rather than skipped just because their source file is the same.
+Embedded-resource replacement still fails explicitly. Assembly retains the enclosing
+native root and exports a real PAC. Fresh native decode checks the selected subset;
+the raw audit checks ARC names/type/index/group/redirect/hierarchy and exact unrelated
+payload hashes. Opaque/compressed/redirect/empty entries and noncanonical reserved/name/
+alignment/trailing bytes that the writer would discard are rejected before native decode.
+Prior file/inventory/assembly quotas remain, with bounded audit depth/records/diagnostics.
+
+Executed checks:
+
+- `scripts/build.ps1`: actual WinForms/net472/x86 app, 0 warnings / 0 errors. Doctor
+  confirms installed MSBuild 17.14.10 and net472 targeting pack; Cargo remains absent.
+  Doctor now reports the actual reviewed-source publication policy from configuration.
+- `scripts/test.ps1 -Containers -Gui`: original PAC with two nested ARC branches,
+  selected model BRRES, separate texture/motion BRRES and unrelated same-name texture.
+  Explicit choices remain distinct and restore in a fresh process. Native PAC assembly,
+  key edit/new-file export/reopen and exact unrelated bytes/entry metadata passed.
+- Original model: four known vertices, Root/Paddle with translated child bind y=6 and
+  inverse bind -6, mixed 75/25 and 25/75 weights, one material, all 1,024 RGBA8 texels,
+  31-frame looping CHR0. Decoded geometry/hierarchy/binds/weights/materials/timing/key
+  and native weighted vertices match independent expected geometry and analytic LBS.
+  Tolerances: 0.002 native position units, 0.0001 binds/weights, 0.001 degree key;
+  declared key samples only, not arbitrary rig fidelity or continuous error bounds.
+- Real companion selectors show nested identities. The actual native tree, texture/
+  material controls and OpenGL preview were exercised; weighted 0/60-degree poses and
+  35-degree edit were visually inspected. Play advanced to frame 15. Actual Program.Save
+  blocked source overwrite without losing dirty edits, wrote a separate edited-gui.pac,
+  and MainForm reopened its enclosing hierarchy and edited motion. The harness bypasses
+  OS file pickers; this is real-control automation, not manual clicking.
+- Cancelled inventory, entry bounds/depth, wrong saved enclosing identity, changed
+  source hash, altered unrelated payload, reserved header loss, compressed PCS and
+  implicit embedded-resource replacement fail explicitly. Negative inputs are copies.
+- All nine original source/fixture hashes stayed unchanged, including a post-standalone-
+  launch recheck. Exact untouched dependency BRRES payloads remain in the edited PAC.
+- Two normal FighterPort.Studio.exe startups restored the final version 3 resolution,
+  preserved exact source/container/resource choices, opened assembled.pac and exited
+  normally. The second launch used the product's own last resolution. This is separate
+  from the harness-hosted GUI test, not an external editor or a game run.
+- Existing default native/GUI, companion native/GUI and multi-root native/GUI suites
+  passed. Original seven/four/ten input hashes remain unchanged in their own suites.
+  A focused check loads versions 1 and 2 without the new container attributes. The
+  inherited distinct D: 8.3 alias probe remains skipped, not newly passed.
+
+Ignored local evidence:
+
+- `artifacts/restart/container-native-20261017-104434-483/result.txt`
+- `artifacts/restart/container-gui-20261017-104438-067/result.txt`, container-originals.sha256,
+  choices/texture/material/OpenGL/edited-key/native-PAC-reopen captures
+- `artifacts/restart/container-product-20261017-104524-543/result.json`, resume/native-open captures
+- `artifacts/restart/container-final-source-hashes.json`
+- `artifacts/restart/native-20261017-103701-932/result.txt`, `gui-20261017-103704-827/result.txt`
+- `artifacts/restart/companions-native-20261017-104030-262/result.txt`, `companions-gui-20261017-103718-585/result.txt`
+- `artifacts/restart/dump-native-20261017-103454-406/result.txt`, `dump-gui-20261017-103458-472/result.txt`
+- `artifacts/restart/build-Release.log`, `test-build-Release.log`
+
+Opt-in configured Brawl inspection ran only the bounded read-only header inventory on
+two existing files, with before/after hashes unchanged. The model file reports 17 native
+records: ARC 0x0101, BRRES, MDL0 v9, TEX0 v1. The other file reports 120 records including
+CHR0 v4, CLR0 v3, SRT0 v4 and four opaque/EFLS/REFF/REFT entries. Raw TSV, issues and
+hashes remain ignored under configured-brawl-model-20261017-103017-042 and
+configured-brawl-moves-20261017-103017-133. No commercial geometry, animation or gameplay
+was decoded/previewed/edited/exported by this inspection. Finding v9 does not widen the
+companion gate. There is still no configured Goku input; no Goku/Modkit/game result is claimed.
+
+Final executable: `D:/Users/ChatGPT/ROA2TOOL/application/BrawlCrate/bin/x86/Release/net472/FighterPort.Studio.exe`.
+SHA256: `68a4e115c1c5500421b0669c18d7fc819561348dd5a230df76825acbdec4da3b`.
+Edited native PAC SHA256: `82393ff3881adb49aaa6ffc24a8931261b083f2b51331413be8c53f48f36c19b`.
+The first expanded negative test correctly hit source protection while generating into
+an already mounted negative folder; generation was moved to an unmounted fixture folder.
+An encoding issue visible in early source labels was fixed with UTF-8/Unicode escapes.
+Early evidence remains local; only the final passing captures/results support this entry.
+
+Remaining: PCS/decompression/recompression, opaque/redirect/noncanonical header fidelity,
+MDL0 v9 and other required versions, palettes/alpha/mips/multiple materials, more complex
+skinning/rest/scale/helper semantics and genuinely animated ancillary channels. The empty
+SRT0 test still proves metadata only. Modified-BRRES arbitrary opaque data is not certified.
+There is no new retargeter, imported attack behavior, character-edit project/library,
+semantic IK/FK, target framework/template builder or automatic tool installer yet. No
+separate native tool, Modkit, in-game or broad retail-character validation ran. Existing
+licensing/corresponding-source audit and legacy parser sandbox limitations remain open.
+No assets, derivatives, captures, settings, binaries or recovery contents enter Git.
+
+The next executable task in plans/current.md is the first visible source-bound library
+and persistent edit-project increment on two genuinely different original rigs. Complete
+Brawl fidelity, all wider game/target routes, native attack conversion, bidirectional Mario/
+Snake proof, Melee and real Goku/Rivals template/attack/build/playtest remain required.
+Source publication follows standing authorization after exact public-origin verification,
+review and normal history-preserving push; publication success is verified separately.

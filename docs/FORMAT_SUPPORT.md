@@ -10,6 +10,8 @@ No previous FighterPort counts or capabilities transfer to this codebase.
 | File > Open Source | Bounded loose-folder inventory, detected extension, verified working copy, guarded native outputs and persistent concurrent mounts tested | Actual list/button opens native editor; standalone product entrypoint also checked | No installation/image/decompression provider yet |
 | Explicit Brawl companions: model BRRES / TEX0 v1 RGBA8 / CHR0 v4 | Missing/ambiguous choices, second-candidate selection, versioned source/resource identities, independent-process restore, guarded assembly, native edit/new-save/reopen and four unchanged sources passed | Actual selectors, native textured poses/playback/key edit and two standalone executable launches verified | Brawl-only loose resources; no palette, cross-rig, container, package or game claim |
 | Configured multi-root Brawl loose dumps | Paged header-only discovery; complete relative-file/container-path overrides; equal-priority ambiguity; explicit lower-priority choice; roots/priorities and hash/native-identity pins restored across processes; six budgets/cancellation/missing/changed/reparse cases tested | Actual dump list/stage actions feed companion selectors and native textured playback/key edit/new-save/reopen; standalone product restart checked separately in status | BRRES/TEX0/CHR0 discovery only. No PAC/PCS nesting, installation/image access or fighter-package round trip |
+| Raw nested ARC/PAC 0x0101 -> BRRES companions | Explicit indexed container/native identities; enclosing PAC assembly, native edit/new-save/reopen; exact unrelated payload hashes/entry IDs; cancellation/bounds/depth/header-loss/collision/stale-input rejection tested | Actual selectors, texture/material panels, native blended-skin OpenGL playback/key edit and separate PAC reopen observed; standalone product restores choices | Canonical raw known children only; no PCS/opaque/redirect/noncanonical-header path or retail fighter/gameplay claim |
+| Original MDL0 v11 blended fixture | Two bones with nonidentity child bind/inverse bind, 25/75 and 75/25 vertex blends, exact expected geometry/material/all RGBA8 pixels, timing/loop/key checked through native PAC output | Native weighted poses compared with analytic LBS at declared key frames; GUI visible deformation/play/edit observed | Two-bone subset only; no arbitrary rest/scale/helper/retarget or continuous-error bound claim |
 | Base SRT0 v4 preservation | Original empty-entry fixture name, 17-frame timing and loop flag retained through assembly/native edit/save/reopen | No SRT0 authoring/preview claim added | Does not prove arbitrary channel/opaque-field preservation |
 | Other inherited Brawl editors/resources | Source retained; operation-specific tests pending | Inherited controls retained, unverified | No universal fidelity claim |
 | Smash 64, Melee, Wii U, 3DS, Ultimate | Planned per game/version | Planned | Planned native output/gameplay/game checks |
@@ -37,17 +39,22 @@ Brawl character-readiness queue (inherited source retained; queued operations ar
 | Resource/version | Read | Preview/evaluate | Edit | Preservation | Native write / package |
 |---|---|---|---|---|---|
 | BRRES + MDL0 v11, rigid original fixture | Native tested | Textured poses tested | Declared key/material workflow only | Geometry/identity binds checked | Separate BRRES tested; no fighter package |
-| MDL0 other versions / blended weights / changed rest hierarchy | Header admission only | Nontrivial fixtures queued | Queued per subset | Queued decoded binds/weights | Queued per version |
+| MDL0 other versions / other blended rigs / changed rest hierarchy | Header admission only | Nontrivial fixtures queued | Queued per subset | Queued decoded binds/weights | Queued per version |
+| MDL0 v11 original two-bone blended weights / translated child bind | Native tested | Declared key poses and analytic weighted vertices tested | Native key edit tested | Geometry, hierarchy, weights and nonidentity bind/inverse bind checked | New enclosing PAC save/reopen tested; other versions/rig semantics remain queued |
 | CHR0 v4 original rigid motion | Native tested | Native playback tested | Numeric key tested | Declared key/timing/loop checked | Native BRRES save/reopen tested |
 | CHR0 other versions / arbitrary rig semantics | Header admission only | Queued | Queued | Tangents/winding/scale/fractional cases queued | Queued, no retarget claim |
 | TEX0 v1 RGBA8 without palette / one material | Native tested | Original texels/material preview tested | Inherited controls exercised; no broad edit claim | Original selected pixels checked | BRRES assembly/save/reopen tested |
 | TEX0 other versions / PLT0 / palette alpha / mip chains / multiple materials | Header admission only | Queued original fixtures | Queued | Queued decoded pixels/palette/mips | Queued per version |
 | SRT0 v4 empty base entry | Native metadata tested | Animated fidelity unverified | Unverified | Name/timing/loop only | Base BRRES metadata retained |
 | Animated SRT0 / PAT0 / CLR0 / VIS0 / SHP0 / SCN0 and material/shader semantics | Header admission only | Nonempty synchronized fixtures queued | Queued | Opaque/curve fidelity unverified | Queued per version/channel |
-| ARC/PAC 0x0101 original raw nested BRRES | Declared source staging/read tested | Embedded fixture only | No container GUI edit claim | General unknown-entry fidelity unverified | Container-preserving companion output queued |
-| PCS/compressed/nested character packages | Loose provider refuses explicitly | Queued | Queued | Hierarchy/unknown entries must survive or fail precisely | Bounded decompression/recompression and package checks queued |
+| ARC/PAC 0x0101 original raw nested BRRES | Bounded inventory/source staging and exact entry identities tested | Embedded blended fixture and native tree tested | Native animation key edit tested | Exact unrelated payload bytes/ARC metadata checked; modified-BRRES opaque fidelity remains unverified | Actual enclosing PAC assembly/new-save/reopen tested; no full fighter/gameplay claim |
+| PCS/compressed/opaque retail character packages | Loose provider refuses explicitly | Queued | Queued | Hierarchy/unknown entries must survive or fail precisely | Bounded decompression/recompression and package checks queued |
 
-Configured real-input versions must be inventoried opt-in before widening these gates.
-The local configuration currently names Brawl/Ultimate Mario folders, not a Goku source;
-their historical metadata is not new verification. No commercial resource was decoded in
-the multi-root fixture suite. Full Brawl/Project M/Project+ scope remains in the master plan.
+Opt-in current configured Brawl Mario header inventory observed ARC 0x0101, MDL0 v9,
+TEX0 v1, CHR0 v4, CLR0 v3 and SRT0 v4, plus opaque/EFLS/REFF/REFT entries. This was
+bounded read-only metadata inspection with unchanged source hashes, not native decoding,
+preview/edit/export or game verification. MDL0 v9 is still outside companion assembly.
+No Goku source is configured. Full Brawl/Project M/Project+ scope and all channel/format
+fidelity rows remain required. No character library/projects, semantic rigs/IK/FK,
+attack translators, native templates or managed tool provisioning were implemented by
+this container increment; those are traceable requirements in the new master spec/plan.

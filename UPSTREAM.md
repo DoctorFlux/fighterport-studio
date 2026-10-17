@@ -45,6 +45,10 @@ FighterPort modifications dated 2026-10-17 are separate from that verified basel
   independent root profiles, selection-time mount/container lineage in version 2
   companion resolutions (version 1 loading retained), existing native editor integration,
   and original base/override/conflict/restart/native-GUI tests. Native format gates remain unchanged.
+- Raw nested ARC/PAC companion traversal, version 3 enclosing-container identities,
+  canonical-header admission and exact unrelated-payload preservation audit, native PAC
+  assembly/editor integration, opt-in read-only header inventory and original blended-
+  skinning/nonidentity-bind tests. Model/texture/motion version gates remain unchanged.
 
 The baseline manifest remains unchanged as a comparison anchor. Git diffs and local commits record
 each modification. `scripts/verify-upstream.py` reports divergence and validates baseline entries.

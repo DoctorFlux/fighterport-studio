@@ -32,12 +32,12 @@ resource tag does not establish editing fidelity for that format/version.
 
 `CompanionWorkspace` is a separate Brawl-specific service used by File > Brawl Companions.
 It inventories only explicitly added files through the same guarded staging path. A model
-is selected from a base BRRES; exact-name textures and one skeletal motion are selected
+is selected from a base BRRES (standalone or inside raw nested ARC/PAC); exact-name textures and one skeletal motion are selected
 explicitly. Even one matching candidate requires a choice. Multiple matches remain
 ambiguous until selected. The implemented gate is MDL0 v11, TEX0 v1 RGBA8 without palettes,
 and CHR0 v4 with exact matching bone names; no cross-rig correction is performed.
 
-Version 2 `.fpcompanion` XML (with version 1 loading retained) records absolute source paths, complete-file SHA256, indexed
+Version 3 `.fpcompanion` XML (with versions 1/2 loading retained) records absolute source paths, complete-file SHA256, indexed
 native resource paths, type/name identities, native versions and texture bindings. Loading
 rejects relative/network source paths before file access and verifies hashes before
 native parsing and again after staging; missing/changed sources
@@ -46,8 +46,8 @@ Native File > Open and command-line file opening route this extension to the wor
 Save/Resume last uses `DataRoot/CompanionResolutions/last.fpcompanion`; the format stores
 resolution choices, not dirty native edits or a game-neutral character project.
 
-Assembly retains the entire base BRRES resource tree, imports only selected textures and
-one motion, and refuses existing-name replacement. Other native entries are listed as
+Assembly retains the entire native root and selected base BRRES resource tree, imports only selected textures and
+one motion into that BRRES, and refuses existing-name replacement. Other native entries are listed as
 retained base data or unimported companion data. A fresh native decode checks expected
 entries and motion metadata before opening the new working BRRES. Native edits use the
 existing editor/Save As path and are saved separately; original source files are never
@@ -58,7 +58,29 @@ Companion budgets: 16 source files, 128 MiB inventory, 64 MiB per file and conse
 selected-source assembly budget, 64 texture bindings, and 128 retained work sessions /
 1 GiB under `DataRoot/CompanionWorkspaces`. Existing per-file staging quotas also apply.
 Work sessions and source receipts remain until the user archives them. This path does
-not discover installations, unpack containers or act as an intermediate for other games.
+not discover installations, decompress inputs or act as an intermediate for other games.
+
+`BrawlContainerAudit` provides a bounded read-only raw header inventory and companion
+preservation check (64 MiB/file, 4,096 records, depth 16, 128 diagnostics). It records
+native versions, indexed nested paths, ARC type/index/group/redirect metadata and names.
+It reports unknown/compressed entries without invoking native decoders. Opt-in CLI
+inventory is independent of companion format admission; finding MDL0 v9 does not enable it.
+Before companion staging/native decode, the audit rejects opaque/compressed/empty/redirect
+entries, noncanonical ARC name bytes, reserved fields, alignment or trailing bytes that
+the inherited ARC writer cannot retain. The existing raw staging validator still runs; the audit also validates the exact
+hash-pinned staged bytes before native decoding.
+
+Companion inventory traverses ARC -> BRRES -> native groups, preserving file/mount and
+full indexed container identity. Version 3 choices additionally pin enclosing BRRES paths
+and native lineage. Same-name resources in different BRRES stay separate explicit choices.
+Sources in the same PAC but different BRRES are imported when explicitly selected;
+same-file membership alone never means a dependency is already in the selected base.
+Assembly of an ARC source exports the enclosing native PAC, not a flattened BRRES.
+Fresh output decode verifies the selected native subset. The raw audit compares all ARC
+hierarchies/entry IDs and hashes unrelated payload ranges exactly, excluding only the
+modified BRRES contents. The selected BRRES's container identity/version must still match.
+This does not prove arbitrary opaque fields inside a modified BRRES; those remain a
+separate fidelity obligation. Native editor Save/reopen is additionally checked by tests.
 
 `BrawlDumpProfile` records up to 16 stable mount IDs, local roots, labels, enabled state
 and integer priorities (-999..999; higher wins). Configuration is saved independently
@@ -124,6 +146,22 @@ adapters; native resource layer; game-neutral character project preserving nativ
 animation/retargeting services; separate target asset writers and gameplay compilers; validation.
 Other games will not be encoded through MDL0/CHR0 as a universal intermediate. Modern/64-bit
 workers may isolate large archives or incompatible dependencies without a speculative UI rewrite.
+
+The product's planned authoring domain is now explicit: SourceCharacterProfile owns
+exact native model/rig provenance and reviewed characterization; AnimationAsset owns
+source-bound motion; MoveAsset owns actual attack evidence or an explicitly authored
+draft; MoveInstance owns non-destructive target/slot/correction/gameplay overrides.
+Versioned character projects persist actual edits/native originals, independent target
+branches and a defined transactional/undo policy. These are planned services, not new
+classes implemented by .fpcompanion. Animation-only input never invents attack behavior.
+The shared rigging core must separate fingerprint/template/heuristic recognition and
+review from FK transfer, editor-only IK controls, interval contacts and measured target
+baking. Aerial attacks receive no default ground locks. Native gameplay compilers and
+real target templates remain separate from animation transfer and mesh rebinding.
+Managed tool provisioning is a planned app-local service with reviewed pinned manifests,
+trusted hashes/downloads, dependencies/compatibility probes, project locks, offline cache,
+cancellation, rollback and manual paths. No arbitrary remote scripts/global installs,
+silent EULAs, credentials or game data are authorized. No new dependency was added here.
 
 Project state must preserve exact IDs/binds/winding/timing, opaque records, semantic maps,
 correction layers, source and target branches, companion ambiguity and explicit losses.

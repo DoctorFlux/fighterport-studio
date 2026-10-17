@@ -13,6 +13,12 @@ origin verification. Binary releases, artifacts, tags and CI dispatch remain una
 Supplement: [reviewed continuation milestone](FighterPort_Next_Codex_Milestone_2026-10-17.md),
 preserved as supplied (reviewed snapshot 20a8dc5). Its R2/readiness/R3/R4 refinements
 continue this application. They do not create a second current-task queue.
+Product definition: a source-character-bound animation/attack library, character/moveset
+editor, semantic rigging/IK/FK retargeting tool and native target-game builder inside this
+application. The [animation/attack library specification](FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md)
+is preserved as supplied; its proposed APIs/features are requirements, not implementation
+evidence. The user's requested canonical filename takes precedence over the alternative
+filename suggested inside the supplied document. Actual HEAD at continuation was 19ae7b2.
 
 | Requirement | Permanent scope |
 |---|---|
@@ -30,7 +36,16 @@ continue this application. They do not create a second current-task queue.
 | REQ-08 | Encoded-size/error-aware animation optimization with protected events, fractional/loop tests; non-destructive material/style conversion, regions, UVs/palettes/color-space/alpha/mips and measured destination preview |
 | REQ-05-INTERCHANGE | Verified bidirectional FBX, glTF/GLB subsets, COLLADA/DAE, SMD/ANIM; optional equal Blender/Maya/Max bridges and versioned conflict-aware manifests; no DCC needed for core editing |
 | REQ-11 | Original fixtures; per-operation capabilities; decoded output and source hashes; independent numeric expectations; GUI, native-tool, Modkit and in-game checks reported separately |
-| REQ-10-TOOLS | Bounded optional-tool discovery, version and availability reporting, manual path overrides and doctor diagnostics; no automatic global installation, EULA acceptance or paid dependency |
+| REQ-10-TOOLS | Managed app-local provisioning after supported automatic setup is enabled: vetted manifests, pinned immutable official downloads/size/SHA256/trust, dependency setup, architecture/profile compatibility, health checks, project locks, offline cache, cancellation, rollback/revocation and manual paths. No arbitrary remote scripts, global installs, silent EULAs, credentials, paid dependency or bundled game data. Detection alone is insufficient. |
+| REQ-LIB-SOURCE | SourceCharacterProfile: exact source game/build/mount/container/model/skeleton identity, native versions/data, binds/inverse binds, hierarchy, axes/units/scale semantics, fingerprint and independently reviewed semantic characterization. Batch clips remain bound to that rig; matching names are not compatibility. |
+| REQ-LIB-ASSET | AnimationAsset: source-bound native motion, timing/curves/tangents/winding, ancillary channels, dependencies/evidence and revisioned layers. MoveAsset: actual native attack evidence or explicitly authored draft gameplay, typed timing/anchors/hitboxes/movement/landing/effects/audio/props and unresolved commands. Animation-only import never fabricates attack behavior. |
+| REQ-LIB-INSTANCE | MoveInstance: non-destructive target assignment, reviewed retarget/correction layers, target slot/time/gameplay overrides, independent versioned outputs and dependency/tool/mapping fingerprints; source/library revisions remain immutable and stale instances/builds are visible. |
+| REQ-LIB-PROJECT | Versioned persistent character projects distinct from .fpcompanion: actual edits, native originals, rigs/binds/weights, curves/timing, materials/outfits, mappings/approvals, corrections, target branches, transactional commands and an explicit undo-history persistence policy. |
+| REQ-RIG-SEMANTIC | Automatic deterministic recognition: reviewed exact profiles, versioned game templates, naming/hierarchy/rest/geometry/weight/motion evidence, confidence/reasons/conflicts and correction UI. Unknown/changed rigs are never silently approved; missing fingers/toes remain missing; extensible nonhumanoid chains. |
+| REQ-RIG-IKFK | Editor-side chains/FK/two-bone IK/poles, pelvis/root policy, twist/helpers, orientations, per-clip contact intervals/corrections/blends and explicit solver limits; aerial attacks have no default planted feet. Bake supported native deformation bones, never export control rigs. |
+| REQ-ATTACK-NATIVE | Separate native gameplay adapters/compilers: semantic hitbox anchors and local frames, exact source/gameplay time mappings, explicit size/physics policy, movement/landing, dependencies/effects/audio/props and unresolved-command reporting. Animation transfer, mesh rebinding and gameplay conversion remain distinct. |
+| REQ-TEMPLATE | Real versioned Brawl/PM/P+, Melee, Ultimate and Rivals II target assets/references/framework/slot setup, native writers and validated build paths. Inspect installed Modkit/templates/interfaces/engine build; no guessed APIs or folder-only playable claims. |
+| REQ-E2E-LIB | Defining route: Brawl Mario forward aerial -> library -> Ultimate Snake native rig/moveset slot -> genuine native asset + gameplay output -> decoded validation -> game test when configured. Reverse independently. Original genuinely different rigs, a Melee route and Goku Rivals II mesh/animations/template plus one real attack are required independent proofs. |
 
 No perfect automatic arbitrary-rig retargeting, guessed approved commercial maps, fabricated
 native writers or playable-fighter claims. No bundled keys/access bypass; encrypted or unsupported
@@ -38,6 +53,17 @@ inputs report prerequisites. Cooked extraction is not recovered authoring data. 
 automatic EULA acceptance or paid services. Binary distribution requires component/license audit.
 
 Ordered executable milestones (only one current acceptance criterion lives in plans/current.md):
+
+Primary full authoring targets are Brawl/Project M/Project+, Melee, Ultimate and Rivals II;
+FighterZ, Sparking! ZERO and Xenoverse 1/2 are required model/animation sources. Every
+wider game/native-output/channel/interchange/optional DCC row above remains permanent.
+After current Brawl container/fidelity work, the first useful library increment must
+show two original source-character profiles, correctly associated clips, a visible
+library/preview, honest draft-attack status, target slot assignment and actual edit
+project save/reopen/undo. Then reviewed characterization/FK, IK/contact-aware baking,
+parsed attack transfer and primary target templates prove the defined E2E routes.
+Develop managed provisioning alongside the first external adapter: original harmless
+package installation/rejection/rollback tests plus one genuinely integrated pinned tool.
 
 1. R0: verified external recovery; pinned application import; original build with documented minimal
    repairs; source/license inventory. Replace old active implementation, retain Git history.
@@ -49,12 +75,17 @@ Ordered executable milestones (only one current acceptance criterion lives in pl
    original-fixture/native GUI gates: scoped ordered file overrides, cancellation, quotas,
    selected-file staging and pinned identities across restart. Installation providers,
    separate platform image/container readers and corruption checks remain queued.
-   Next Brawl readiness: opt-in actual configured resource/version inventory; native nested
+   Raw nested ARC/PAC -> BRRES selection, enclosing PAC assembly/edit/save/reopen, exact
+   unrelated payload/entry identity checks and original blended skinning now pass.
+   Current configured Brawl header versions were inventoried opt-in; no retail decode/game claim.
+   Remaining Brawl readiness: required native versions (observed MDL0 v9); nested
    ARC/PAC/PCS/BRRES lineage and container-preserving output; palettes/alpha/mips, multiple
    materials, nontrivial blended skinning and genuinely animated SRT0/PAT0/CLR0/VIS0/SHP0/SCN0
    fixtures. Read/preview/edit/preserve/write/package evidence stays separate. No flattening
    a fighter package into BRRES and calling it a package round trip.
-4. R3: game-neutral character projects plus native original retention, semantic review/mapping,
+4. R3: first visible source-character-bound library and real edit-project increment (current
+   acceptance), then semantic characterization and retargeting. Preserve native originals,
+   immutable/revisioned source profiles/animations/moves, non-destructive target instances, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original
    changed-axis/proportion/helper/contact fixtures with declared pose/orientation, contact/foot-slide,
    loop-seam and post-export decoded-motion tolerances. Channel remapping remains separately declared.

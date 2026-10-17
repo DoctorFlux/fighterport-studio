@@ -77,10 +77,14 @@ internal static partial class NativeSmoke
         workspace.Save(resolution);
         Expect<IOException>(() => workspace.Save(Path.Combine(Path.GetDirectoryName(paths[0]), "forbidden.fpcompanion")), "resolution save must not write mounted sources");
         var doc = new XmlDocument { XmlResolver = null }; doc.Load(resolution);
-        doc.DocumentElement.SetAttribute("version", "1");
-        doc.DocumentElement.RemoveChild(doc.DocumentElement.SelectSingleNode("brawlDumpRoots"));
-        string legacyResolution = Path.Combine(_output, "version1.fpcompanion"); doc.Save(legacyResolution);
-        Assert(CompanionWorkspace.Load(legacyResolution, storage).TextureSelections["OriginalQuadrants"].SourcePath == paths[2], "existing version 1 resolutions still restore exact selections");
+        foreach(string version in new[]{"1","2"})
+        {
+            doc.Load(resolution); doc.DocumentElement.SetAttribute("version",version);
+            if(version=="1") doc.DocumentElement.RemoveChild(doc.DocumentElement.SelectSingleNode("brawlDumpRoots"));
+            foreach(XmlElement choice in doc.DocumentElement.SelectNodes("choice")) {choice.RemoveAttribute("containerPath");choice.RemoveAttribute("containerIdentity");}
+            string legacyResolution=Path.Combine(_output,"version"+version+".fpcompanion");doc.Save(legacyResolution);
+            Assert(CompanionWorkspace.Load(legacyResolution,storage).TextureSelections["OriginalQuadrants"].SourcePath==paths[2],"existing version "+version+" resolutions restore exact selections");
+        }
         doc.Load(resolution);
         ((XmlElement)doc.DocumentElement.SelectSingleNode("source")).SetAttribute("sha256", new string('0', 64));
         string stale = Path.Combine(_output, "changed-source.fpcompanion"); doc.Save(stale);

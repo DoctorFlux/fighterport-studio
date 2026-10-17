@@ -20,6 +20,12 @@ Changed or missing sources stop restoration. Open assembled copy uses the native
 editors. Save edited work separately as a native BRRES: the resolution records source
 choices and rebuilds from those pinned originals, rather than storing pending edits.
 Verify this slice with `./scripts/test.ps1 -Companions -Gui`.
+Add source files also accepts canonical raw PAC/ARC containing nested BRRES. Indexed
+paths distinguish same-name resources in different entries. Select companions explicitly;
+Open assembled copy retains the enclosing PAC hierarchy and validates unrelated payloads.
+Native edits save separately as PAC and reopen through the inherited tree/editor.
+Compressed/opaque/redirect entries and unrepresentable header bytes fail explicitly.
+Verify this subset with `./scripts/test.ps1 -Containers -Gui`.
 
 For matching loose-dump/override folder layouts, open Brawl Companions > Dump folders.
 Add non-overlapping roots, set priorities (larger numbers win) and Save roots. Discover
@@ -36,6 +42,10 @@ location. Preserve that folder when updating the application; staged edits are n
 automatically deleted. Upstream profiles are not imported.
 
 This is a source development checkpoint, not a released binary or a playable-fighter exporter.
+The product roadmap is a source-character-bound animation/attack library and moveset
+editor with semantic rigging/IK/FK and native target builders. The library/project/
+retarget/gameplay/template/tool-provisioning services remain planned; see the
+[master specification](docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md).
 All remaining games and conversion goals remain in [the master plan](docs/MASTER_PLAN.md).
 Current evidence: [development status](docs/DEVELOPMENT_STATUS.md).
 One next task: [current plan](docs/plans/current.md).

@@ -21,6 +21,8 @@ namespace BrawlCrate.Sources
         public string Kind { get; internal set; }
         public int Version { get; internal set; }
         public string Detail { get; internal set; }
+        public string ContainerPath { get; internal set; }
+        public string ContainerIdentity { get; internal set; }
         public string MountId { get; internal set; }
         public string MountRoot { get; internal set; }
         public string MountLabel { get; internal set; }
@@ -28,8 +30,8 @@ namespace BrawlCrate.Sources
         public string LogicalPath { get; internal set; }
         public string SelectionReason { get; internal set; }
         public string Identity => SourceHash + ":" + TreePath + ":" + Kind + ":" + Name;
-        public override string ToString() => Name + " — " + Kind + " v" + Version + " — " +
-            (MountId == null ? SourcePath : MountLabel + " (priority " + MountPriority + ") / " + LogicalPath) + " [" + TreePath + "]";
+        public override string ToString() => Name + " \u2014 " + Kind + " v" + Version + " [" + TreePath + "] \u2014 " + ContainerIdentity + " \u2014 " +
+            (MountId == null ? SourcePath : MountLabel + " (priority " + MountPriority + ") / " + LogicalPath);
     }
 
     /// <summary>Brawl-specific explicit dependency choices, not a game-neutral project or retargeter.</summary>
@@ -63,7 +65,7 @@ namespace BrawlCrate.Sources
             (s.OtherResources.Count > 8 ? " (and " + (s.OtherResources.Count - 8) + " more native resources)" : "") +
             (Model != null && string.Equals(s.File.SourcePath, Model.SourcePath, StringComparison.OrdinalIgnoreCase) ? " retained in base" : " not imported from this companion")));
         public static string LastResolutionPath => Path.Combine(FighterPortPaths.DataRoot, "CompanionResolutions", "last.fpcompanion");
-        public const string ScopeNotice = "Brawl subset: MDL0 v11, TEX0 v1 RGBA8 without palettes, CHR0 v4 with matching bone names. Base BRRES resources are retained; only selected textures and one motion are added. Other companion channels are not imported. This is not retargeting.";
+        public const string ScopeNotice = "Brawl subset: MDL0 v11, TEX0 v1 RGBA8 without palettes, CHR0 v4 with matching bone names. Raw nested ARC/PAC hierarchy and the selected base BRRES are retained; only selected textures and one motion are added. Other companion channels are not imported. This is not retargeting.";
 
         public CompanionWorkspace(string storageRoot = null)
         {
@@ -97,11 +99,14 @@ namespace BrawlCrate.Sources
             if (length > SourceFolderSession.MaxFileBytes || _sources.Sum(s => s.File.Length) + length > 128L * 1024 * 1024)
                 throw new IOException("Companion inventory is limited to 64 MiB per file and 128 MiB total.");
             var session = new SourceFolderSession(Path.GetDirectoryName(path), _storageRoot);
+            BrawlContainerAudit.Inspect(path, token).RequirePreservable();
             var source = new Source { File = session.Stage(path, token) };
+            // Validate the exact hash-pinned bytes given to the native decoder as well.
+            BrawlContainerAudit.Inspect(source.File.StagedPath, token).RequirePreservable();
             using (ResourceNode root = NodeFactory.FromFile(null, source.File.StagedPath))
             {
-                if (!(root is BRRESNode) && !(root is TEX0Node) && !(root is CHR0Node))
-                    throw new IOException("Choose a model BRRES, texture BRRES/TEX0 or motion BRRES/CHR0. Other resource types are not companion inputs yet.");
+                if (!(root is ARCNode) && !(root is BRRESNode) && !(root is TEX0Node) && !(root is CHR0Node))
+                    throw new IOException("Choose raw ARC/PAC containing BRRES, a model BRRES, texture BRRES/TEX0 or motion BRRES/CHR0. Other resource types are not companion inputs yet.");
                 Walk(root, "", (node, treePath) =>
                 {
                     token.ThrowIfCancellationRequested();
@@ -113,9 +118,11 @@ namespace BrawlCrate.Sources
                         if (node is BRESEntryNode) source.OtherResources.Add(node.GetType().Name + " '" + node.Name + "'");
                         return;
                     }
+                    ResourceNode container = EnclosingBrres(node);
                     int version = node is MDL0Node model ? model.Version : node is TEX0Node texture ? texture.Version : ((CHR0Node)node).Version;
                     source.Resources.Add(new CompanionResource { SourcePath = path, SourceHash = source.File.Sha256,
                         TreePath = treePath, Name = node.Name, Kind = kind, Version = version,
+                        ContainerPath = container == null ? null : NodePath(root, container), ContainerIdentity = NativeLineage(node),
                         MountId = origin?.MountId, MountRoot = origin?.Root, MountLabel = origin?.RootLabel, MountPriority = origin?.Priority ?? 0,
                         LogicalPath = origin?.RelativePath, SelectionReason = reason,
                         Detail = node is TEX0Node t ? t.Format + (t.HasPalette ? " with palette" : "") : "" });
@@ -137,7 +144,7 @@ namespace BrawlCrate.Sources
             if (Model == resource) return; // Refreshing the same model must not clear explicit texture choices.
             using (ResourceNode root = OpenSource(resource))
             {
-                if (!(root is BRRESNode)) throw new IOException("The model must be selected from a BRRES so its other native resources can be retained.");
+                if (resource.ContainerPath == null) throw new IOException("The model must be selected from a BRRES so its native container and other resources can be retained.");
                 var model = (MDL0Node)Locate(root, resource);
                 model.Populate();
                 var names = model._matList.OfType<MDL0MaterialNode>().SelectMany(m => m.Children.OfType<MDL0MaterialRefNode>())
@@ -182,7 +189,7 @@ namespace BrawlCrate.Sources
                 using (ResourceNode modelRoot = OpenSource(Model))
                 using (ResourceNode motionRoot = OpenSource(Motion))
                 {
-                    if (modelRoot.Children.OfType<BRESGroupNode>().Any(g => g.Children.GroupBy(n => n.Name, StringComparer.Ordinal).Any(group => group.Count() > 1)))
+                    if (Container(modelRoot, Model).Children.OfType<BRESGroupNode>().Any(g => g.Children.GroupBy(n => n.Name, StringComparer.Ordinal).Any(group => group.Count() > 1)))
                         errors.Add("The base BRRES contains duplicate resource names; resolve them in the native editor before assembling companions.");
                     var model = (MDL0Node)Locate(modelRoot, Model); model.Populate();
                     var bones = new HashSet<string>(model.BoneCache.OfType<MDL0BoneNode>().Select(b => b.Name), StringComparer.Ordinal);
@@ -210,16 +217,19 @@ namespace BrawlCrate.Sources
                 throw new IOException("Companion workspace quota reached (128 sessions / 1 GiB). Archive your edits before removing old sessions.");
             string folder = Path.Combine(workRoot, Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(folder);
-            string output = Path.Combine(folder, "assembled.brres");
-            using (var root = (BRRESNode)OpenSource(Model))
+            string output;
+            using (var root = OpenSource(Model))
             {
-                foreach (var pair in _textures) Import<TEX0Node>(root, pair.Value, folder, token);
-                Import<CHR0Node>(root, Motion, folder, token);
+                output = Path.Combine(folder, root is ARCNode ? "assembled.pac" : "assembled.brres");
+                BRRESNode target = Container(root, Model);
+                foreach (var pair in _textures) Import<TEX0Node>(target, pair.Value, folder, token);
+                Import<CHR0Node>(target, Motion, folder, token);
                 token.ThrowIfCancellationRequested();
                 root.Export(output);
             }
             if (new FileInfo(output).Length > SourceFolderSession.MaxFileBytes) throw new IOException("Assembled output exceeds 64 MiB; it was not opened.");
             ValidateOutput(output);
+            BrawlContainerAudit.VerifyPreserved(Model.SourcePath, output, Model.ContainerPath, token);
             VerifySources(token);
             Save(Path.Combine(folder, "resolution.fpcompanion"));
             return output;
@@ -227,13 +237,13 @@ namespace BrawlCrate.Sources
 
         private void ValidateOutput(string output)
         {
-            using (var decoded = NodeFactory.FromFile(null, output) as BRRESNode)
+            using (var decoded = NodeFactory.FromFile(null, output))
             using (ResourceNode modelSource = OpenSource(Model))
             using (ResourceNode motionSource = OpenSource(Motion))
             {
-                if (decoded == null) throw new IOException("Assembled output did not decode as BRRES.");
-                var entries = decoded.Children.OfType<BRESGroupNode>().SelectMany(g => g.Children).ToList();
-                foreach (ResourceNode original in modelSource.Children.OfType<BRESGroupNode>().SelectMany(g => g.Children))
+                if (decoded == null || decoded.GetType() != modelSource.GetType()) throw new IOException("Assembled native container type changed.");
+                var entries = Container(decoded, Model).Children.OfType<BRESGroupNode>().SelectMany(g => g.Children).ToList();
+                foreach (ResourceNode original in Container(modelSource, Model).Children.OfType<BRESGroupNode>().SelectMany(g => g.Children))
                     if (!entries.Any(n => n.GetType() == original.GetType() && n.Name == original.Name))
                         throw new IOException("A base resource was lost during native assembly: " + original.Name);
                 if (entries.OfType<MDL0Node>().Single(n => n.Name == Model.Name).Version != Model.Version)
@@ -254,7 +264,7 @@ namespace BrawlCrate.Sources
         private void Import<T>(BRRESNode root, CompanionResource choice, string folder, CancellationToken token) where T : BRESEntryNode
         {
             token.ThrowIfCancellationRequested();
-            if (string.Equals(choice.SourcePath, Model.SourcePath, StringComparison.OrdinalIgnoreCase)) return; // Already retained in the base BRRES.
+            if (string.Equals(choice.SourcePath, Model.SourcePath, StringComparison.OrdinalIgnoreCase) && choice.ContainerPath == Model.ContainerPath) return; // Already retained in the base BRRES.
             BRESGroupNode group = root.GetOrCreateFolder<T>();
             if (group.Children.Any(n => n.Name == choice.Name))
                 throw new IOException("The base BRRES already contains " + choice.Kind + " " + choice.Name + ". No existing resource is overwritten. Select that embedded resource or edit the base explicitly.");
@@ -283,7 +293,7 @@ namespace BrawlCrate.Sources
         {
             SourceWriteGuard.ThrowIfProtected(path);
             var doc = new XmlDocument { XmlResolver = null };
-            XmlElement root = doc.CreateElement("fighterportCompanions"); root.SetAttribute("version", "2");
+            XmlElement root = doc.CreateElement("fighterportCompanions"); root.SetAttribute("version", "3");
             root.SetAttribute("scope", ScopeNotice); root.SetAttribute("otherNativeResources", AdditionalResourceNotice); doc.AppendChild(root);
             root.AppendChild(DumpProfile.Write(doc));
             foreach (Source source in _sources)
@@ -324,7 +334,7 @@ namespace BrawlCrate.Sources
             var doc = new XmlDocument { XmlResolver = null };
             using (var reader = System.Xml.XmlReader.Create(path, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 1024 * 1024 })) doc.Load(reader);
             XmlElement root = doc.DocumentElement;
-            if (root?.Name != "fighterportCompanions" || (root.GetAttribute("version") != "1" && root.GetAttribute("version") != "2")) throw new IOException("Unsupported companion resolution version.");
+            if (root?.Name != "fighterportCompanions" || (root.GetAttribute("version") != "1" && root.GetAttribute("version") != "2" && root.GetAttribute("version") != "3")) throw new IOException("Unsupported companion resolution version.");
             var files = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "source").ToList();
             var choices = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "choice").ToList();
             var profiles = root.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "brawlDumpRoots").ToList();
@@ -365,6 +375,8 @@ namespace BrawlCrate.Sources
             {
                 string source = choice.GetAttribute("source"), tree = choice.GetAttribute("tree"), role = choice.GetAttribute("role");
                 CompanionResource resource = result.Resources.SingleOrDefault(r => string.Equals(r.SourcePath, source, StringComparison.OrdinalIgnoreCase) && r.TreePath == tree && r.Identity == choice.GetAttribute("identity") && r.Version.ToString() == choice.GetAttribute("nativeVersion"));
+                if (resource != null && root.GetAttribute("version") == "3" && ((resource.ContainerPath ?? "") != choice.GetAttribute("containerPath") || resource.ContainerIdentity != choice.GetAttribute("containerIdentity")))
+                    throw new IOException("Saved enclosing container identity changed.");
                 if (resource == null) throw new IOException("Saved native resource identity is missing or changed: " + source + " [" + tree + "]");
                 if (role == "model") { if (result.Model != null) throw new IOException("Duplicate model selection."); result.SelectModel(resource); }
                 else if (role == "motion") { if (result.Motion != null) throw new IOException("Duplicate motion selection."); result.SelectMotion(resource); }
@@ -378,7 +390,8 @@ namespace BrawlCrate.Sources
         {
             XmlElement e = doc.CreateElement("choice"); e.SetAttribute("role", role); e.SetAttribute("binding", binding);
             e.SetAttribute("source", resource.SourcePath); e.SetAttribute("tree", resource.TreePath); e.SetAttribute("identity", resource.Identity);
-            e.SetAttribute("nativeVersion", resource.Version.ToString()); root.AppendChild(e);
+            e.SetAttribute("nativeVersion", resource.Version.ToString());
+            e.SetAttribute("containerPath", resource.ContainerPath ?? ""); e.SetAttribute("containerIdentity", resource.ContainerIdentity); root.AppendChild(e);
         }
         private static void ValidateOrigin(string source, string root, string relative)
         {
@@ -412,8 +425,44 @@ namespace BrawlCrate.Sources
         private static void Walk(ResourceNode node, string path, Action<ResourceNode, string> visit)
         {
             visit(node, path);
-            if (!(node is BRRESNode) && !(node is BRESGroupNode)) return; // Inventory only native entries, not every mesh/animation descendant.
+            if (!(node is ARCNode) && !(node is BRRESNode) && !(node is BRESGroupNode)) return; // Inventory only native entries, not every mesh/animation descendant.
             for (int i = 0; i < node.Children.Count; i++) Walk(node.Children[i], path.Length == 0 ? i.ToString() : path + "/" + i, visit);
+        }
+        private static ResourceNode EnclosingBrres(ResourceNode node)
+        {
+            while (node != null && !(node is BRRESNode)) node = node.Parent;
+            return node;
+        }
+        private static string NodePath(ResourceNode root, ResourceNode node)
+        {
+            var indices = new Stack<int>();
+            while (node != root) { if (node.Parent == null) throw new IOException("Resource is outside its source container."); indices.Push(node.Index); node = node.Parent; }
+            return string.Join("/", indices);
+        }
+        private static ResourceNode AtPath(ResourceNode root, string path)
+        {
+            if (path == null) throw new IOException("No enclosing BRRES was selected.");
+            foreach (string segment in path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries))
+            { if (!int.TryParse(segment, out int i) || i < 0 || i >= root.Children.Count) throw new IOException("Enclosing container path changed."); root = root.Children[i]; }
+            return root;
+        }
+        private static BRRESNode Container(ResourceNode root, CompanionResource resource) =>
+            AtPath(root, resource.ContainerPath) as BRRESNode ?? throw new IOException("Selected native entry is no longer inside a BRRES.");
+        private static string NativeLineage(ResourceNode node)
+        {
+            var result = new Stack<string>();
+            while (node != null)
+            {
+                if (node is ARCNode || node is BRRESNode)
+                {
+                    string identity = node.GetType().Name + " '" + node.Name + "'";
+                    if (node is ARCEntryNode entry && node.Parent is ARCNode)
+                        identity += " [" + node.Index + ":" + entry.FileType + ":" + entry.FileIndex + ":" + entry.GroupID + ":" + entry.RedirectIndex + "]";
+                    result.Push(identity);
+                }
+                node = node.Parent;
+            }
+            return string.Join(" > ", result);
         }
         private static string HashFile(string path)
         {

@@ -51,7 +51,7 @@ namespace BrawlCrate.UI
             });
             AddAction("Add source files…", "companionAdd", async () =>
             {
-                using (var dialog = new OpenFileDialog { Title = "Add Brawl companion sources", Multiselect = true, Filter = "Brawl resources|*.brres;*.tex0;*.chr0|All files|*.*" })
+                using (var dialog = new OpenFileDialog { Title = "Add Brawl companion sources", Multiselect = true, Filter = "Raw Brawl containers and resources|*.pac;*.arc;*.brres;*.tex0;*.chr0|All files|*.*" })
                     if (dialog.ShowDialog(this) == DialogResult.OK)
                         foreach (string path in dialog.FileNames) await AddSourceAsync(path);
             });

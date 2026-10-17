@@ -35,6 +35,8 @@ internal static partial class NativeSmoke
     {
         if (args.Length == 2 && args[0] == "--verify-companions") return VerifyCompanionRestart(args[1]);
         if (args.Length == 2 && args[0] == "--verify-dump") return VerifyDumpRestart(args[1]);
+        if (args.Length == 3 && args[0] == "--inspect-brawl") return InspectConfiguredBrawl(args[1], args[2]);
+        if (args.Length == 2 && args[0] == "--verify-container") return VerifyContainerRestart(args[1]);
         if (args.Length == 2 && args[0] == "--guard-live")
         {
             try
@@ -76,7 +78,7 @@ internal static partial class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui" }.Contains(args[0]))
+        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui", "--dump-native", "--dump-gui", "--container-native", "--container-gui" }.Contains(args[0]))
         {
             Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
@@ -96,6 +98,11 @@ internal static partial class NativeSmoke
             // pumping can create WinForms handles on this STA thread.
             if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if (args[0].StartsWith("--container", StringComparison.Ordinal))
+            {
+                ExerciseContainers(args[0].EndsWith("gui", StringComparison.Ordinal));
+                Log("PASS: completed " + args[0] + "; original fixtures only, no game test"); return 0;
+            }
             if (args[0].StartsWith("--dump", StringComparison.Ordinal))
             {
                 ExerciseDump(args[0].EndsWith("gui", StringComparison.Ordinal));
@@ -293,7 +300,7 @@ internal static partial class NativeSmoke
         if (failure != null) throw new InvalidOperationException("Native GUI exercise failed", failure);
     }
 
-    private static void ExerciseGuiContents(MainForm main, string source, SourceFolderSession session, CompanionWorkspace companions = null)
+    private static void ExerciseGuiContents(MainForm main, string source, SourceFolderSession session, CompanionWorkspace companions = null, Action<string, float> verify = null)
     {
         Log("Native WinForms loop: " + Application.MessageLoop + "; context=" + SynchronizationContext.Current?.GetType().FullName);
         using (var graphics = main.CreateGraphics())
@@ -421,14 +428,14 @@ internal static partial class NativeSmoke
         Assert(blockedSave && root.IsDirty && Hash(source) == sourceBeforeBlockedSave, "actual application Save refuses source overwrite and preserves pending edits");
         Log("PASS: actual Program.Save refuses mounted source overwrite; source hash and dirty edits retained");
 
-        string saved = Path.Combine(_output, "edited-gui.brres");
+        string saved = Path.Combine(_output, root is ARCNode ? "edited-gui.pac" : "edited-gui.brres");
         // Supply a distinct output path to the native save handler; this bypasses
         // only the OS Save As file picker, not rebuilding or serialization.
         NativeProgram.GetField("_rootPath", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, saved);
         Assert((bool)CallProgram("Save", new[] { typeof(bool) }, false), "actual application Save handler");
-        VerifyNative(saved, 35);
+        (verify ?? VerifyNative)(saved, 35);
         if (companions != null) VerifyPreservedBase(saved);
-        Log("PASS: actual Program.Save wrote separate BRRES; native decode verifies edited key");
+        Log("PASS: actual Program.Save wrote separate " + Path.GetExtension(saved).ToUpperInvariant() + "; native decode verifies edited key");
         viewer.Close();
         Pump(100);
         Assert((bool)CallProgram("Open", new[] { typeof(string), typeof(bool) }, saved, false), "main reopen native output");
@@ -437,7 +444,7 @@ internal static partial class NativeSmoke
         main.TargetResource(Find<CHR0Node>(reopened));
         CaptureWindow(main, "06-reopened-native.png");
         Assert(Math.Abs(Find<CHR0Node>(reopened).Children.OfType<CHR0EntryNode>().Single().GetKeyframe(5, 15)._value - 35) < .01f, "reopened application edited key");
-        Log("PASS: actual MainForm reopens saved BRRES and edited CHR0");
+        Log("PASS: actual MainForm reopens saved native container and edited CHR0");
         CallProgram("Close", Type.EmptyTypes);
         main.Close();
     }

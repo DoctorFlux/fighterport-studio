@@ -125,3 +125,13 @@ launches FighterPort.Studio.exe twice, checks actual restored root/companion win
 compares persisted mount/hash/native identities, opens the new native output and
 observes normal exits. Captures/output remain ignored. OS folder/Save As pickers
 are bypassed throughout; no manual-click, native-tool or game claim follows.
+
+
+`-Containers -Gui` selects the original nested PAC fixture, not a commercial fighter.
+It proves explicit full container identities, native enclosing PAC save/reopen, exact
+unrelated payload preservation, nonidentity binds and two-bone blended-skin positions
+against analytic expected results. It tests header-loss rejection, cancellation,
+bounds/depth, stale identities, source protection and unchanged original hashes.
+Use VerifyDumpProduct.ps1 -NativeExtension pac for the normal product entrypoint check.
+The --inspect-brawl mode is explicit read-only local metadata inspection only; its TSV
+and hashes stay ignored. It is not retail native editing or game validation.

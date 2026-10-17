@@ -38,7 +38,7 @@
       "TEX0 v1 RGBA8 without palette",
       "CHR0 v4 with exact bone names"
     ],
-    "persistence": "version 2 fpcompanion XML with version 1 loading: source SHA256, native identities, root snapshots and selection-time mount/container path/priority/reason",
+    "persistence": "version 3 XML with versions 1/2 loading: full source hashes, mount lineage and explicit native enclosing-container paths/identities",
     "selection": "missing and ambiguous reported; no automatic first candidate; explicit second same-name texture tested",
     "restore": "separate-process restoration plus two actual FighterPort executable launches with exact persisted identities",
     "nativeOutput": "new assembled BRRES freshly decoded before open; native key edit and separate save/reopen verified",
@@ -50,10 +50,10 @@
       "paletted textures",
       "other native versions",
       "cross-rig correction",
-      "ARC/PAC companion assembly",
       "dirty-edit project persistence",
       "other game formats",
-      "automatic native-resource binding or installation/container discovery"
+      "automatic native-resource binding or installation/container discovery",
+      "compressed/opaque/noncanonical/redirect ARC/PAC/PCS companion paths"
     ],
     "inGame": "unrun"
   },
@@ -93,5 +93,74 @@
       "pending-edit character projects",
       "fighter package write/game validation"
     ]
+  },
+  "rawNestedContainerCompanions": {
+    "status": "original-native-and-real-GUI-tested",
+    "formats": [
+      "canonical raw ARC/PAC 0x0101",
+      "nested BRRES",
+      "MDL0 v11",
+      "TEX0 v1 RGBA8 without palettes",
+      "CHR0 v4"
+    ],
+    "identity": "source hash plus complete indexed native path, enclosing BRRES identity and ARC type/index/group/redirect/name lineage; same-name resources remain distinct",
+    "output": "genuine enclosing native PAC assembly/edit/new-save/reopen; no flattened package claim",
+    "preservation": "exact ARC hierarchy/entry metadata and unrelated native payload hashes; selected BRRES opaque fidelity remains unverified",
+    "fixture": "two bones; translated child bind/inverse bind y=6; 25/75 and 75/25 blends; four known vertices; one material; all original RGBA8 pixels; looping 31-frame CHR0; 60->35 degree key edit",
+    "numeric": "decoded native positions vs analytic LBS at declared key; 0.002 native position units, 0.0001 binds/weights and 0.001 degree key tolerance; no continuous bound claim",
+    "tests": [
+      "source/container restore in fresh process",
+      "actual GUI/native playback and PAC save/reopen",
+      "bounds/depth/cancel/stale identity",
+      "noncanonical headers and compressed/opaque admission rejection",
+      "unrelated payload modification rejection",
+      "embedded collision refusal",
+      "nine original source hashes unchanged",
+      "two normal standalone product launches"
+    ],
+    "limits": "64 MiB/file, 4096 audit records, depth 16, 128 diagnostics; prior selected-file inventory and assembly quotas retained",
+    "evidence": "artifacts/restart/container-gui-20261017-104438-067/result.txt",
+    "unsupported": [
+      "PCS/decompression/recompression",
+      "opaque/redirect/header-reserved entries",
+      "MDL0 v9 companion operations",
+      "palettes/alpha/mips and other native versions",
+      "genuinely animated ancillary channels",
+      "semantic rigging/retargeting",
+      "native attacks/templates/playable mods"
+    ],
+    "nativeToolAndGame": "unrun"
+  },
+  "sourceCharacterLibraryAndMovesets": {
+    "status": "required-planned-not-implemented",
+    "specification": "docs/FIGHTERPORT_ANIMATION_ATTACK_LIBRARY_MASTER_SPEC.md",
+    "concepts": [
+      "SourceCharacterProfile",
+      "AnimationAsset",
+      "MoveAsset",
+      "MoveInstance",
+      "persistent edit projects",
+      "reviewed semantic recognition",
+      "editor IK/FK and interval contacts",
+      "native gameplay translators/templates",
+      "vetted app-local tool provisioning"
+    ],
+    "next": "first visible source-bound library and actual edit-project increment; one authoritative task in docs/plans/current.md"
+  },
+  "configuredBrawlHeaderInventory": {
+    "status": "explicit-opt-in-read-only-metadata-observed",
+    "observed": [
+      "ARC 0x0101",
+      "MDL0 v9",
+      "TEX0 v1",
+      "CHR0 v4",
+      "CLR0 v3",
+      "SRT0 v4",
+      "opaque and EFLS/REFF/REFT entries"
+    ],
+    "nativeDecodePreviewEditExport": "unrun",
+    "sourceHashes": "two configured input files unchanged",
+    "goku": "not configured",
+    "rawRecords": "ignored local evidence only"
   }
 }

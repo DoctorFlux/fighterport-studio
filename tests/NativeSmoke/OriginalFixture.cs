@@ -14,12 +14,21 @@ using System.Linq;
 
 internal static class OriginalFixture
 {
-    public static string Create(string directory)
+    public static string Create(string directory, bool blended = false)
     {
         Directory.CreateDirectory(directory);
         string dae = Path.Combine(directory, "original-paddle.dae");
         // The inherited fast COLLADA reader expects double-quoted XML attributes.
-        File.WriteAllText(dae, ColladaSource.Replace('\'', '"'));
+        string scene = ColladaSource;
+        if (blended)
+        {
+            scene = scene.Replace("<float_array id='weights-array' count='1'>1</float_array>", "<float_array id='weights-array' count='2'>0.25 0.75</float_array>")
+                .Replace("source='#weights-array' count='1'", "source='#weights-array' count='2'")
+                .Replace("<vcount>1 1 1 1</vcount><v>1 0 1 0 1 0 1 0</v>", "<vcount>2 2 2 2</vcount><v>0 1 1 0 0 1 1 0 0 0 1 1 0 0 1 1</v>")
+                .Replace("<node id='Paddle' name='Paddle' sid='Paddle' type='JOINT'><matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1", "<node id='Paddle' name='Paddle' sid='Paddle' type='JOINT'><matrix>1 0 0 0 0 1 0 6 0 0 1 0 0 0 0 1")
+                .Replace("count='32'>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1", "count='32'>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 0 1 0 -6 0 0 1 0 0 0 0 1");
+        }
+        File.WriteAllText(dae, scene.Replace('\'', '"'));
         Collada._importOptions = new Collada.ImportOptions
         {
             ModelVersion = 11, SetOriginalPath = false, BlenderFBXBoneFix = false,
