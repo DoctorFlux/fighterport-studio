@@ -565,6 +565,14 @@ Full changelog: see the preserved upstream Changelog.txt and FighterPort develop
                 return false;
             }
 
+            // FighterPort modification, 2026-10-17: resume explicit dependency choices through
+            // the workspace instead of feeding the XML resolution to a native resource parser.
+            if (path.EndsWith(".fpcompanion", StringComparison.OrdinalIgnoreCase))
+            {
+                CompanionWorkspaceForm.ShowWorkspace(MainForm.Instance, path);
+                return true;
+            }
+
             if (path.EndsWith(".gct", StringComparison.OrdinalIgnoreCase) ||
                 path.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {

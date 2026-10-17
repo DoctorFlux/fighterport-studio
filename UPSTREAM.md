@@ -37,6 +37,9 @@ FighterPort modifications dated 2026-10-17 are separate from that verified basel
 - Hard gates for inherited updater/issue submission/Discord; local diagnostic reports; safe defaults,
   scripting opt-in/whitelist, no inherited cleanup or file-association writes.
 - File > Open Source staged folder workflow and source write protection.
+- Explicit Brawl model/texture/motion companion selection, versioned hash-pinned local
+  resolution files, guarded assembly with fresh native output validation, and native-editor
+  resume through File > Open. This remains a Brawl-specific subset, not a universal project.
 - Bounded independent build hooks and new original-fixture regression harness.
 
 The baseline manifest remains unchanged as a comparison anchor. Git diffs and local commits record

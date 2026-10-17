@@ -12,6 +12,15 @@ Use native File > Open for the inherited editor workflow. File > Open Source add
 read-only folder mount and opens recognized Brawl resources as separate staged working copies.
 See [testing](docs/TESTING.md) for the exact verified workflow and limitations.
 
+File > Brawl Companions resolves a model BRRES, exact-name RGBA8 textures, and one
+skeletal motion from separately selected files. Choose every dependency explicitly;
+missing and ambiguous matches are shown. Save a `.fpcompanion` resolution and reopen
+it with File > Open, Load resolution, or Resume last resolution after restarting.
+Changed or missing sources stop restoration. Open assembled copy uses the native
+editors. Save edited work separately as a native BRRES: the resolution records source
+choices and rebuilds from those pinned originals, rather than storing pending edits.
+Verify this slice with `./scripts/test.ps1 -Companions -Gui`.
+
 Preferences, source-root registrations and staged edits live in `UserData` beside the
 executable. Set `FIGHTERPORT_DATA_ROOT` to an absolute local folder to choose another
 location. Preserve that folder when updating the application; staged edits are not

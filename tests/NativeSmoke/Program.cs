@@ -24,7 +24,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Windows.Forms;
 
-internal static class NativeSmoke
+internal static partial class NativeSmoke
 {
     private static string _output;
     private static readonly List<string> Results = new List<string>();
@@ -33,6 +33,7 @@ internal static class NativeSmoke
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.Length == 2 && args[0] == "--verify-companions") return VerifyCompanionRestart(args[1]);
         if (args.Length == 2 && args[0] == "--guard-live")
         {
             try
@@ -74,9 +75,9 @@ internal static class NativeSmoke
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.Length != 2 || (args[0] != "--native" && args[0] != "--gui"))
+        if (args.Length != 2 || !new[] { "--native", "--gui", "--companions-native", "--companions-gui" }.Contains(args[0]))
         {
-            Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui <new-output-directory>");
+            Console.Error.WriteLine("Usage: NativeSmoke.exe --native|--gui|--companions-native|--companions-gui <new-output-directory>");
             return 2;
         }
         _output = Path.GetFullPath(args[1]);
@@ -92,8 +93,14 @@ internal static class NativeSmoke
             SourceWriteGuard.Initialize(Path.Combine(_output, "storage", "source-roots.txt"));
             // Match application entrypoint ordering before fixture import or message
             // pumping can create WinForms handles on this STA thread.
-            if (args[0] == "--gui") System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
+            if (args[0].EndsWith("gui", StringComparison.Ordinal)) System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(NativeProgram.TypeHandle);
             VerifySettingsPersistence();
+            if (args[0].StartsWith("--companions", StringComparison.Ordinal))
+            {
+                ExerciseCompanions(args[0].EndsWith("gui", StringComparison.Ordinal));
+                Log("PASS: completed " + args[0] + "; no commercial inputs or game test");
+                return 0;
+            }
             Log("Generating original fixture with imported BrawlLib");
             string source = OriginalFixture.Create(Path.Combine(_output, "source"));
             string sourceHash = Hash(source);
@@ -118,7 +125,7 @@ internal static class NativeSmoke
         }
         finally
         {
-            if (args[0] == "--gui")
+            if (args[0].EndsWith("gui", StringComparison.Ordinal))
                 foreach (Form form in Application.OpenForms.Cast<Form>().ToArray())
                     try { form.Dispose(); } catch (Exception error) { Log("GUI cleanup: " + error.Message); }
             // Exit the smoke process without touching unrelated user applications.
@@ -279,12 +286,24 @@ internal static class NativeSmoke
         if (failure != null) throw new InvalidOperationException("Native GUI exercise failed", failure);
     }
 
-    private static void ExerciseGuiContents(MainForm main, string source, SourceFolderSession session)
+    private static void ExerciseGuiContents(MainForm main, string source, SourceFolderSession session, CompanionWorkspace companions = null)
     {
         Log("Native WinForms loop: " + Application.MessageLoop + "; context=" + SynchronizationContext.Current?.GetType().FullName);
         using (var graphics = main.CreateGraphics())
             Log("GUI environment: x86=" + !Environment.Is64BitProcess + "; desktop=" + Screen.PrimaryScreen.Bounds.Size + "; main=" + main.Size + "; DPI=" + graphics.DpiX + "x" + graphics.DpiY);
-        using (var browser = new SourceBrowserForm(session))
+        if (companions != null)
+        {
+            using (var browser = new CompanionWorkspaceForm(companions))
+            {
+                browser.Show(main);
+                CaptureWindow(browser, "00-companion-resolution.png");
+                ((Button)browser.Controls.Find("companionOpen", true).Single()).PerformClick();
+                WaitFor(() => browser.IsDisposed || !browser.Visible, "companion Open assembled copy");
+                Assert(browser.LastOpenedPath != null, "companion native open path");
+            }
+            Log("PASS: actual CompanionWorkspace Open button assembled selected dependencies and opened MainForm");
+        }
+        else using (var browser = new SourceBrowserForm(session))
         {
             browser.Show(main);
             var entries = (ListView)browser.Controls.Find("sourceEntries", true).Single();
@@ -310,7 +329,7 @@ internal static class NativeSmoke
         Pump(250);
         var root = (ResourceNode)NativeProgram.GetProperty("RootNode").GetValue(null, null);
         Assert(root != null && (string)NativeProgram.GetProperty("RootPath").GetValue(null, null) != source, "source browser opens staged native copy");
-        Log("PASS: actual SourceBrowser list/button opens independent copy in MainForm");
+        if (companions == null) Log("PASS: actual SourceBrowser list/button opens independent copy in MainForm");
         var model = Find<MDL0Node>(root);
         var texture = Find<TEX0Node>(root);
         var animation = Find<CHR0Node>(root);
@@ -401,6 +420,7 @@ internal static class NativeSmoke
         NativeProgram.GetField("_rootPath", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, saved);
         Assert((bool)CallProgram("Save", new[] { typeof(bool) }, false), "actual application Save handler");
         VerifyNative(saved, 35);
+        if (companions != null) VerifyPreservedBase(saved);
         Log("PASS: actual Program.Save wrote separate BRRES; native decode verifies edited key");
         viewer.Close();
         Pump(100);

@@ -19,7 +19,21 @@
     "nativeWriteGuards": "selected export/save/stream/map/hardlink and concurrent persistent mount paths tested",
     "distinct8dot3Alias": "skipped on D volume; focused C probe separate",
     "limits": "64 MiB/file; 512 entries/list; 16 container levels; 4096 entries; 1 GiB staging; 1024 sessions; 256 retained roots",
-    "unsupported": ["compressed or opaque container children", "companion assembly", "installations/images", "hostile-parser or arbitrary-script sandbox"]
+    "unsupported": ["compressed or opaque container children", "automatic companion discovery", "installations/images", "hostile-parser or arbitrary-script sandbox"]
+  },
+  "explicitBrawlCompanions": {
+    "status": "native-and-real-GUI-tested",
+    "formats": ["base BRRES with MDL0 v11", "TEX0 v1 RGBA8 without palette", "CHR0 v4 with exact bone names"],
+    "persistence": "version 1 fpcompanion XML: absolute source paths, SHA256, native tree/type/name identities, versions and explicit bindings",
+    "selection": "missing and ambiguous reported; no automatic first candidate; explicit second same-name texture tested",
+    "restore": "separate-process restoration plus two actual FighterPort executable launches with exact persisted identities",
+    "nativeOutput": "new assembled BRRES freshly decoded before open; native key edit and separate save/reopen verified",
+    "retainedBaseData": "original SRT0 v4 empty-entry fixture name, 17-frame timing and loop flag retained; no general opaque fidelity claim",
+    "sourceHashes": "all 4 model/texture/motion source files unchanged across restart/edit/save/reopen",
+    "evidence": "artifacts/restart/companions-gui-20261017-090351-036/result.txt",
+    "limits": "16 files; 128 MiB inventory; 64 MiB/file and conservative selected-source assembly budget; 64 texture bindings; 128 work sessions / 1 GiB",
+    "unsupported": ["paletted textures", "other native versions", "cross-rig correction", "ARC/PAC companion assembly", "automatic discovery", "dirty-edit project persistence", "other game formats"],
+    "inGame": "unrun"
   },
   "independentSettings": "scalar, XML/binary, collections, complex viewer settings, scoped reset and separate-process reload tested",
   "standaloneEntrypoint": "actual FighterPort.Studio.exe opened saved original fixture using default portable UserData; normal exit observed",

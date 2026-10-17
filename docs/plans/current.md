@@ -1,20 +1,24 @@
 # Next executable acceptance criterion
 
-R2 next: resolve loose Brawl companions explicitly through the actual native workspace.
-Use original fixtures with MDL0/material in one BRRES, its RGBA8 texture in another
-resource, and CHR0 in a separate motion folder. Let the user select dependencies;
-report missing/ambiguous matches and record selected paths, identities and hashes.
-Persist that resolution and recover it after restarting the application. Do not
-silently guess companions or alter either source folder.
+R2 next: add a configured Brawl loose-dump folder provider with persistent multiple
+source roots and explicit ordered overrides. Use original directory fixtures rather
+than scanning a user's real installation implicitly. Discover supported loose BRRES,
+TEX0 and CHR0 candidates lazily, with cancellation and explicit file/depth/resource
+budgets. Show which root supplied each candidate and why an override applies; equal
+priority collisions remain ambiguous until the user decides.
 
-Acceptance: native editor visibly previews the resolved texture and plays the selected
-motion; an edit saves to a separate Brawl-native output and reopens with the expected
-texture/motion; all original hashes match before/after and after process restart.
-Add missing/ambiguous dependency fixtures and keep unsupported native data explicit.
-This Brawl-specific path must not become the intermediate format for other games.
+Acceptance: restore the configured roots and priority order after restarting; select
+a model and texture/motion companions through the existing Companion Workspace;
+visibly preview/play the selected resources, save a separate native BRRES and reopen
+it. Expected override selection, missing/conflicting companions, cancelled discovery,
+reparse rejection and unchanged source hashes must pass original-fixture checks.
+Unsupported PAC/PCS nesting, compressed inputs and images must be reported explicitly
+until their separate container-preserving readers/writers are implemented.
 
-The restart baseline, independent identity/safety and first Open Source slice have
-passed their documented build/native/GUI gates. After this single next task, continue
-installation/dump/image/container providers, game-neutral projects and measured
-cross-rig/contact/bake work, then the configured Goku-to-installed-Rivals-Modkit
-import/state/attack/build/playtest slice in MASTER_PLAN.md. No publication is authorized.
+The explicit persistent companion milestone is complete: four separate source files,
+missing/ambiguous cases, exact resource/hash restoration, native preview/play/edit/
+save/reopen and two fresh product launches passed. Evidence is in DEVELOPMENT_STATUS.
+After this one next task, continue installation/image/container providers, game-neutral
+projects, measured cross-rig/contact/bake work and the configured Goku-to-installed-
+Rivals-Modkit import/state/attack/build/playtest slice in MASTER_PLAN.md. This native
+Brawl path is not an intermediate for other games. All work remains local.

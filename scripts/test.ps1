@@ -1,4 +1,4 @@
-param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui)
+param([ValidateSet('Debug','Release')][string]$Configuration='Release', [switch]$Gui, [switch]$Companions)
 . $PSScriptRoot/environment.ps1
 $project = Join-Path $repoRoot 'tests/NativeSmoke/NativeSmoke.csproj'
 $logDir = Join-Path $repoRoot 'artifacts/restart'
@@ -9,6 +9,10 @@ $exe = Join-Path $repoRoot "tests/NativeSmoke/bin/x86/$Configuration/net472/Nati
 if (!(Test-Path -LiteralPath $exe)) { throw "Test executable missing: $exe" }
 $modes = @('native')
 if ($Gui) { $modes += 'gui' }
+if ($Companions) {
+    $modes = @('companions-native')
+    if ($Gui) { $modes += 'companions-gui' }
+}
 foreach ($mode in $modes) {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
     $evidence = Join-Path $logDir "$mode-$stamp"

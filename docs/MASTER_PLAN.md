@@ -36,7 +36,9 @@ Ordered executable milestones (only one current acceptance criterion lives in pl
 2. R1: independent product/settings identity; inherited update/reporting/Discord and association
    safety; original native GUI open/preview/animate/edit/save-new/reopen and source hashes.
 3. R2: first functional File > Open Source loose-folder path through existing native editors.
-   Then companion graph, persistent multiple roots/overrides, cancellation/cache/resource budgets,
+   The initial folder slice and explicit persistent MDL0/TEX0/CHR0 companion slice now pass their
+   original-fixture gates. Continue provider discovery and persistent multiple roots/overrides,
+   cancellation/cache/resource budgets,
    installation providers, separate platform image/container readers and corruption checks.
 4. R3: game-neutral character projects plus native original retention, semantic review/mapping,
    exact rest/axis/hierarchy and scale/root policies; measured cross-rig correction/baking on original

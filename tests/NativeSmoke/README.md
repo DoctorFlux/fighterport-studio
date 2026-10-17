@@ -85,3 +85,25 @@ check. The D: volume exposed no distinct 8.3 alias, which this run records as sk
 its actual outside hardlink test passed. Earlier failed runs remain local diagnostic
 receipts and are not verification evidence. In particular, blank viewport captures
 were rejected until the actual viewport was selected and the camera framed.
+
+Companion milestone: run `scripts/test.ps1 -Companions -Gui`. CompanionChecks.cs
+splits the original model/material, texture and CHR0 into separate input folders,
+adds a different magenta texture with the same name, and retains an original SRT0
+v4 entry in the base BRRES. It requires explicit second-candidate selection and tests
+missing/ambiguous resolution, hash mismatch, absent source, relative/network paths, wrong native identity,
+manifest write protection and XML-entity rejection. Original inputs are not modified
+to create negative cases; malformed resolution copies carry the deliberate errors.
+
+The final companion native/GUI evidence is `artifacts/restart/companions-native-20261017-090347-261`
+and `artifacts/restart/companions-gui-20261017-090351-036`. The GUI exercises real
+selectors, Save resolution, Open assembled copy, texture/material editors, visible
+OpenGL poses, native Play, the 35-degree numeric edit, protected Save and separate
+native reopen. Four source hashes match before/after and in a separate fresh process.
+SRT0 preservation checks only name/version/timing/loop metadata on this original
+empty-entry fixture. No new general SRT0 editing or opaque fidelity claim follows.
+
+Standalone product restart evidence is `artifacts/restart/companion-product-20261017-090452-628`:
+two fresh FighterPort.Studio.exe processes reopen the resolution, enable the actual
+workspace controls, open a new native BRRES and exit normally using an isolated
+profile. Exact persisted choice XML is compared, since a ListView subitem is not
+ordinary Win32 window text. All input roots and generated native data remain local.

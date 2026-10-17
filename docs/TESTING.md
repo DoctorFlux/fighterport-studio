@@ -9,6 +9,7 @@ repository root:
 ./scripts/build.ps1
 ./scripts/test.ps1
 ./scripts/test.ps1 -Gui
+./scripts/test.ps1 -Companions -Gui
 ./scripts/run.ps1
 ```
 
@@ -69,3 +70,24 @@ is required before any later explicitly authorized distribution.
 No broad fidelity, arbitrary skeleton retargeting, separate native tool, Modkit build,
 console or game result follows from these checks. Keep each format/version/operation,
 manual GUI observation and native/in-game validation separately declared.
+
+Companion verification uses four original input files: a model/material BRRES with no
+texture or CHR0, two texture BRRES files offering the same texture name with different
+pixels, and a loose CHR0 in another folder. The explicit second texture must win; no
+first-match fallback is allowed. A base SRT0 v4 entry must retain its name/timing/loop
+metadata. Missing/ambiguous choices, source-hash mismatch, absent source, wrong resource
+identity, guarded manifest output and prohibited XML entities are checked separately.
+
+`-Companions` runs companion native tests instead of the single-file suite; add `-Gui`
+to exercise real model/texture/motion selectors, persistent resolution, Open assembled
+copy, native texture/material controls, OpenGL poses/playback, numeric key edit and
+separate Save/reopen. A separate hidden process restores the resolution and checks all
+four source hashes again. No folder or Save As picker is driven by these tests.
+
+The standalone executable also accepts a `.fpcompanion` argument through its normal
+file-open path. The recorded product check launches it twice with an isolated data
+root, restores the saved choices, invokes Open assembled copy, compares the exact
+resolution identities persisted by the product and observes normal exits. Application
+window captures and native framebuffer captures are visually inspected separately.
+The resolution stores pinned source choices; save native edits to a separate BRRES.
+See DEVELOPMENT_STATUS.md for exact latest paths, hashes and tested scope.
