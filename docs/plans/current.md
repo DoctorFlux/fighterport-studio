@@ -21,4 +21,6 @@ save/reopen and two fresh product launches passed. Evidence is in DEVELOPMENT_ST
 After this one next task, continue installation/image/container providers, game-neutral
 projects, measured cross-rig/contact/bake work and the configured Goku-to-installed-
 Rivals-Modkit import/state/attack/build/playtest slice in MASTER_PLAN.md. This native
-Brawl path is not an intermediate for other games. All work remains local.
+Brawl path is not an intermediate for other games. Publication requires explicit user
+authorization; the user authorized uploading the current source replacement on 2026-10-17.
+This does not change the next implementation acceptance criterion above.

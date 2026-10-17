@@ -5,6 +5,9 @@ It supersedes earlier WPF/bridge/migration and auto-push strategies. Retained pr
 in CODEX_START_FROM_ZERO.md remain applicable except where the clean brief supersedes architecture,
 scope or publication instructions. The newer scope adds gameplay authoring and Dragon Ball
 native-output goals. Implemented status comes only from FORMAT_SUPPORT.md and current evidence.
+The user's 2026-10-17 source-upload instruction supersedes the reset's local-only restriction
+for publishing this replacement to the existing origin/main while preserving history.
+It does not authorize automatic future pushes or binary releases.
 
 | Requirement | Permanent scope |
 |---|---|

@@ -1,1 +1,1 @@
-throw 'Online publication and binary redistribution are disabled for this local restart. Run build.ps1 and run.ps1 for the local application. Resolve the component/license audit before any future distribution.'
+throw 'Automatic publication and binary packaging are disabled. Source Git updates require explicit user authorization, exact origin/public-status verification and outgoing content review. Resolve the component/license audit before binary distribution.'

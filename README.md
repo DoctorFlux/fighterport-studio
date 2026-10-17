@@ -26,7 +26,7 @@ executable. Set `FIGHTERPORT_DATA_ROOT` to an absolute local folder to choose an
 location. Preserve that folder when updating the application; staged edits are not
 automatically deleted. Upstream profiles are not imported.
 
-This is a local development checkpoint, not a released binary or a playable-fighter exporter.
+This is a source development checkpoint, not a released binary or a playable-fighter exporter.
 All remaining games and conversion goals remain in [the master plan](docs/MASTER_PLAN.md).
 Current evidence: [development status](docs/DEVELOPMENT_STATUS.md).
 One next task: [current plan](docs/plans/current.md).
@@ -35,3 +35,7 @@ Derived from BrawlCrate / BrawlBox / BrawlLib. Original authors and licenses are
 See [UPSTREAM](UPSTREAM.md), [third-party notices](THIRD_PARTY_NOTICES.md),
 [LGPL](LICENSE), and component license files. Independent product; no upstream endorsement.
 No branch, tag, public PR, artifact or release is automatically published for this restart.
+The user authorized uploading the source replacement to this existing repository on
+2026-10-17. The old application remains recoverable in Git history; future publication
+still requires explicit authorization. Local settings, game inputs, builds and test outputs
+are excluded. Binary distribution remains pending the component/license audit.

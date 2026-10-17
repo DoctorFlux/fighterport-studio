@@ -3,7 +3,8 @@
   "url": "https://github.com/DoctorFlux/fighterport-studio",
   "remote": "https://github.com/DoctorFlux/fighterport-studio.git",
   "private": false,
-  "branch": "codex/clean-brawlcrate-restart",
-  "publication": "local-only",
+  "branch": "main",
+  "publication": "explicit-authorization-only",
+  "sourceUploadAuthorizedOn": "2026-10-17",
   "automaticPush": false
 }

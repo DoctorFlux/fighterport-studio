@@ -1,5 +1,15 @@
 # Clean restart status — 2026-10-17
 
+Publication: the user subsequently authorized uploading the source replacement to the
+existing public DoctorFlux/fighterport-studio repository on 2026-10-17. This supersedes
+the earlier local-only instruction for this upload. The target is a normal fast-forward
+update of main from `86f698a3f75eeeb6ea82bd02c9623fe7019c4962`; no history deletion,
+repository recreation, force/mirror push, visibility change, tags, PRs or binary releases.
+The receipts below describe what was local at each implementation checkpoint. Source
+upload does not add GUI/game evidence or resolve the distribution audit. Publication
+success must be established by comparing the remote main SHA with the uploaded commit.
+Automatic publication remains disabled; settings, inputs, builds and evidence remain local.
+
 Current checkpoint: [persistent companion resolution](#persistent-companion-resolution--2026-10-17)
 is implemented and verified. The initial restart receipts below remain historical;
 the companion entry records the latest executable, checks and next-task boundary.

@@ -32,7 +32,10 @@ Private local development does not constitute a completed distribution audit. Be
 distribution, identify exact source/build inputs and notices for every included component, resolve
 opaque binary/resource provenance, prepare exact corresponding source and modification notices,
 and verify applicable LGPL/GPL/AGPL conditions including replacement/relink requirements where
-applicable. No installer, release, public upload or automatic publication is authorized here.
+applicable. The user authorized a source repository update on 2026-10-17; this does not
+resolve the audit or authorize installers, binary releases or automatic publication.
+The source baseline retains the inherited dependency references and resources listed above;
+their unresolved provenance is explicitly recorded, not represented as distribution clearance.
 
 New FighterPort source files mark their modifications/date and compatible terms. Original fixture
 design/output permission is stated in the new test generator; generated game-format fixtures are
