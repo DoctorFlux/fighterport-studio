@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Internal;
 using BrawlLib.SSBB.ResourceNodes;
 using BrawlLib.Wii.Animations;
@@ -19,10 +20,11 @@ namespace BrawlLib.Modeling.Collada
 
         public static void Serialize(MDL0Node model, string outFile)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFile); // FighterPort: mounted sources are read-only.
             model.Populate();
             model.ApplyCHR(null, 0);
 
-            using (FileStream stream = new FileStream(outFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFile), FileMode.Create, FileAccess.ReadWrite, FileShare.None,
                 0x1000, FileOptions.SequentialScan))
             {
                 using (XmlWriter writer = XmlWriter.Create(stream, _writerSettings))
@@ -1290,11 +1292,12 @@ namespace BrawlLib.Modeling.Collada
 
         public static void Serialize(CHR0Node[] animations, float fps, bool bake, string outFile)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFile); // FighterPort: mounted sources are read-only.
             string[] types = new[] {"scale", "rotate", "translate"};
             string[] axes = new[] {"X", "Y", "Z"};
             bool first = true;
 
-            using (FileStream stream = new FileStream(outFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFile), FileMode.Create, FileAccess.ReadWrite, FileShare.None,
                 0x1000, FileOptions.SequentialScan))
             {
                 using (XmlWriter writer = XmlWriter.Create(stream, _writerSettings))

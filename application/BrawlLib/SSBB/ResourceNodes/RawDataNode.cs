@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using System.ComponentModel;
 using System.IO;
@@ -53,7 +54,8 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
-            using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                 FileShare.None, 8, FileOptions.SequentialScan))
             {
                 stream.SetLength(_buffer.Length);

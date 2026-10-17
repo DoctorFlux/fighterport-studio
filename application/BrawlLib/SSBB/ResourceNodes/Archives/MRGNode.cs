@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.SSBB.Types;
 using System;
 using System.IO;
@@ -39,7 +40,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             if (!Directory.Exists(outFolder))
             {
-                Directory.CreateDirectory(outFolder);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFolder));
             }
 
             foreach (ARCEntryNode entry in Children)
@@ -116,6 +117,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportAsARC(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             ARCNode node = new ARCNode
             {
                 _children = _children,
@@ -126,6 +128,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (outPath.EndsWith(".pac", StringComparison.OrdinalIgnoreCase) ||
                 outPath.EndsWith(".pcs", StringComparison.OrdinalIgnoreCase) ||
                 outPath.EndsWith(".pair", StringComparison.OrdinalIgnoreCase))

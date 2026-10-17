@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal.Windows.Forms;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal.Windows.Forms;
 using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
 using System;
@@ -635,7 +636,7 @@ namespace BrawlLib.Internal.Windows.Controls
                 string newPath = _targetNode._origPath.Substring(0, _targetNode._origPath.LastIndexOf('\\')) + dir;
                 if (!Directory.Exists(newPath))
                 {
-                    Directory.CreateDirectory(newPath);
+                    Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(newPath));
                 }
 
                 i._node.Export(newPath + fileName);

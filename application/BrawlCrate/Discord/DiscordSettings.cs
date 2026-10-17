@@ -1,4 +1,5 @@
-﻿using BrawlCrate.UI;
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
+using BrawlCrate.UI;
 using BrawlLib.Internal;
 using BrawlLib.Internal.Windows.Forms;
 using BrawlLib.SSBB.ResourceNodes;
@@ -34,6 +35,10 @@ namespace BrawlCrate.Discord
 
         public static void Update()
         {
+            if (!Program.CanRunDiscordRPC)
+            {
+                return;
+            }
             if (!_enabled)
             {
                 DiscordRpc.ClearPresence();
@@ -284,6 +289,13 @@ namespace BrawlCrate.Discord
 
         public static void LoadSettings(bool update = false)
         {
+            // SettingsDialog also calls this directly; hidden controls alone are not a safety gate.
+            if (!Program.CanRunDiscordRPC)
+            {
+                _enabled = false;
+                _controllerSet = false;
+                return;
+            }
             if (Properties.Settings.Default.DiscordRPCEnabled && !DiscordControllerSet)
             {
                 DiscordController.Initialize();

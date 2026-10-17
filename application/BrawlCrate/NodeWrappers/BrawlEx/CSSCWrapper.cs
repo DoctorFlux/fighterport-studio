@@ -1,4 +1,5 @@
-﻿using BrawlLib.CustomLists;
+// FighterPort Studio modification, 2026-10-17: open companion resources in this product executable.
+using BrawlLib.CustomLists;
 using BrawlLib.Internal;
 using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
@@ -230,7 +231,7 @@ namespace BrawlCrate.NodeWrappers
             {
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = AppDomain.CurrentDomain.BaseDirectory + "\\BrawlCrate.exe",
+                    FileName = typeof(BrawlCrate.UI.MainForm).Assembly.Location,
                     Arguments = "\"" + s + "\""
                 });
             }

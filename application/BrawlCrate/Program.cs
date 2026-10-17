@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
 using BrawlCrate.NodeWrappers;
 using BrawlCrate.UI;
 using BrawlCrate.UI.Model_Previewer.ModelEditControl;
@@ -32,7 +33,7 @@ namespace BrawlCrate
         ///     If this isn't equal to the latest release, it assumes it needs to update.
         ///     MAKE SURE THIS IS ALWAYS PROPERLY UPDATED FOR ANY STABLE RELEASE!!!
         /// </summary>
-        public static readonly string TagName = "v0.42h1";
+        public static readonly string TagName = "fighterport-v0.1.0-restart";
 
         /// <summary>
         ///     Shows upon first launch of a given stable release assuming that automated updating is on.
@@ -41,20 +42,12 @@ namespace BrawlCrate
         ///     assume that the user already saw this with the update prompt.
         /// </summary>
         public static readonly string UpdateMessage =
-            @"Updated to BrawlCrate v0.42 Hotfix 1! Here's what's new in this release:
-- (Hotfix 1) Fix crash when loading the program on Windows 7 (API will now be disabled in this instance)
-- (Hotfix 1) Fix crash when a palette is missing on 50CC conversion
-- (Hotfix 1) Allow the Pokemon Trainer collision flag to be set with the Everything collision flag in the default editor
-- (Hotfix 1) Discontinue support for internal BrawlManagers (Check out BrawlInstaller for a more up-to-date version of the concept!)
-- Updated IronPython from v2.7.11 to v3.4.1, with an integrated installation
-- Updated known Item Parameters
-- EventMatchFighterNode: Unknown0a -> SpawnPosition
-- Fixes crash when opening Bowser's module in latest P+
-- Fixes regression in which UserEntries would not load properly
-- Fixes bug in which UV viewer would display off by a pixel
-- Added new easter egg
+            @"FighterPort Studio v0.1.0 restart:
+- Independent application derived from BrawlCrate v0.42 Hotfix 1.
+- Separate product settings, read-only source mounts and local diagnostics.
+- Inherited updating, online reports and Discord presence are disabled.
 
-Full changelog and documentation can be viewed from the help menu.";
+Full changelog: see the preserved upstream Changelog.txt and FighterPort development status.";
 
         public static readonly string AssemblyTitleFull;
         public static readonly string AssemblyTitleShort;
@@ -104,99 +97,17 @@ Full changelog and documentation can be viewed from the help menu.";
             Application.EnableVisualStyles();
 
 #if !DEBUG
-            try
-            {
-                if (Properties.Settings.Default.UpdateSettings)
-                {
-                    foreach (Assembly _Assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        foreach (Type _Type in _Assembly.GetTypes())
-                        {
-                            if (_Type.Name == "Settings" && typeof(SettingsBase).IsAssignableFrom(_Type))
-                            {
-                                ApplicationSettingsBase settings =
-                                    (ApplicationSettingsBase) _Type.GetProperty("Default").GetValue(null, null);
-                                if (settings != null)
-                                {
-                                    settings.Upgrade();
-                                    settings.Reload();
-                                    settings.Save();
-                                }
-                            }
-                        }
-                    }
-
-                    // This is the first time booting this update
-                    FirstBoot = true;
-
-                    // Ensure settings only get updated once
-                    Properties.Settings.Default.UpdateSettings = false;
-                    Properties.Settings.Default.Save();
-                }
-            }
-            catch
-            {
-                string settingsPath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"),
-                    "BrawlCrate");
-                if (Directory.Exists(settingsPath))
-                {
-                    if (MessageBox.Show(
-                            "Settings corruption has been detected. You can either reset your settings or fix them manually.\n" +
-                            "Would you like to reset them? Note that if they are not reset the program may not start correctly.",
-                            "BrawlCrate", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
-                    {
-                        foreach (DirectoryInfo d in Directory.CreateDirectory(settingsPath).GetDirectories())
-                        {
-                            try
-                            {
-                                d.Delete(true);
-                            }
-                            catch
-                            {
-                                // ignored. Likely the current settings file
-                            }
-                        }
-                    }
-                }
-
-                // This is the first time booting this update
-                FirstBoot = true;
-
-                // Ensure settings only get updated once
-                Properties.Settings.Default.UpdateSettings = false;
-                Properties.Settings.Default.Save();
-            }
+            // Independent portable settings are initialized under the startup error handler.
+            // Do not upgrade, reset, or remove another application's settings.
+            FirstBoot = false;
 #endif
 
             FullPath = Process.GetCurrentProcess().MainModule.FileName;
             AppPath = Path.GetDirectoryName(FullPath);
-#if CANARY
-            try
-            {
-                AssemblyTitleFull = "BrawlCrate Canary #" + File.ReadAllLines(AppPath + "\\Canary\\New")[2];
-            }
-            catch
-            {
-                AssemblyTitleFull = "BrawlCrate Canary";
-                MessageBox.Show("An error was found in the Canary installation. Redownloading.");
-                ForceDownloadCanary();
-            }
-            if (BrawlLib.BrawlCrate.PerSessionSettings.ProgramBirthday)
-            {
-                AssemblyTitleFull = AssemblyTitleFull.Replace("BrawlCrate", "PartyBrawl");
-            }
-            AssemblyTitleShort = AssemblyTitleFull.Substring(0, AssemblyTitleFull.IndexOf('#') + 8);
-#else
+            // The original Canary identity/update recovery does not apply to this product.
             AssemblyTitleFull = ((AssemblyTitleAttribute) Assembly.GetExecutingAssembly()
-                .GetCustomAttributes(typeof(AssemblyTitleAttribute),
-                    false)[0]).Title;
-            if (BrawlLib.BrawlCrate.PerSessionSettings.ProgramBirthday)
-            {
-                AssemblyTitleFull = AssemblyTitleFull.Replace("BrawlCrate", "PartyBrawl");
-            }
-
-            AssemblyTitleShort = AssemblyTitleFull.Replace(" Hotfix ", "-h");
-#endif
+                .GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0]).Title;
+            AssemblyTitleShort = AssemblyTitleFull;
 #if DEBUG
             AssemblyTitleFull += " DEBUG";
             AssemblyTitleShort += " DEBUG";
@@ -240,6 +151,15 @@ Full changelog and documentation can be viewed from the help menu.";
             Application.ThreadException += Application_ThreadException;
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+            // No inherited updater/legacy-executable deletion on startup.
+        }
+
+        private static bool _settingsInitialized;
+
+        internal static void InitializeSettings()
+        {
+            if (_settingsInitialized) return;
+            SourceWriteGuard.InitializeDefault();
             // Set default values for settings immediately, to prevent possible errors down the line
             if (BrawlLib.Properties.Settings.Default.Codes == null)
             {
@@ -278,37 +198,7 @@ Full changelog and documentation can be viewed from the help menu.";
                 Properties.Settings.Default.Save();
             }
 
-            try
-            {
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + '\\' + "Update.exe"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + '\\' + "Update.exe");
-                }
-
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + '\\' + "temp.exe"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + '\\' + "temp.exe");
-                }
-
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + '\\' + "Update.bat"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + '\\' + "Update.bat");
-                }
-
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + '\\' + "StageBox.exe"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + '\\' + "StageBox.exe");
-                }
-
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + '\\' + "BrawlBox.exe"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + '\\' + "BrawlBox.exe");
-                }
-            }
-            catch
-            {
-                // ignored
-            }
+            _settingsInitialized = true;
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
@@ -331,7 +221,7 @@ Full changelog and documentation can be viewed from the help menu.";
                 else
                 {
                     MessageBox.Show(
-                        "One or more key installation files are missing, including the automatic updater. This is likely due to antivirus software. Please reinstall and add your installation folder to your antivirus's exceptions list.",
+                        "A required FighterPort Studio dependency is missing. See the local build/doctor report. No automatic download or reinstall will run.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -368,7 +258,7 @@ Full changelog and documentation can be viewed from the help menu.";
                     else
                     {
                         MessageBox.Show(
-                            "One or more key installation files are missing, including the automatic updater. This is likely due to antivirus software. Please reinstall and add your installation folder to your antivirus's exceptions list.",
+                            "A required FighterPort Studio dependency is missing. See the local build/doctor report. No automatic download or reinstall will run.",
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
@@ -412,6 +302,18 @@ Full changelog and documentation can be viewed from the help menu.";
         [STAThread]
         public static void Main(string[] args)
         {
+            try
+            {
+                SourceWriteGuard.InitializeDefault();
+                InitializeSettings();
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException ||
+                ex is System.Configuration.ConfigurationErrorsException || ex is System.Xml.XmlException)
+            {
+                MessageBox.Show("FighterPort settings or source protection could not be initialized. The editor will not open.\n" + ex.Message,
+                    "FighterPort Studio", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             if (args.Length >= 1)
             {
                 // Writes the latest changelog to a text file
@@ -907,6 +809,22 @@ Full changelog and documentation can be viewed from the help menu.";
 
         public static bool Save(bool showMessages = true)
         {
+            // Reject protected destinations before Merge changes the working resource state.
+            if (_rootNode != null && _rootPath != null)
+            {
+                try
+                {
+                    SourceWriteGuard.ThrowIfProtected(_rootPath);
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    if (showMessages)
+                    {
+                        MessageBox.Show(ex.Message, "Read-only source", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    return false;
+                }
+            }
             MainForm.Instance.resourceTree_SelectionChanged("Saving File", EventArgs.Empty);
             if (_rootNode != null)
             {
@@ -1039,6 +957,16 @@ Full changelog and documentation can be viewed from the help menu.";
 
                 //Fix extension
                 fileName = ApplyExtension(SaveDlg.FileName, filter, fIndex - 1);
+                try
+                {
+                    SourceWriteGuard.ThrowIfProtected(fileName);
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    MessageBox.Show(ex.Message, "Read-only source", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    fileName = null;
+                    return false;
+                }
                 return true;
             }
 
@@ -1144,21 +1072,18 @@ Full changelog and documentation can be viewed from the help menu.";
 
         public static bool CanRunGithubApp(bool showMessages, out string path)
         {
-            path = $"{AppPath}\\Updater.exe";
-            if (!File.Exists(path))
+            // Deliberately independent of file presence and editable preferences.
+            path = null;
+            if (showMessages)
             {
-                if (showMessages)
-                {
-                    MessageBox.Show($"Could not find {path}");
-                }
-
-                return false;
+                MessageBox.Show("Inherited BrawlCrate updates and online issue submission are disabled in FighterPort Studio.",
+                    "FighterPort Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            return true;
+            return false;
         }
 
-        public static bool CanRunDiscordRPC => File.Exists($"{AppPath}\\discord-rpc.dll");
+        // The independent product never initializes the upstream Discord application.
+        public static bool CanRunDiscordRPC => false;
 
         public static void ForceDownloadStable()
         {

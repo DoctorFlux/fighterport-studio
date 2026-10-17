@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using System;
@@ -189,6 +190,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             LabelBuilder labl;
             int lablLen, size;
             VoidPtr addr;
@@ -202,7 +204,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             size = WorkingUncompressed.Length + lablLen + _audioSource.Length;
 
             using (FileStream stream =
-                new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
             {
                 stream.SetLength(size);
                 using (FileMap map = FileMap.FromStreamInternal(stream, FileMapProtect.ReadWrite, 0, size))

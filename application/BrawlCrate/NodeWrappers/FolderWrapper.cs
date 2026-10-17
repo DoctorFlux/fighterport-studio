@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using System.ComponentModel;
 using System.Windows.Forms;
 using BrawlLib.SSBB.ResourceNodes;
 using System.IO;
@@ -66,8 +67,9 @@ namespace BrawlCrate.NodeWrappers
             }
 
             string dir = ((FolderNode) _resource).FolderPath;
+            BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(dir);
             base.Delete();
-            Directory.Delete(dir, true);
+            Directory.Delete(BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(dir), true);
         }
     }
 }

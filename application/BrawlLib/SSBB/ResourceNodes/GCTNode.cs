@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using System;
 using System.Collections.Generic;
@@ -182,7 +183,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ToTXT(string path)
         {
-            using (StreamWriter file = new StreamWriter(path))
+            using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(path)))
             {
                 file.WriteLine(_name);
                 file.WriteLine(_gameName);

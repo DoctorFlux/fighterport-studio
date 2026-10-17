@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.Internal.Windows.Controls.Model_Panel;
@@ -1896,12 +1897,13 @@ For example, if the shader has two stages but this number is 1, the second stage
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             StringTable table = new StringTable();
             GetStrings(table);
             int dataLen = CalculateSize(false);
             int totalLen = dataLen + table.GetTotalSize();
 
-            using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                 FileShare.None, 8, FileOptions.RandomAccess))
             {
                 stream.SetLength(totalLen);

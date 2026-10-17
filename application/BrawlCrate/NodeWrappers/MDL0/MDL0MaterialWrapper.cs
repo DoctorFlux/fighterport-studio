@@ -1,4 +1,5 @@
-﻿using BrawlCrate.UI;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlCrate.UI;
 using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
 using BrawlLib.Wii.Graphics;
@@ -115,7 +116,7 @@ namespace BrawlCrate.NodeWrappers
             };
             if (s.ShowDialog() == DialogResult.OK)
             {
-                System.IO.File.WriteAllText(s.FileName,
+                System.IO.File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(s.FileName),
                     ShaderGenerator.GenVertexShader().Replace("\n", Environment.NewLine));
             }
 
@@ -126,7 +127,7 @@ namespace BrawlCrate.NodeWrappers
             {
                 string m = ShaderGenerator.GenMaterialFragShader();
                 string[] t = ShaderGenerator.GenTEVFragShader();
-                System.IO.File.WriteAllText(s.FileName,
+                System.IO.File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(s.FileName),
                     ShaderGenerator.CombineFragShader(m, t, mat.ActiveShaderStages)
                         .Replace("\n", Environment.NewLine));
             }

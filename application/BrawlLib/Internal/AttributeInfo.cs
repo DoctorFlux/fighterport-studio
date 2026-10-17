@@ -1,4 +1,5 @@
-﻿using System;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
@@ -101,7 +102,7 @@ namespace BrawlLib.Internal
             string dir = Path.GetDirectoryName(Filename);
             if (!Directory.Exists(dir))
             {
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(dir));
             }
 
             if (File.Exists(Filename))
@@ -113,7 +114,7 @@ namespace BrawlLib.Internal
                 }
             }
 
-            using (StreamWriter sw = new StreamWriter(Filename))
+            using (StreamWriter sw = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(Filename)))
             {
                 for (int i = 0; i < Array.Length; i++)
                 {

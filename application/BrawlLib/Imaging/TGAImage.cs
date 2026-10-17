@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.Internal.Drawing.Imaging;
 using BrawlLib.Internal.IO;
 using System;
@@ -357,6 +358,7 @@ namespace BrawlLib.Imaging
 
         public static unsafe void ToStream(Bitmap bmp, FileStream stream)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(stream); // FighterPort: guard before any stream resize/write.
             int w = bmp.Width, h = bmp.Height;
 
             TGAHeader header = new TGAHeader();
@@ -515,7 +517,7 @@ namespace BrawlLib.Imaging
 
         public static void ToFile(Bitmap bmp, string path)
         {
-            using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(path), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8,
                 FileOptions.RandomAccess))
             {
                 ToStream(bmp, stream);

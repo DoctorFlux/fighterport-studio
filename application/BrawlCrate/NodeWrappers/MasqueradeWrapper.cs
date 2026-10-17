@@ -1,4 +1,5 @@
-﻿using BrawlLib.SSBB;
+// FighterPort Studio modification, 2026-10-17: open companion resources in this product executable.
+using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
 using System;
 using System.Collections.Generic;
@@ -233,7 +234,7 @@ namespace BrawlCrate.NodeWrappers
             {
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = AppDomain.CurrentDomain.BaseDirectory + "\\BrawlCrate.exe",
+                    FileName = typeof(BrawlCrate.UI.MainForm).Assembly.Location,
                     Arguments = "\"" + s + "\""
                 });
             }

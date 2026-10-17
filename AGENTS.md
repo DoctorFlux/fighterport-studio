@@ -20,6 +20,8 @@ docs/plans/current.md. The clean restart supersedes the earlier bridge/WPF strat
 - This restart is LOCAL ONLY: no pushes/tags, public PRs, uploads, releases, CI dispatch,
   visibility changes, repository recreation, force push or mirror push. Existing origin:
   https://github.com/DoctorFlux/fighterport-studio.git (public, independently hosted).
+  If later explicitly authorized to publish, verify exact origin and expected public
+  status against config/repository.json, and review staged files AND content diff first.
 - No global installs, EULA acceptance, paid services or automatic source-script execution.
 - Recovery outside the working tree must remain intact. At a real boundary record the exact
   failure and a coherent checkpoint; never claim unobserved GUI/native-tool/game checks.

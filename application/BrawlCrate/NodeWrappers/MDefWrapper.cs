@@ -1,4 +1,5 @@
-﻿using BrawlCrate.UI;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlCrate.UI;
 using BrawlLib.Internal;
 using BrawlLib.Internal.Windows.Forms;
 using BrawlLib.SSBB;
@@ -134,7 +135,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(events))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(events)))
                 {
                     foreach (ActionEventInfo info in MoveDefNode.EventDictionary.Values)
                     {
@@ -190,7 +191,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(parameters))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(parameters)))
                 {
                     foreach (ActionEventInfo info in MoveDefNode.EventDictionary.Values)
                     {
@@ -253,7 +254,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(syntax))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(syntax)))
                 {
                     foreach (ActionEventInfo info in MoveDefNode.EventDictionary.Values)
                     {
@@ -309,7 +310,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(attributes))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(attributes)))
                 {
                     foreach (AttributeInfo i in node.AttributeArray)
                     {
@@ -351,7 +352,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(Params))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(Params)))
                 {
                     foreach (KeyValuePair<string, SectionParamInfo> i in node.Params)
                     {
@@ -410,7 +411,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(requirements))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(requirements)))
                 {
                     foreach (string i in node.iRequirements)
                     {
@@ -467,7 +468,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(airground))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(airground)))
                 {
                     foreach (string i in node.iAirGroundStats)
                     {
@@ -495,7 +496,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(collision))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(collision)))
                 {
                     foreach (string i in node.iCollisionStats)
                     {
@@ -523,7 +524,7 @@ namespace BrawlCrate.NodeWrappers
 
             if (go)
             {
-                using (StreamWriter file = new StreamWriter(gfx))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(gfx)))
                 {
                     foreach (string i in node.iGFXFiles)
                     {
@@ -618,7 +619,7 @@ namespace BrawlCrate.NodeWrappers
                     }
                 }
 
-                using (StreamWriter file = new StreamWriter(enums))
+                using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(enums)))
                 {
                     int i = 0;
                     foreach (Dictionary<int, List<string>> d in EnumList)

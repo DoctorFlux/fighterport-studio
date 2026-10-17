@@ -23,13 +23,17 @@ Baseline build, before branding/runtime/UI changes: installed Visual Studio 2022
 17.14, original solution Debug/x86/net472. Untouched build restored dependencies and built
 BrawlLib/Updater, then failed MSB3073/9009 because the pre-build hook invokes unavailable Cargo.
 A local CustomAfterMicrosoftCommonTargets override of PreBuild/PostBuild compiled the actual
-BrawlCrate executable without managed source edits. The override avoids updater -killAll,
-recursive output deletion and shell copying; ColorSmash helper compilation remains unverified.
+BrawlCrate executable without managed source edits. An inherited BrawlLib PreBuildEvent emitted
+an empty-path shell syntax error; it performed no observed deletion. The independent product
+build now also overrides PreBuildEvent/PostBuildEvent. Those bounded hooks avoid updater
+-killAll, recursive output deletion and shell copying; ColorSmash compilation remains unverified.
 No old FighterPort bfloat/animation-codec patches were silently carried into this baseline.
 Original checkout and failed/success logs remain external; local copies of logs are ignored.
 
 FighterPort modifications dated 2026-10-17 are separate from that verified baseline:
 - Product/executable/version/settings identity, upstream lineage in About; original copyrights remain.
+- Shared portable settings provider preserving the existing scalar/XML/binary representations;
+  no upstream profile migration or encryption/ACL changes.
 - Hard gates for inherited updater/issue submission/Discord; local diagnostic reports; safe defaults,
   scripting opt-in/whitelist, no inherited cleanup or file-association writes.
 - File > Open Source staged folder workflow and source write protection.

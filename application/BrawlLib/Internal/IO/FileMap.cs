@@ -1,4 +1,5 @@
-﻿using BrawlLib.Platform;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Platform;
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -74,6 +75,7 @@ namespace BrawlLib.Internal.IO
             }
             catch // Just open the file normally
             {
+                if (prot == FileMapProtect.ReadWrite) SourceWriteGuard.ThrowIfProtected(path);
                 stream = new FileStream(path, FileMode.Open,
                     prot == FileMapProtect.ReadWrite ? FileAccess.ReadWrite : FileAccess.Read, FileShare.Read, 8,
                     options);
@@ -126,6 +128,7 @@ namespace BrawlLib.Internal.IO
 
         public static FileMap FromStream(FileStream stream, FileMapProtect prot, int offset, int length)
         {
+            if (prot == FileMapProtect.ReadWrite) SourceWriteGuard.ThrowIfProtected(stream);
             //FileStream newStream = new FileStream(stream.Name, FileMode.Open, prot == FileMapProtect.Read ? FileAccess.Read : FileAccess.ReadWrite, FileShare.Read, 8, FileOptions.RandomAccess);
             //try { return FromStreamInternal(newStream, prot, offset, length); }
             //catch (Exception x) { newStream.Dispose(); throw x; }
@@ -151,6 +154,7 @@ namespace BrawlLib.Internal.IO
 
         public static FileMap FromStreamInternal(FileStream stream, FileMapProtect prot, int offset, int length)
         {
+            if (prot == FileMapProtect.ReadWrite) SourceWriteGuard.ThrowIfProtected(stream);
             if (length == 0)
             {
                 length = (int) stream.Length;
@@ -234,6 +238,7 @@ namespace BrawlLib.Internal.IO
 
         public cFileMap(FileStream stream, FileMapProtect protect, int offset, int length)
         {
+            if (protect == FileMapProtect.ReadWrite) SourceWriteGuard.ThrowIfProtected(stream); // FighterPort, 2026-10-17: protect direct writable mappings.
             MemoryMappedFileAccess cProtect = protect == FileMapProtect.ReadWrite
                 ? MemoryMappedFileAccess.ReadWrite
                 : MemoryMappedFileAccess.Read;

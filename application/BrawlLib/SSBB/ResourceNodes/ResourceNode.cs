@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.Wii;
@@ -908,12 +909,13 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public virtual void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             Rebuild(); //Apply changes the user has made by rebuilding.
 #if !DEBUG
             try
             {
 #endif
-            using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                 FileShare.ReadWrite, 8, FileOptions.SequentialScan))
             {
                 Export(stream);
@@ -930,6 +932,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void Export(FileStream outStream)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outStream);
             if (WorkingSource.Length != 0)
             {
                 outStream.SetLength(WorkingSource.Length);
@@ -946,10 +949,11 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public virtual void ExportUncompressed(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             Rebuild(); //Apply changes the user has made by rebuilding.
             try
             {
-                using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                     FileShare.None, 8, FileOptions.SequentialScan))
                 {
                     ExportUncompressed(stream);
@@ -963,6 +967,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportUncompressed(FileStream outStream)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outStream);
             if (WorkingUncompressed.Length != 0)
             {
                 outStream.SetLength(WorkingUncompressed.Length);

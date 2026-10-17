@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.SSBB.Types;
@@ -467,7 +468,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             if (!Directory.Exists(outFolder))
             {
-                Directory.CreateDirectory(outFolder);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFolder));
             }
 
             List<string> directChildrenExportedPaths = new List<string>();
@@ -597,6 +598,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (outPath.EndsWith(".pair", StringComparison.OrdinalIgnoreCase))
             {
                 ExportPair(outPath);
@@ -638,6 +640,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportAsMRG(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             MRGNode node = new MRGNode
             {
                 _children = Children,
@@ -648,6 +651,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportPair(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(path))
             {
                 path = path.Substring(0, path.LastIndexOf('.'));
@@ -660,6 +664,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         // STGMARIOPAST uses 00/01
         public void ExportMarioPast(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(path))
             {
                 path = path.Substring(0, path.LastIndexOf('.'));
@@ -689,6 +694,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         // STGMETALGEAR uses 00, 01, and 02
         public void ExportMetalGear(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(path))
             {
                 path = path.Substring(0, path.LastIndexOf('.'));
@@ -720,6 +726,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         // STGVILLAGE uses 00, 01, 02, and 03
         public void ExportVillage(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(path))
             {
                 path = path.Substring(0, path.LastIndexOf('.'));
@@ -755,6 +762,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         // STGTENGAN uses 1, 2, 3
         public void ExportTengan(string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(path))
             {
                 path = path.Substring(0, path.LastIndexOf('.'));
@@ -800,12 +808,14 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportPAC(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             Rebuild();
             ExportUncompressed(outPath);
         }
 
         public void ExportPCS(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             Rebuild();
             if (_compression != CompressionType.None || !Properties.Settings.Default.AutoCompressFighterPCS)
             {
@@ -816,7 +826,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                 using (FileStream inStream = new FileStream(Path.GetTempFileName(), FileMode.OpenOrCreate,
                     FileAccess.ReadWrite, FileShare.None, 0x8, FileOptions.SequentialScan | FileOptions.DeleteOnClose))
                 {
-                    using (FileStream outStream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                    using (FileStream outStream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                         FileShare.None, 8, FileOptions.SequentialScan))
                     {
                         Compressor.Compact(CompressionType.ExtendedLZ77, WorkingUncompressed.Address,

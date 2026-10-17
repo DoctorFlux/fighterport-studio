@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Internal;
 using BrawlLib.SSBB.ResourceNodes;
 using BrawlLib.Wii.Graphics;
@@ -63,8 +64,9 @@ namespace BrawlLib.Modeling
 
         public static void Export(MDL0Node model, string filename)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(filename); // FighterPort: mounted sources are read-only.
             filename = Path.GetFullPath(filename);
-            using (FileStream fs = new FileStream(filename, FileMode.Create))
+            using (FileStream fs = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(filename), FileMode.Create))
             {
                 BinaryWriter writer = new BinaryWriter(fs);
                 writer.Write(encoder.GetBytes("Pmd"));

@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Imaging.GIF;
 using BrawlLib.Internal;
 using BrawlLib.Internal.Drawing;
@@ -337,19 +338,22 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportToFolder(string outFolder)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             ExportToFolder(outFolder, ".tex0");
         }
 
         public void ExportToFolder(string outFolder, string imageExtension)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             ExportToFolder(outFolder, imageExtension, ".mdl0");
         }
 
         public void ExportToFolder(string outFolder, string imageExtension, string modelExtension)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             if (!Directory.Exists(outFolder))
             {
-                Directory.CreateDirectory(outFolder);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFolder));
             }
 
             string ext = "";
@@ -1128,6 +1132,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             Rebuild();
 
             StringTable table = new StringTable();
@@ -1136,7 +1141,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             int dataLen = WorkingUncompressed.Length.Align(4);
             int size = dataLen + table.GetTotalSize();
 
-            using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                 FileShare.None, 8, FileOptions.RandomAccess))
             {
                 stream.SetLength(size);

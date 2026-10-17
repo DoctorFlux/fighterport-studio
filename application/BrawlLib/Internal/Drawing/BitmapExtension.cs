@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Internal.Drawing.Imaging;
 using BrawlLib.Internal.Windows.Forms;
 using BrawlLib.Wii.Textures;
@@ -679,6 +680,7 @@ namespace BrawlLib.Internal.Drawing
 
         public static void SaveTGA(this Bitmap bmp, string path)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path); // FighterPort: mounted sources are read-only.
             TGA.ToFile(bmp, path);
         }
 

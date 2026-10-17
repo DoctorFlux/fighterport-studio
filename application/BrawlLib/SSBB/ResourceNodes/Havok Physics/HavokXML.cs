@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -12,7 +13,8 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public static void Serialize(HavokNode node, string outFile)
         {
-            using (FileStream stream = new FileStream(outFile, FileMode.Create, FileAccess.ReadWrite, FileShare.None,
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFile); // FighterPort: mounted sources are read-only.
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFile), FileMode.Create, FileAccess.ReadWrite, FileShare.None,
                 0x1000, FileOptions.SequentialScan))
             {
                 using (XmlWriter writer = XmlWriter.Create(stream, _writerSettings))

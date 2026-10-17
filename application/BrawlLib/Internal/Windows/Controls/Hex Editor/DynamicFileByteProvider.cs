@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using System;
 using System.IO;
 
@@ -38,7 +39,7 @@ namespace BrawlLib.Internal.Windows.Controls.Hex_Editor
 
             if (!readOnly)
             {
-                _stream = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+                _stream = File.Open(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(fileName), FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             }
             else
             {
@@ -360,6 +361,7 @@ namespace BrawlLib.Internal.Windows.Controls.Hex_Editor
         /// </summary>
         public void ApplyChanges()
         {
+            if (_stream is FileStream fileStream) BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(fileStream);
             if (_readOnly)
             {
                 throw new OperationCanceledException("File is in read-only mode");

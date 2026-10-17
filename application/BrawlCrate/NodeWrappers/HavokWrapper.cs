@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.SSBB;
 using BrawlLib.SSBB.ResourceNodes;
@@ -96,7 +97,7 @@ namespace BrawlCrate.NodeWrappers
 
                 //_resource.Rebuild();
                 HavokNode p = _resource as HavokNode;
-                using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                     FileShare.ReadWrite, 8, FileOptions.SequentialScan))
                 {
                     stream.SetLength(p._buffer.Length);

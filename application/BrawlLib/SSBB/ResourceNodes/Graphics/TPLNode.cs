@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging;
 using BrawlLib.Internal;
 using BrawlLib.Internal.Drawing;
 using BrawlLib.Internal.IO;
@@ -362,11 +363,12 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (outPath.EndsWith(".png"))
             {
                 using (Bitmap bmp = GetImage(0))
                 {
-                    bmp.Save(outPath, ImageFormat.Png);
+                    bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Png);
                 }
             }
             else if (outPath.EndsWith(".tga"))
@@ -380,34 +382,34 @@ namespace BrawlLib.SSBB.ResourceNodes
             {
                 using (Bitmap bmp = GetImage(0))
                 {
-                    bmp.Save(outPath, ImageFormat.Tiff);
+                    bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Tiff);
                 }
             }
             else if (outPath.EndsWith(".bmp"))
             {
                 using (Bitmap bmp = GetImage(0))
                 {
-                    bmp.Save(outPath, ImageFormat.Bmp);
+                    bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Bmp);
                 }
             }
             else if (outPath.EndsWith(".jpg") || outPath.EndsWith(".jpeg"))
             {
                 using (Bitmap bmp = GetImage(0))
                 {
-                    bmp.Save(outPath, ImageFormat.Jpeg);
+                    bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Jpeg);
                 }
             }
             else if (outPath.EndsWith(".gif"))
             {
                 using (Bitmap bmp = GetImage(0))
                 {
-                    bmp.Save(outPath, ImageFormat.Gif);
+                    bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Gif);
                 }
             }
             else
             {
                 int dataLen = TPLTextureHeader.Size + CalculateSize(true);
-                using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                     FileShare.None, 8, FileOptions.RandomAccess))
                 {
                     stream.SetLength(dataLen);

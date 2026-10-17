@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.SSBB.Types;
 using BrawlLib.Wii;
@@ -256,16 +257,19 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             ExportNonYaz0(outPath);
         }
 
         public void ExportSZS(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             ExportCompressed(outPath);
         }
 
         public void ExportPair(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (Path.HasExtension(outPath))
             {
                 outPath = outPath.Substring(0, outPath.LastIndexOf('.'));
@@ -277,11 +281,13 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportNonYaz0(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             base.Export(outPath);
         }
 
         public void ExportCompressed(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (_compression != CompressionType.None)
             {
                 base.Export(outPath);
@@ -291,7 +297,7 @@ namespace BrawlLib.SSBB.ResourceNodes
                 using (FileStream inStream = new FileStream(Path.GetTempFileName(), FileMode.OpenOrCreate,
                     FileAccess.ReadWrite, FileShare.None, 0x8, FileOptions.SequentialScan | FileOptions.DeleteOnClose))
                 {
-                    using (FileStream outStream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                    using (FileStream outStream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                         FileShare.None, 8, FileOptions.SequentialScan))
                     {
                         Compressor.Compact(CompressionType.RunLengthYAZ0, WorkingUncompressed.Address,
@@ -328,7 +334,7 @@ namespace BrawlLib.SSBB.ResourceNodes
         {
             if (!Directory.Exists(outFolder))
             {
-                Directory.CreateDirectory(outFolder);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFolder));
             }
 
             List<string> directChildrenExportedPaths = new List<string>();
@@ -433,19 +439,22 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public void ExportToFolder(string outFolder)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             ExportToFolder(outFolder, ".tex0");
         }
 
         public void ExportToFolder(string outFolder, string imageExtension)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             ExportToFolder(outFolder, imageExtension, ".mdl0");
         }
 
         public void ExportToFolder(string outFolder, string imageExtension, string modelExtension)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outFolder); // FighterPort: mounted sources are read-only.
             if (!Directory.Exists(outFolder))
             {
-                Directory.CreateDirectory(outFolder);
+                Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outFolder));
             }
 
             List<string> directChildrenExportedPaths = new List<string>();

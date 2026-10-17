@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.SSBB.ResourceNodes;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace BrawlLib.Wii.Animations
 
         public static void Serialize(CHR0Node node, string output)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(output); // FighterPort: mounted sources are read-only.
             Dictionary<CHR0Node, string> dict = new Dictionary<CHR0Node, string>();
             dict.Add(node, output);
             Serialize(dict);
@@ -43,8 +45,9 @@ namespace BrawlLib.Wii.Animations
 
         public static void Serialize(CHR0Node node, string output, MDL0Node model)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(output); // FighterPort: mounted sources are read-only.
             model.Populate();
-            using (StreamWriter file = new StreamWriter(output))
+            using (StreamWriter file = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(output)))
             {
                 file.WriteLine("animVersion 1.1;");
                 file.WriteLine("mayaVersion 2015;");

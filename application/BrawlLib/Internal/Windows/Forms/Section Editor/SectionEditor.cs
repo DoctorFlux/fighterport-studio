@@ -1,4 +1,5 @@
-﻿using BrawlLib.Internal.PowerPCAssembly;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Internal.PowerPCAssembly;
 using BrawlLib.Internal.Windows.Forms.Section_Editor;
 using BrawlLib.SSBB.ResourceNodes;
 using BrawlLib.SSBB.Types;
@@ -1704,7 +1705,7 @@ namespace BrawlLib.Internal.Windows.Controls.Hex_Editor
                 }
             }
 
-            using (StreamWriter sw = new StreamWriter(filename))
+            using (StreamWriter sw = new StreamWriter(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(filename)))
             {
                 bool firstLine = true;
                 //foreach (AttributeInfo attr in Array) {

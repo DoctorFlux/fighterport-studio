@@ -1,4 +1,5 @@
-﻿using BrawlCrate.ExternalInterfacing;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlCrate.ExternalInterfacing;
 using BrawlCrate.UI;
 using BrawlLib.Internal.Windows.Forms;
 #if !MONO
@@ -438,12 +439,13 @@ namespace BrawlCrate.NodeWrappers
 
                 try
                 {
-                    DirectoryInfo d = Directory.CreateDirectory(infFaceFolder);
-                    DirectoryInfo d2 = Directory.CreateDirectory(infFaceFolder + '\\' + "temp");
+                    DirectoryInfo d = Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(infFaceFolder));
+                    DirectoryInfo d2 = Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(infFaceFolder + '\\' + "temp"));
                     Console.WriteLine(infFaceFolder);
                     int count = 0;
                     foreach (FileInfo infFace in d.GetFiles())
                     {
+                        BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(infFace.FullName);
                         Console.WriteLine(infFaceFolder + '\\' + infFace.Name);
                         int properlength = infFace.Name.EndsWith(".brres", StringComparison.OrdinalIgnoreCase)
                             ? infFace.Name.Length - ".brres".Length
@@ -497,12 +499,14 @@ namespace BrawlCrate.NodeWrappers
 
                     foreach (FileInfo infFace in d2.GetFiles())
                     {
+                        BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(infFace.FullName);
                         infFace.MoveTo(infFaceFolder + '\\' + infFace.Name +
                                        (infFace.Name.EndsWith(".brres", StringComparison.OrdinalIgnoreCase)
                                            ? ""
                                            : ".brres"));
                     }
 
+                    BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(d2.FullName);
                     d2.Delete();
                     if (count > 0)
                     {
@@ -714,12 +718,13 @@ namespace BrawlCrate.NodeWrappers
 
                 try
                 {
-                    DirectoryInfo d = Directory.CreateDirectory(infFaceFolder);
-                    DirectoryInfo d2 = Directory.CreateDirectory(infFaceFolder + '\\' + "temp");
+                    DirectoryInfo d = Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(infFaceFolder));
+                    DirectoryInfo d2 = Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(infFaceFolder + '\\' + "temp"));
                     Console.WriteLine(infFaceFolder);
                     int count = 0;
                     foreach (FileInfo infFace in d.GetFiles().Reverse())
                     {
+                        BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(infFace.FullName);
                         Console.WriteLine(infFaceFolder + '\\' + infFace.Name);
                         int properlength = infFace.Name.EndsWith(".brres", StringComparison.OrdinalIgnoreCase)
                             ? infFace.Name.Length - ".brres".Length
@@ -776,12 +781,14 @@ namespace BrawlCrate.NodeWrappers
 
                     foreach (FileInfo infFace in d2.GetFiles())
                     {
+                        BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(infFace.FullName);
                         infFace.MoveTo(infFaceFolder + '\\' + infFace.Name +
                                        (infFace.Name.EndsWith(".brres", StringComparison.OrdinalIgnoreCase)
                                            ? ""
                                            : ".brres"));
                     }
 
+                    BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(d2.FullName);
                     d2.Delete();
                     if (count > 0)
                     {

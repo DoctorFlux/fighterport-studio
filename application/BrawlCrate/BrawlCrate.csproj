@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProductVersion>9.0.30729</ProductVersion>
+    <!-- FighterPort Studio modification, 2026-10-17: independent executable/settings identity. -->
     <OutputType>WinExe</OutputType>
+    <AssemblyName>FighterPort.Studio</AssemblyName>
     <PlatformTarget>x86</PlatformTarget>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFramework>net472</TargetFramework>
@@ -19,16 +21,16 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <AssemblyTitle>BrawlCrate v0.42 Hotfix 1</AssemblyTitle>
-    <Product>BrawlCrate</Product>
+    <AssemblyTitle>FighterPort Studio v0.1.0 restart</AssemblyTitle>
+    <Product>FighterPort Studio</Product>
     <Description>This program is provided as-is without any warranty, implied or otherwise. By using this program, the end user agrees to take full responsibility regarding its proper and lawful use. The authors/hosts/distributors cannot be held responsible for any damage resulting in the use of this program, nor can they be held accountable for the manner in which it is used.</Description>
     <Copyright>
       Copyright © 2018 - 2024 soopercool101, NuclearNecrosis, Simon381
       BrawlBox Copyright © 2009 - 2019 Bryan Moulton, BlackJax96, libertyernie, Sammi Husky
       Super Smash Bros. Brawl © 2008 Nintendo and HAL Laboratory
     </Copyright>
-    <AssemblyVersion>0.42.0.1</AssemblyVersion>
-    <FileVersion>0.42.0.1</FileVersion>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Configurations>Debug;Release;Mono;Canary;Doxygen;Documentation</Configurations>
@@ -185,9 +187,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>BrawlCrate.Program</StartupObject>
-    <Version>42.0.1</Version>
+    <Version>0.1.0</Version>
     <Authors>soopercool101, NuclearNecrosis, Simon381, Onium, Bryan Moulton, BlackJax96, libertyernie, Sammi Husky</Authors>
-    <Company>BrawlCrate</Company>
+    <Company>FighterPort Studio</Company>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -283,6 +285,8 @@
     <Reference Include="OpenTK">
       <HintPath>..\BrawlLib\OpenTK.dll</HintPath>
     </Reference>
+    <!-- FighterPort Studio: independent settings startup error handling. -->
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
   </ItemGroup>

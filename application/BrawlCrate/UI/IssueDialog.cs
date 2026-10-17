@@ -1,4 +1,5 @@
-﻿using BrawlLib.SSBB.ResourceNodes;
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
+using BrawlLib.SSBB.ResourceNodes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,8 +19,14 @@ namespace BrawlCrate.UI
             _exception = e;
 
             InitializeComponent();
-
-            Text = e.GetType().ToString();
+            label1.Text = "FighterPort Studio encountered an error. Diagnostics remain local. You can save a report and try to save changed resources.";
+            button1.Text = "Save report";
+            button1.Width = 90;
+            button1.Left -= 15;
+            button2.Text = "Close";
+            button2.Width = 100;
+            txtDescription.Text = "Describe what happened for your local report.";
+            Text = "FighterPort Studio — " + e.GetType();
             txtStack.Text = e.Message + ' ' + (e.InnerException?.Message ?? "") + '\n' + e.StackTrace;
 
             lstChangedFiles.Visible =
@@ -55,50 +62,29 @@ namespace BrawlCrate.UI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtTitle.Text) || txtTitle.ForeColor == Color.Gray)
+            using (SaveFileDialog dialog = new SaveFileDialog
             {
-                MessageBox.Show("Please write a short summary for this bug report in the title box before sending.");
-                return;
-            }
-
-            //Send the issue to the repository
-            if (Program.CanRunGithubApp(true, out string path))
+                Filter = "Text diagnostic report|*.txt",
+                FileName = "FighterPort-diagnostic.txt",
+                OverwritePrompt = true
+            })
             {
-#if CANARY
-                string programTitle = Program.AssemblyTitleFull;
-#else
-                string programTitle = Program.TagName;
-#endif
-                string exceptionMessage = _exception.Message.Replace("\"", "\\\"");
-                // Add inner exception if available
-                if (_exception.InnerException != null)
+                if (dialog.ShowDialog(this) != DialogResult.OK)
                 {
-                    exceptionMessage += " ";
-                    exceptionMessage += _exception.InnerException.Message.Replace("\"", "\\\"");
+                    return;
                 }
-
-                string args =
-                    $"-bi \"{programTitle}\" \"{exceptionMessage}\" \"{_exception.StackTrace.Replace("\"", "\\\"")}\" \"{txtTitle.Text.Replace("\"", "\\\"")}\" \"{(string.IsNullOrEmpty(txtDescription.Text) || txtDescription.ForeColor == Color.Gray ? "" : txtDescription.Text.Replace("\"", "\\\""))}\"";
-
-                Process.Start(new ProcessStartInfo
+                try
                 {
-                    FileName = path,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    Arguments = args
-                });
+                    BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(dialog.FileName);
+                    File.WriteAllText(dialog.FileName, Program.AssemblyTitleFull + Environment.NewLine +
+                        txtTitle.Text + Environment.NewLine + txtDescription.Text + Environment.NewLine +
+                        txtStack.Text);
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    MessageBox.Show(ex.Message, "Diagnostic report", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
-            {
-                MessageBox.Show(
-                    "An error was thrown when sending the issue. Make sure the Updater.exe is undisturbed.");
-            }
-
-            if (chkForceClose.Checked)
-            {
-                Environment.Exit(0);
-            }
-
-            Close();
         }
 
         private void txtTitle_Leave(object sender, EventArgs e)
@@ -129,7 +115,7 @@ namespace BrawlCrate.UI
             {
                 txtDescription.ForeColor = Color.Gray;
                 txtDescription.Text =
-                    "Explain in detail what you were doing that caused the bug. Reproducable steps and/or links to files that were worked on will make the bug much easier to fix. This will be posted publicly at https://github.com/BrawlCrate/BrawlCrateIssues/issues, so do not put any personal information here. It may be beneficial to you to sign your report with a username unless you wish to stay anonymous. It is also very helpful to report the issue on our Discord at https://discord.gg/s7c8763";
+                    "Describe what happened for your local report. Nothing is submitted online. Review file paths and other personal information before sharing a report yourself.";
             }
         }
 
@@ -208,7 +194,7 @@ namespace BrawlCrate.UI
 
         private void txtDescription_LinkClicked(object sender, LinkClickedEventArgs e)
         {
-            Process.Start(e.LinkText);
+            // Report descriptions do not open inherited online destinations.
         }
 
         private void txtDescription_MouseUp(object sender, MouseEventArgs e)

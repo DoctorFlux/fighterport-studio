@@ -184,6 +184,8 @@ BrawlLib Copyright © 2009 - 2019 Bryan Moulton, BlackJax96, libertyernie, Sammi
       <HintPath>.\OpenTK.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <!-- FighterPort Studio modification, 2026-10-17: shared independent settings provider. -->
+    <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />

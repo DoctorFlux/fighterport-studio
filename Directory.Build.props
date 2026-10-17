@@ -1,0 +1,7 @@
+<Project>
+  <!-- FighterPort Studio modification, 2026-10-17: the independent build policy
+       also applies when opening the imported projects directly in Visual Studio. -->
+  <PropertyGroup>
+    <CustomAfterMicrosoftCommonTargets Condition="'$(CustomAfterMicrosoftCommonTargets)' == ''">$(MSBuildThisFileDirectory)build\Independent.targets</CustomAfterMicrosoftCommonTargets>
+  </PropertyGroup>
+</Project>

@@ -26,6 +26,7 @@ strings and source-specific copyright notices remain available in application/.
 | Octokit 5.0.0 | Updater project dependency; updater source retained, runtime updates disabled and updater not part of independent app build. |
 | Doxygen 1.8.14 | Inherited build/documentation tooling dependency; not a product license blanket. |
 | Icons/resources/documentation | Preserved upstream resources; per-asset provenance/redistribution audit remains open. No user game assets imported. |
+| Embedded native templates/effects | `BrawlLib/HardcodedFiles/Models/Static.mdl0` and `Textures/FB.tex0`, `TShadow1.tex0`, `metal00.tex0`, `spycloak00.tex0` are unchanged upstream resources. Common-resource import and metal preview reference them. No generator or explicit origin/redistribution proof was found. They are NOT the original smoke fixtures. Exact hashes are in docs/upstream-manifest.json; source provenance remains unresolved before any distribution. |
 
 Private local development does not constitute a completed distribution audit. Before any binary
 distribution, identify exact source/build inputs and notices for every included component, resolve

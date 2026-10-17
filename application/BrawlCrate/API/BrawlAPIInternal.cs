@@ -1,4 +1,5 @@
-﻿using BrawlCrate.NodeWrappers;
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
+using BrawlCrate.NodeWrappers;
 using BrawlCrate.UI;
 using BrawlLib.SSBB.ResourceNodes;
 using IronPython.Hosting;
@@ -67,10 +68,7 @@ namespace BrawlCrate.API
                 Runtime = null;
             }
 
-            if (Directory.Exists($"{Application.StartupPath}\\BrawlAPI\\Python"))
-            {
-                Directory.Delete($"{Application.StartupPath}\\BrawlAPI\\Python", true);
-            }
+            // Preserve local API files; no inherited migration cleanup.
             fsi_path = Properties.Settings.Default.FSharpInstallationPath;
 
             //Import BrawlCrate and Brawllib
@@ -276,6 +274,7 @@ namespace BrawlCrate.API
                     DepreciatedReplacementStrings.Values.ElementAt(i));
             }
 
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(path);
             File.WriteAllText(path, text);
         }
 

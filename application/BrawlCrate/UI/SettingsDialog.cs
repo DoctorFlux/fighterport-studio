@@ -1,4 +1,5 @@
-﻿using BrawlCrate.API;
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
+using BrawlCrate.API;
 using BrawlCrate.Discord;
 using BrawlLib.Internal.IO;
 using BrawlLib.Internal.Windows.Controls;
@@ -138,6 +139,9 @@ namespace BrawlCrate.UI
         public SettingsDialog()
         {
             InitializeComponent();
+            // The inherited handler shares SSBB.* registry keys and is unsafe for an independent product.
+            tabControl1.TabPages.Remove(tabFileAssociations);
+            btnApply.Enabled = false;
             Icon = BrawlLib.Properties.Resources.Icon;
             _updating = true;
 #if DEBUG
@@ -188,68 +192,8 @@ namespace BrawlCrate.UI
 
         private void Apply()
         {
-            try
-            {
-                int index = 0;
-                foreach (ListViewItem i in lstViewFileAssociations.Items)
-                {
-                    bool check = i.Checked;
-                    if (check != (bool) i.Tag)
-                    {
-                        if (check)
-                        {
-                            _assocList[index].FileType = _typeList[index];
-                            _typeList[index].SetCommand("open", $"\"{Program.FullPath}\" \"%1\"");
-                        }
-                        else
-                        {
-                            _typeList[index].Delete();
-                            _assocList[index].Delete();
-                        }
-
-                        i.Tag = check;
-                    }
-
-                    index++;
-                }
-
-                lstViewFileAssociations.Sort();
-                if (datFileAssociation.Checked)
-                {
-                    FileAssociation.Get(".dat").FileType = FileType.Get("SSBB.DAT");
-                    FileType.Get("SSBB.DAT").SetCommand("open", $"\"{Program.FullPath}\" \"%1\"");
-                }
-                else
-                {
-                    FileType.Get("SSBB.DAT").Delete();
-                    FileAssociation.Get(".dat").Delete();
-                }
-
-                if (binFileAssociation.Checked)
-                {
-                    FileAssociation.Get(".bin").FileType = FileType.Get("SSBB.BIN");
-                    FileType.Get("SSBB.BIN").SetCommand("open", $"\"{Program.FullPath}\" \"%1\"");
-                }
-                else
-                {
-                    FileType.Get("SSBB.BIN").Delete();
-                    FileAssociation.Get(".bin").Delete();
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(null,
-                    "Unable to access the registry to set file associations.\nRun the program as administrator and try again.",
-                    "Insufficient Privileges", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                lblAdminApproval.Visible = true;
-                btnApply.Visible = false;
-                associatiedFilesBox.Enabled = false;
-                genericFileAssociationBox.Enabled = false;
-            }
-            finally
-            {
-                btnApply.Enabled = false;
-            }
+            MessageBox.Show("File association changes are disabled in this independent build.",
+                "FighterPort Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void SettingsDialog_Shown(object sender, EventArgs e)

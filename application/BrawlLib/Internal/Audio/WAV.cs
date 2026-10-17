@@ -1,4 +1,5 @@
-﻿using System;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -218,7 +219,7 @@ namespace BrawlLib.Internal.Audio
         public static void ToFile(IAudioStream source, string path, int samplePosition = 0,
                                   int maxSampleCount = int.MaxValue)
         {
-            File.WriteAllBytes(path, ToByteArray(source, samplePosition, maxSampleCount));
+            File.WriteAllBytes(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(path), ToByteArray(source, samplePosition, maxSampleCount));
         }
 
         public static byte[] ToByteArray(IAudioStream source, int samplePosition = 0, int maxSampleCount = int.MaxValue,

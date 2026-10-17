@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.Internal;
 using BrawlLib.Internal.IO;
 using BrawlLib.Internal.Windows.Forms;
@@ -195,6 +196,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             if (outPath.EndsWith(".dae", StringComparison.OrdinalIgnoreCase))
             {
                 Collada.Serialize(new CHR0Node[] {this}, 60.0f, false, outPath);
@@ -1058,6 +1060,7 @@ namespace BrawlLib.SSBB.ResourceNodes
 
         public override void Export(string outPath)
         {
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(outPath); // FighterPort: mounted sources are read-only.
             StringTable table = new StringTable
             {
                 _name
@@ -1066,7 +1069,7 @@ namespace BrawlLib.SSBB.ResourceNodes
             int dataLen = OnCalculateSize(true);
             int totalLen = dataLen + table.GetTotalSize();
 
-            using (FileStream stream = new FileStream(outPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+            using (FileStream stream = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), FileMode.OpenOrCreate, FileAccess.ReadWrite,
                 FileShare.None, 8, FileOptions.RandomAccess))
             {
                 stream.SetLength(totalLen);

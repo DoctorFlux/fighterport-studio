@@ -1,4 +1,5 @@
-﻿using BrawlLib.SSBB;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.SSBB;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -121,7 +122,7 @@ namespace BrawlLib.CustomLists
                     }
                 }
 
-                File.WriteAllText(listName, listDefault);
+                File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(listName), listDefault);
             }
             catch
             {
@@ -135,7 +136,7 @@ namespace BrawlLib.CustomLists
                     }
                 }
 
-                File.WriteAllText(listName, listDefault);
+                File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(listName), listDefault);
             }
         }
 
@@ -147,7 +148,7 @@ namespace BrawlLib.CustomLists
 
         public static bool GenerateLists()
         {
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(directory));
             bool fileOutdated = false;
             // Ensure unmodified files get updated properly
             if (File.Exists(listName))
@@ -164,7 +165,7 @@ namespace BrawlLib.CustomLists
 
             if (fileOutdated)
             {
-                File.Delete(listName);
+                File.Delete(BrawlLib.Internal.IO.SourceWriteGuard.ProtectDeletionPath(listName));
             }
 
             if (!File.Exists(listName))
@@ -388,7 +389,7 @@ namespace BrawlLib.CustomLists
                     }
                 }
 
-                File.WriteAllText(listName, listDefault);
+                File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(listName), listDefault);
             }
             catch
             {
@@ -402,13 +403,13 @@ namespace BrawlLib.CustomLists
                     }
                 }
 
-                File.WriteAllText(listName, listDefault);
+                File.WriteAllText(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(listName), listDefault);
             }
         }
 
         public static bool GenerateList()
         {
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(directory));
             if (!File.Exists(listName))
             {
                 GenerateDefaultList();

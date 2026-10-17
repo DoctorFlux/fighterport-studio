@@ -1,4 +1,5 @@
-﻿using BrawlLib.Imaging.GIF;
+﻿// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
+using BrawlLib.Imaging.GIF;
 using BrawlLib.Internal.Drawing;
 using BrawlLib.Internal.Windows.Controls.Model_Panel;
 using BrawlLib.Internal.Windows.Forms;
@@ -317,7 +318,7 @@ namespace BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase
                 outPath = path;
                 if (!Directory.Exists(outPath))
                 {
-                    Directory.CreateDirectory(outPath);
+                    Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath));
                 }
 
                 DirectoryInfo dir = new DirectoryInfo(outPath);
@@ -397,7 +398,7 @@ namespace BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase
                     string outPath = path;
                     if (!Directory.Exists(outPath))
                     {
-                        Directory.CreateDirectory(outPath);
+                        Directory.CreateDirectory(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath));
                     }
 
                     DirectoryInfo dir = new DirectoryInfo(outPath);
@@ -418,7 +419,7 @@ namespace BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase
                     bool okay = true;
                     if (extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
                     {
-                        bmp.Save(outPath, ImageFormat.Png);
+                        bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Png);
                     }
                     else if (extension.Equals(".tga", StringComparison.OrdinalIgnoreCase))
                     {
@@ -427,20 +428,20 @@ namespace BrawlLib.Internal.Windows.Controls.ModelViewer.MainWindowBase
                     else if (extension.Equals(".tiff", StringComparison.OrdinalIgnoreCase) ||
                              extension.Equals(".tif", StringComparison.OrdinalIgnoreCase))
                     {
-                        bmp.Save(outPath, ImageFormat.Tiff);
+                        bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Tiff);
                     }
                     else if (extension.Equals(".bmp", StringComparison.OrdinalIgnoreCase))
                     {
-                        bmp.Save(outPath, ImageFormat.Bmp);
+                        bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Bmp);
                     }
                     else if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
                              outPath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
                     {
-                        bmp.Save(outPath, ImageFormat.Jpeg);
+                        bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Jpeg);
                     }
                     else if (extension.Equals(".gif", StringComparison.OrdinalIgnoreCase))
                     {
-                        bmp.Save(outPath, ImageFormat.Gif);
+                        bmp.Save(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(outPath), ImageFormat.Gif);
                     }
                     else
                     {

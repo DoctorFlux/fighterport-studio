@@ -3,12 +3,28 @@
   "baseline": "d56cbac89dc2cd0e5c3f923e1d03041b16902add",
   "evidencePolicy": "inherited source does not imply tested support",
   "originalBrawlFixture": {
-    "formats": ["BRRES", "MDL0 v11", "CHR0 v4", "RGBA8 TEX0"],
-    "nativeEncodeDecode": "synthetic-tested",
-    "animationEditSaveNewReopen": "synthetic-tested",
-    "gui": "pending",
+    "formats": ["BRRES", "MDL0 v11", "CHR0 v4", "TEX0 v1 RGBA8"],
+    "nativeEncodeDecode": "original-fixture-tested",
+    "animationEditSaveNewReopen": "original-fixture-tested",
+    "gui": "actual-native-controls-and-OpenGL-visually-verified",
+    "scope": "two-bone rigid four-vertex mesh, one material/sampler, identity binds, 32x32 texture, 31-frame looping rotation",
+    "automation": "real Application.Run and native handlers; OS pickers bypassed; no manual-click claim",
+    "evidence": "artifacts/restart/gui-20261017-054526-294/result.txt",
     "inGame": "unrun"
   },
+  "rawOriginalArcPac": "0x0101 container with fixture BRRES staged and decoded; no broad write claim",
+  "openSourceFolder": {
+    "status": "actual-list-button-native-open-tested",
+    "sourceHashes": "all 7 original fixture files unchanged",
+    "nativeWriteGuards": "selected export/save/stream/map/hardlink and concurrent persistent mount paths tested",
+    "distinct8dot3Alias": "skipped on D volume; focused C probe separate",
+    "limits": "64 MiB/file; 512 entries/list; 16 container levels; 4096 entries; 1 GiB staging; 1024 sessions; 256 retained roots",
+    "unsupported": ["compressed or opaque container children", "companion assembly", "installations/images", "hostile-parser or arbitrary-script sandbox"]
+  },
+  "independentSettings": "scalar, XML/binary, collections, complex viewer settings, scoped reset and separate-process reload tested",
+  "standaloneEntrypoint": "actual FighterPort.Studio.exe opened saved original fixture using default portable UserData; normal exit observed",
+  "existingCommercialInputs": "679 files matched verified recovery hashes; not loaded into tests",
+  "externalNativeToolAndModkitValidation": "unrun",
   "otherGames": "planned per format/version/operation; full scope in MASTER_PLAN.md",
   "retargetingGameplayAndPlayableFighters": "not implemented in restarted product"
 }

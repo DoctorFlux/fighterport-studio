@@ -12,6 +12,11 @@ Use native File > Open for the inherited editor workflow. File > Open Source add
 read-only folder mount and opens recognized Brawl resources as separate staged working copies.
 See [testing](docs/TESTING.md) for the exact verified workflow and limitations.
 
+Preferences, source-root registrations and staged edits live in `UserData` beside the
+executable. Set `FIGHTERPORT_DATA_ROOT` to an absolute local folder to choose another
+location. Preserve that folder when updating the application; staged edits are not
+automatically deleted. Upstream profiles are not imported.
+
 This is a local development checkpoint, not a released binary or a playable-fighter exporter.
 All remaining games and conversion goals remain in [the master plan](docs/MASTER_PLAN.md).
 Current evidence: [development status](docs/DEVELOPMENT_STATUS.md).

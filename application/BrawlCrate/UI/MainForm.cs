@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: independent product identity and local-only safety.
 using BrawlCrate.API;
 using BrawlCrate.ExternalInterfacing;
 using BrawlCrate.NodeWrappers;
@@ -99,7 +100,14 @@ namespace BrawlCrate.UI
 
         private MainForm()
         {
+            Program.InitializeSettings();
             InitializeComponent();
+            fileToolStripMenuItem.DropDownItems.Insert(2,
+                new ToolStripMenuItem("Open &Source...", null,
+                    (sender, args) => SourceBrowserForm.ShowSourceBrowser(this))
+                { Name = "openSourceToolStripMenuItem" });
+            checkForUpdatesToolStripMenuItem.Text = "Upstream updates disabled";
+            checkForUpdatesToolStripMenuItem.Enabled = false;
             Text = Program.AssemblyTitleFull;
 
             _autoUpdate = Properties.Settings.Default.UpdateAutomatically;
@@ -190,50 +198,10 @@ namespace BrawlCrate.UI
 
         internal void CheckUpdates(bool manual)
         {
-            try
+            // Hard gate: preferences and a manually copied Updater.exe cannot bypass this.
+            if (manual)
             {
-                if (Program.CanRunGithubApp(manual, out string path))
-                {
-#if CANARY
-                    UpdaterHelper.CheckCanaryUpdate(true, Program.RootPath ?? "<null>", manual, false,
-                        Properties.Settings.Default.APIAutoUpdate);
-                    if (File.Exists(Program.AppPath + "\\Canary\\Old"))
-                    {
-                        Process changelog = Process.Start(new ProcessStartInfo()
-                        {
-                            FileName = path,
-                            WindowStyle = ProcessWindowStyle.Hidden,
-                            Arguments = "-canarylog"
-                        });
-                        changelog?.WaitForExit();
-                    }
-#else
-                    UpdaterHelper.CheckUpdate(manual, true,
-                        Program.TagName, manual, Program.RootPath ?? "<null>",
-                        _docUpdates, !manual && _autoUpdate, Properties.Settings.Default.APIAutoUpdate);
-#endif
-                    if (Properties.Settings.Default.APIAutoUpdate)
-                    {
-                        APISubscriptionManager.GetNewFiles();
-                    }
-                }
-                else
-                {
-                    if (manual)
-                    {
-                        MessageBox.Show("The updater could not be found.");
-                    }
-
-                    checkForUpdatesToolStripMenuItem.Enabled =
-                        checkForUpdatesToolStripMenuItem.Visible = false;
-                }
-            }
-            catch (Exception e)
-            {
-                if (manual)
-                {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                Program.CanRunGithubApp(true, out _);
             }
         }
 
@@ -1183,12 +1151,6 @@ namespace BrawlCrate.UI
         {
             Focus();
             base.OnShown(e);
-#if (!DEBUG && !CANARY)
-            if (BrawlCrate.Properties.Settings.Default.UpdateAutomatically && Program.FirstBoot)
-            {
-                MessageBox.Show(Program.UpdateMessage);
-            }
-#endif
             UpdateDiscordRPC(null, null);
             resourceTree_SelectionChanged(null, null);
         }

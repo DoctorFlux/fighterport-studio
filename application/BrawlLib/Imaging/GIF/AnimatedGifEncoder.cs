@@ -1,3 +1,4 @@
+// FighterPort Studio modification, 2026-10-17: protect mounted source inputs from native writes.
 using BrawlLib.Internal;
 using System;
 using System.Drawing;
@@ -311,6 +312,8 @@ namespace BrawlLib.Imaging.GIF
                 return false;
             }
 
+            BrawlLib.Internal.IO.SourceWriteGuard.ThrowIfProtected(os); // FighterPort, 2026-10-17: protect mounted source streams.
+
             bool ok = true;
             closeStream = false;
             fs = os;
@@ -338,7 +341,7 @@ namespace BrawlLib.Imaging.GIF
             try
             {
                 //bw = new BinaryWriter( new FileStream( file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None ) );
-                fs = new FileStream(file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+                fs = new FileStream(BrawlLib.Internal.IO.SourceWriteGuard.ProtectOutputPath(file), FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
                 ok = Start(fs);
                 closeStream = true;
             }
